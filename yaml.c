@@ -29,8 +29,6 @@
  */
 
 #include "php_yaml.h"
-#include "zval_zval.h" /* for PHP 4.x */
-#include "zval_refcount.h" /* for PHP < 5.3 */
 
 /* {{{ globals */
 
