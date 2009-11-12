@@ -1186,6 +1186,11 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
     *ptr++ = '0';
     check_float:
     *ptr++ = *value++;
+    if (value == end) {
+      // don't treat strings ending with a period as numbers
+      // mostly here to catch the degenerate case of `.` as input
+      goto not_numeric;
+    }
     if (type == (Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL)) {
       /* sexagecimal float */
       while (value < end && (*(end - 1) == '_' || *(end - 1) == '0')) {
