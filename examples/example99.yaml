@@ -1,0 +1,20 @@
+--- !<php_serialized_var>
+a:8:{i:0;s:6:"string";i:1;i:123;i:2;d:3.14;i:3;N;i:4;b:1;i:5;b:0;i:6;a:3:{i:0;s:6:"cogito";i:1;s:4:"ergo";i:2;s:3:"sum";}i:7;a:2:{s:1:"I";s:5:"think";s:9:"therefore";s:4:"I am";}}
+---
+- 1980-07-11 20:35:00 +9
+- '1980-07-11 20:35:00 +9'
+- !!timestamp 1980-07-11 20:35:00 +9
+- !<tag:yaml.org,2002:timestamp> 1980-07-11 20:35:00 +9
+---
+date: &alias 1980-07-11 20:35:00 +9
+*alias: alias object key
+--- !<php_unique_array>
+- 1
+- 2
+- 1
+- 2
+--- !<php_unique_array>
+1: 1
+2: 2
+3: 1
+4: 2
