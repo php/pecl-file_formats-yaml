@@ -562,11 +562,11 @@ php_yaml_read_impl(yaml_parser_t *parser, yaml_event_t *parent,
       break;
 
       case YAML_ALIAS_EVENT:
-      if (zend_hash_find(Z_ARRVAL_P(aliases),
-          (char *)event.data.alias.anchor,
-          (uint)strlen((char *)event.data.alias.anchor) + 1,
-          (void **)&tmp_pp) == SUCCESS)
-      {
+      if (SUCCESS == zend_hash_find(
+            Z_ARRVAL_P(aliases),
+            (char *) event.data.alias.anchor,
+            (uint) strlen((char *)event.data.alias.anchor) + 1,
+            (void **) &tmp_pp)) {
         if (parent->type == YAML_MAPPING_START_EVENT) {
           if (key == NULL) {
             key = php_yaml_convert_to_char(*tmp_pp TSRMLS_CC);
@@ -728,10 +728,16 @@ php_yaml_apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRML
       tag = (char *)event.data.sequence_start.tag;
     }
     break;
+
     case YAML_MAPPING_START_EVENT:
     if (!event.data.mapping_start.implicit) {
       tag = (char *)event.data.mapping_start.tag;
     }
+    break;
+
+    default:
+    // don't care about other event types
+    tag = NULL;
     break;
   }
 
@@ -740,7 +746,8 @@ php_yaml_apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRML
   }
 
   /* find and apply the filter function */
-  if (zend_hash_find(callbacks, tag, strlen(tag) + 1, (void **)&callback) == SUCCESS) {
+  if (SUCCESS == zend_hash_find(
+        callbacks, tag, strlen(tag) + 1, (void **)&callback)) {
     zval **argv[] = { zpp };
     zval *retval = NULL;
 
@@ -1071,7 +1078,7 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
       /* check the sequence */
       while (value < end) {
         if (*value == '_') {
-          *value++;
+          value++;
         } else if (*value == '0' || *value == '1') {
           *ptr++ = *value++;
         } else {
@@ -1095,7 +1102,7 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
       /* check the sequence */
       while (value < end) {
         if (*value == '_') {
-          *value++;
+          value++;
         } else if ((*value >= '0' && *value <= '9') ||
           (*value >= 'A' && *value <= 'F') ||
           (*value >= 'a' && *value <= 'f'))
@@ -1111,7 +1118,7 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
       /* octal integer */
       while (value < end) {
         if (*value == '_') {
-          *value++;
+          value++;
         } else if (*value >= '0' && *value <= '7') {
           *ptr++ = *value++;
         } else {
@@ -1132,7 +1139,7 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
     *ptr++ = *value++;
     while (value < end) {
       if (*value == '_' || *value == ',') {
-        *value++;
+        value++;
       } else if (*value >= '0' && *value <= '9') {
         *ptr++ = *value++;
       } else if (*value == ':') {
@@ -1203,7 +1210,7 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
       }
       while (value < end) {
         if (*value == '_') {
-          *value++;
+          value++;
         } else if (*value >= '0' && *value <= '9') {
           *ptr++ = *value++;
         } else {
@@ -1215,7 +1222,7 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
       int is_exp = 0;
       while (value < end) {
         if (*value == '_') {
-          *value++;
+          value++;
         } else if (*value >= '0' && *value <= '9') {
           *ptr++ = *value++;
         } else if (*value == 'E' || *value == 'e') {
@@ -1392,7 +1399,7 @@ php_yaml_scalar_is_timestamp(const char *value, size_t length)
     return (pos2 - pos1 == 10) ? 1 : 0;
   }
   if (*ptr == 'T' || *ptr == 't') {
-    *ptr++;
+    ptr++;
   }
 
   /* check hour and separator */
@@ -1502,11 +1509,11 @@ php_yaml_eval_sexagesimal_l(long lval, char *sg, char *eos)
 {
   char *ep;
   while (sg < eos && (*sg < '0' || *sg > '9')) {
-    *sg++;
+    sg++;
   }
   ep = sg;
   while (ep < eos && *ep >= '0' && *ep <= '9') {
-    *ep++;
+    ep++;
   }
   if (sg == eos) {
     return lval;
@@ -1522,11 +1529,11 @@ php_yaml_eval_sexagesimal_d(double dval, char *sg, char *eos)
 {
   char *ep;
   while (sg < eos && *sg != '.' && (*sg < '0' || *sg > '9')) {
-    *sg++;
+    sg++;
   }
   ep = sg;
   while (ep < eos && *ep >= '0' && *ep <= '9') {
-    *ep++;
+    ep++;
   }
   if (sg == eos || *sg == '.') {
     return dval;
@@ -1649,7 +1656,8 @@ php_yaml_eval_timestamp(zval **zpp, char *ts, int ts_len TSRMLS_DC)
 static int
 php_yaml_write_impl(yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 {
-  yaml_event_t event = {0};
+  //XXX: Implement
+  //yaml_event_t event = {0};
   return FAILURE;
 }
 /* }}} */
@@ -1680,7 +1688,7 @@ php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 
   zend_hash_internal_pointer_reset(callbacks);
 
-  while (zend_hash_get_current_data(callbacks, (void **)&entry) == SUCCESS) {
+  while (SUCCESS == zend_hash_get_current_data(callbacks, (void **) &entry)) {
     int key_type = zend_hash_get_current_key_ex(
         callbacks, &key, &key_len, &idx, 0, NULL);
 
@@ -2028,7 +2036,7 @@ PHP_FUNCTION(yaml_emit)
   yaml_emitter_initialize(&emitter);
   yaml_emitter_set_output(&emitter, &php_yaml_write_to_buffer, (void *)&str);
 
-  if (php_yaml_write(&emitter, data) == SUCCESS) {
+  if (php_yaml_write_impl(&emitter, data) == SUCCESS) {
 #ifdef IS_UNICODE
     RETVAL_U_STRINGL(UG(utf8_conv), str.c, str.len, ZSTR_DUPLICATE);
 #else
@@ -2091,7 +2099,7 @@ PHP_FUNCTION(yaml_emit_file)
   yaml_emitter_initialize(&emitter);
   yaml_emitter_set_output_file(&emitter, fp);
 
-  RETVAL_BOOL((php_yaml_write(&emitter, data) == SUCCESS));
+  RETVAL_BOOL((php_yaml_write_impl(&emitter, data) == SUCCESS));
 
   yaml_emitter_delete(&emitter);
   php_stream_close(stream);
