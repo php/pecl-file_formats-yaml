@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any personobtaining a
+ * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -23,7 +23,9 @@
  *
  * @package     php_yaml
  * @author      Ryusuke SEKIYAMA <rsky0711@gmail.com>
+ * @author      Bryan Davis <bpd@keynetics.com>
  * @copyright   2007 Ryusuke SEKIYAMA
+ * @copyright   2009 Keynetics Inc
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  * @version     SVN: $Id$
  */

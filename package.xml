@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE package SYSTEM "../pear/package.dtd">
+<package>
+ <deps>
+  <dep type="php" rel="ge" version="5.2.0" optional="no"/>
+ </deps>
+ <name>yaml</name>
+ <summary>YAML Ain't Markup Language</summary>
+ <maintainers>
+  <maintainer>
+   <user>bpd</user>
+   <name>Bryan Davis</name>
+   <email>bpd@keynetics.com</email>
+   <role>lead</role>
+  </maintainer>
+  <maintainer>
+   <user>rsky</user>
+   <name>Ryusuke Sekiyama</name>
+   <email>rsky0711@gmail.com</email>
+   <role>helper</role>
+  </maintainer>
+ </maintainers>
+ <description> 
+  Support for YAML (YAML Ain't Markup Language) serialization.
+ </description>
+ <license>MIT</license>
+ <release>
+  <state>devel</state>
+  <version>0.4.0</version>
+  <date>2009-11-12</date>
+  <notes>
+   Initial release of fork from rsky's 0.3.0 tarball found at http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
+  </notes>
+ </release>
+ <configureoptions>
+ </configureoptions>
+ <filelist>
+  <file role="doc" name="CREDITS" />
+  <file role="doc" name="EXPERIMENTAL" />
+  <file role="doc" name="LICENSE" />
+  <file role="doc" name="README" />
+  <file role="src" name="config.m4" />
+  <file role="src" name="config.w32" />
+  <file role="src" name="full-clean.sh" />
+  <file role="src" name="package.xml" />
+  <file role="src" name="php_yaml.h" />
+  <file role="src" name="yaml.c" />
+  <file role="src" name="yaml.dsp" />
+  <dir role="test" name="tests">
+   <file role="test" name="yaml_emit_file.phpt" />
+   <file role="test" name="yaml_emit.phpt" />
+   <file role="test" name="yaml_parse_file.phpt" />
+   <file role="test" name="yaml_parse.phpt" />
+   <file role="test" name="yaml_parse_url.phpt" />
+  </dir>
+ </filelist>
+ <changelog>
+  <release>
+   <state>devel</state>
+   <version>0.4.0</version>
+   <date>2009-11-12</date>
+   <notes>
+    Initial release of fork from rsky's 0.3.0 tarball found at http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
+   </notes>
+  </release>
+ </changelog>
+</package>
+<!--
+vim:et:ts=1:sw=1
+-->
