@@ -1,71 +1,98 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE package SYSTEM "../pear/package.dtd">
-<package>
- <deps>
-  <dep type="php" rel="ge" version="5.2.0" optional="no"/>
- </deps>
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.8.0" version="2.0"
+  xmlns="http://pear.php.net/dtd/package-2.0"
+  xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+http://pear.php.net/dtd/tasks-1.0.xsd
+http://pear.php.net/dtd/package-2.0
+http://pear.php.net/dtd/package-2.0.xsd">
  <name>yaml</name>
- <summary>YAML Ain't Markup Language</summary>
- <maintainers>
-  <maintainer>
-   <user>bpd</user>
-   <name>Bryan Davis</name>
-   <email>bpd@keynetics.com</email>
-   <role>lead</role>
-  </maintainer>
-  <maintainer>
-   <user>rsky</user>
-   <name>Ryusuke Sekiyama</name>
-   <email>rsky0711@gmail.com</email>
-   <role>helper</role>
-  </maintainer>
- </maintainers>
- <description> 
-  Support for YAML (YAML Ain't Markup Language) serialization.
+ <channel>pecl.php.net</channel>
+ <summary>YAML Ain&apos;t Markup Language</summary>
+ <description>
+ Support for YAML (YAML Ain&apos;t Markup Language) serialization.
  </description>
- <license>MIT</license>
- <release>
-  <state>devel</state>
-  <version>0.4.0</version>
-  <date>2009-11-13</date>
-  <notes>
-   Initial release of fork from rsky's 0.3.0 tarball found at http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
-  </notes>
- </release>
- <configureoptions>
- </configureoptions>
- <filelist>
-  <file role="doc" name="CREDITS" />
-  <file role="doc" name="EXPERIMENTAL" />
-  <file role="doc" name="LICENSE" />
-  <file role="doc" name="README" />
-  <file role="src" name="config.m4" />
-  <file role="src" name="config.w32" />
-  <file role="src" name="package.xml" />
-  <file role="src" name="php_yaml.h" />
-  <file role="src" name="yaml.c" />
-  <file role="src" name="yaml.dsp" />
-  <file role="src" name="zval_refcount.h" />
-  <file role="src" name="zval_zval.h" />
-  <dir role="test" name="tests">
-   <file role="test" name="yaml_emit_file.phpt" />
-   <file role="test" name="yaml_emit.phpt" />
-   <file role="test" name="yaml_parse_file.phpt" />
-   <file role="test" name="yaml_parse.phpt" />
-   <file role="test" name="yaml_parse_url.phpt" />
-  </dir>
- </filelist>
+ <lead>
+  <name>Bryan Davis</name>
+  <user>bpd</user>
+  <email>bpd@keynetics.com</email>
+  <active>yes</active>
+ </lead>
+ <lead>
+  <name>Ryusuke Sekiyama</name>
+  <user>rsky</user>
+  <email>rsky0711@gmail.com</email>
+  <active>no</active>
+ </lead>
+ <date>2009-11-13</date>
+ <version>
+  <release>0.4.0</release>
+  <api>0.4.0</api>
+ </version>
+ <stability>
+  <release>devel</release>
+  <api>devel</api>
+ </stability>
+ <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
+ <notes>
+Initial release of fork from rsky&apos;s 0.3.0 tarball found at http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
+ </notes>
+ <contents>
+  <dir name="/">
+   <dir name="tests">
+    <file name="yaml_emit.phpt" role="test" />
+    <file name="yaml_emit_file.phpt" role="test" />
+    <file name="yaml_parse.phpt" role="test" />
+    <file name="yaml_parse_file.phpt" role="test" />
+    <file name="yaml_parse_url.phpt" role="test" />
+   </dir> <!-- //tests -->
+   <file name="config.m4" role="src" />
+   <file name="config.w32" role="src" />
+   <file name="CREDITS" role="doc" />
+   <file name="EXPERIMENTAL" role="doc" />
+   <file name="LICENSE" role="doc" />
+   <file name="package.xml" role="src" />
+   <file name="php_yaml.h" role="src" />
+   <file name="README" role="doc" />
+   <file name="yaml.c" role="src" />
+   <file name="yaml.dsp" role="src" />
+   <file name="zval_refcount.h" role="src" />
+   <file name="zval_zval.h" role="src" />
+  </dir> <!-- / -->
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.2.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0b1</min>
+   </pearinstaller>
+  </required>
+  <optional>
+   <extension>
+    <name>date</name>
+   </extension>
+  </optional>
+ </dependencies>
+ <providesextension>yaml</providesextension>
+ <extsrcrelease />
  <changelog>
   <release>
-   <state>devel</state>
-   <version>0.4.0</version>
+   <version>
+    <release>0.4.0</release>
+    <api>0.4.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
    <date>2009-11-12</date>
+   <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
    <notes>
-    Initial release of fork from rsky's 0.3.0 tarball found at http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
+Initial release of fork from rsky&apos;s 0.3.0 tarball found at http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
    </notes>
   </release>
  </changelog>
 </package>
-<!--
-vim:et:ts=1:sw=1
--->

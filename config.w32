@@ -1,4 +1,4 @@
-// $ Id: $
+// $Id$
 // vim:ft=javascript
 
 ARG_WITH('yaml', 'The YAML parser and emitter PHP extension', 'no');
