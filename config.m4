@@ -1,5 +1,5 @@
 dnl
-dnl $ Id: $
+dnl $Id$
 dnl
 
 PHP_ARG_WITH(yaml, [whether to enable LibYAML suppot],
