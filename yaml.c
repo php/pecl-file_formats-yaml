@@ -273,6 +273,7 @@ PHP_MINFO_FUNCTION(yaml)
   php_info_print_table_start();
   php_info_print_table_row(2, "LibYAML Support", "enabled");
   php_info_print_table_row(2, "Module Version", PHP_YAML_MODULE_VERSION);
+  php_info_print_table_row(2, "LibYAML Version", yaml_get_version_string());
   php_info_print_table_end();
 
   DISPLAY_INI_ENTRIES();
