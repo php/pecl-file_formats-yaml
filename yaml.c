@@ -1673,7 +1673,7 @@ php_yaml_write_to_buffer(void *data, unsigned char *buffer, size_t size)
 }
 /* }}} */
 
-/* {{{ php_yaml_write_to_buffer()
+/* {{{ php_yaml_check_callbacks()
  */
 static int
 php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
