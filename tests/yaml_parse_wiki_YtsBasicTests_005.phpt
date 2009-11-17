@@ -11,7 +11,7 @@ a mapping.
 Bryan Davis bpd@keynetics.com
 # yaml.kwiki.org import/conversion
 --SKIPIF--
-<?php if(!extension_loaded('yaml')) die('skip'); ?>
+<?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
 --FILE--
 <?php
   var_dump(yaml_parse('foo: whatever
