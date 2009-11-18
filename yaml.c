@@ -242,7 +242,7 @@ static PHP_MINIT_FUNCTION(yaml)
 #endif
   REGISTER_INI_ENTRIES();
 
-  // expose constants
+  /* expose constants */
   REGISTER_LONG_CONSTANT(
     "YAML_ANY_SCALAR_STYLE", YAML_ANY_SCALAR_STYLE,
     CONST_PERSISTENT | CONST_CS);
@@ -297,6 +297,7 @@ static PHP_GINIT_FUNCTION(yaml)
 #endif
 }
 /* }}} */
+
 
 /* {{{ php_yaml_convert_to_char()
  */
@@ -448,7 +449,7 @@ static void php_yaml_handle_parser_error (
 /* {{{ php_yaml_read_impl()
  */
 static zval *
-php_yaml_read_impl(yaml_parser_t *parser, yaml_event_t *parent,
+php_yaml_read_impl (yaml_parser_t *parser, yaml_event_t *parent,
     zval *aliases, zval *zv, long *ndocs,
     eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC)
 {
@@ -458,8 +459,11 @@ php_yaml_read_impl(yaml_parser_t *parser, yaml_event_t *parent,
   int code = Y_PARSER_CONTINUE;
 
   if (zv != NULL) {
+    /* use provided value as our result holder */
     retval = zv;
+
   } else {
+    /* create an empty array to hold results */
     MAKE_STD_ZVAL(retval);
     array_init(retval);
 #ifdef IS_UNICODE
@@ -482,158 +486,177 @@ php_yaml_read_impl(yaml_parser_t *parser, yaml_event_t *parent,
     switch (event.type) {
       case YAML_NO_EVENT:
       case YAML_STREAM_START_EVENT:
-      break;
+        /* don't care about stream start */
+        break;
 
       case YAML_DOCUMENT_START_EVENT:
-      {
-        zval *a = NULL;
-        MAKE_STD_ZVAL(a);
-        array_init(a);
+        {
+          /* make a new array to hold aliases */
+          zval *a = NULL;
+          MAKE_STD_ZVAL(a);
+          array_init(a);
 #ifdef IS_UNICODE
-        Z_ARRVAL_P(a)->unicode = UG(unicode);
+          Z_ARRVAL_P(a)->unicode = UG(unicode);
 #endif
-        if (php_yaml_read_impl(parser, &event, a, retval, ndocs, eval_func, callbacks TSRMLS_CC) == NULL) {
-          code = Y_PARSER_FAILURE;
+          /* parse the found document contents into current retval */
+          if (php_yaml_read_impl(parser, &event, a, retval, ndocs, eval_func,
+                callbacks TSRMLS_CC) == NULL) {
+            code = Y_PARSER_FAILURE;
+          }
+          zval_ptr_dtor(&a);
         }
-        zval_ptr_dtor(&a);
-      }
-      (*ndocs)++;
-      break;
+        (*ndocs)++;
+        break;
 
       case YAML_SEQUENCE_START_EVENT:
       case YAML_MAPPING_START_EVENT:
-      MAKE_STD_ZVAL(tmp_p);
-      array_init(tmp_p);
+        /* sequences and maps are both arrays in php-land */
+        MAKE_STD_ZVAL(tmp_p);
+        array_init(tmp_p);
 #ifdef IS_UNICODE
-      Z_ARRVAL_P(tmp_p)->unicode = UG(unicode);
+        Z_ARRVAL_P(tmp_p)->unicode = UG(unicode);
 #endif
 
-      if (event.type == YAML_SEQUENCE_START_EVENT) {
-        if (event.data.sequence_start.anchor != NULL) {
-          Z_ADDREF_P(tmp_p);
-          Z_SET_ISREF_P(tmp_p);
-          /* add this node to the aliases table */
-          add_assoc_zval(aliases, (char *)event.data.sequence_start.anchor, tmp_p);
+        /* record anchors in current alias table */
+        if (event.type == YAML_SEQUENCE_START_EVENT) {
+          if (event.data.sequence_start.anchor != NULL) {
+            Z_ADDREF_P(tmp_p);
+            Z_SET_ISREF_P(tmp_p);
+            add_assoc_zval(aliases, (char *)event.data.sequence_start.anchor, tmp_p);
+          }
+        } else if (event.type == YAML_MAPPING_START_EVENT) {
+          if (event.data.mapping_start.anchor != NULL) {
+            Z_ADDREF_P(tmp_p);
+            Z_SET_ISREF_P(tmp_p);
+            add_assoc_zval(aliases, (char *)event.data.mapping_start.anchor, tmp_p);
+          }
         }
-      } else if (event.type == YAML_MAPPING_START_EVENT) {
-        if (event.data.mapping_start.anchor != NULL) {
-          Z_ADDREF_P(tmp_p);
-          Z_SET_ISREF_P(tmp_p);
-          /* add this node to the aliases table */
-          add_assoc_zval(aliases, (char *)event.data.mapping_start.anchor, tmp_p);
-        }
-      }
 
-      tmp_p = php_yaml_read_impl(parser, &event, aliases, tmp_p, ndocs, eval_func, callbacks TSRMLS_CC);
-      if (tmp_p == NULL) {
-        code = Y_PARSER_FAILURE;
-        break;
-      }
-
-      if (callbacks != NULL) {
-        if (php_yaml_apply_filter(&tmp_p, event, callbacks TSRMLS_CC) == Y_FILTER_FAILURE) {
-          zval_ptr_dtor(&tmp_p);
+        /* continue parsing using this event as the parent and our newly 
+         * allocated array as the holder container
+         */
+        tmp_p = php_yaml_read_impl(parser, &event, aliases, tmp_p, ndocs, 
+            eval_func, callbacks TSRMLS_CC);
+        if (tmp_p == NULL) {
           code = Y_PARSER_FAILURE;
           break;
         }
-      }
 
-      if (parent->type == YAML_MAPPING_START_EVENT) {
-        if (key == NULL) {
-          key = php_yaml_convert_to_char(tmp_p TSRMLS_CC);
-          if (key == NULL) {
+        if (callbacks != NULL) {
+          /* apply callbacks to the collected node */
+          if (Y_FILTER_FAILURE == php_yaml_apply_filter(
+                &tmp_p, event, callbacks TSRMLS_CC)) {
             zval_ptr_dtor(&tmp_p);
             code = Y_PARSER_FAILURE;
             break;
           }
-          /* assign tmp_p to the alias-storage
-             tmp_p will be freed in its destructor */
-          add_next_index_zval(aliases, tmp_p);
-        } else {
-          add_assoc_zval(retval, key, tmp_p);
-          efree(key);
-          key = NULL;
         }
-      } else {
-        add_next_index_zval(retval, tmp_p);
-      }
-      break;
+
+        if (parent->type == YAML_MAPPING_START_EVENT) {
+          if (key == NULL) {
+            /* new node is key for mapping */
+            key = php_yaml_convert_to_char(tmp_p TSRMLS_CC);
+            if (key == NULL) {
+              zval_ptr_dtor(&tmp_p);
+              code = Y_PARSER_FAILURE;
+              break;
+            }
+            /* assign tmp_p to the alias-storage
+               tmp_p will be freed in its destructor */
+            add_next_index_zval(aliases, tmp_p);
+          } else {
+            /* new node is value, assign to container */
+            /* XXX: support << merge */
+            add_assoc_zval(retval, key, tmp_p);
+            efree(key);
+            key = NULL;
+          }
+
+        } else {
+          /* append the node onto the current container */
+          add_next_index_zval(retval, tmp_p);
+        }
+        break;
 
       case YAML_STREAM_END_EVENT:
       case YAML_DOCUMENT_END_EVENT:
       case YAML_SEQUENCE_END_EVENT:
       case YAML_MAPPING_END_EVENT:
-      code = Y_PARSER_SUCCESS;
-      break;
+        code = Y_PARSER_SUCCESS;
+        break;
 
       case YAML_ALIAS_EVENT:
-      if (SUCCESS == zend_hash_find(
-            Z_ARRVAL_P(aliases),
-            (char *) event.data.alias.anchor,
-            (uint) strlen((char *)event.data.alias.anchor) + 1,
-            (void **) &tmp_pp)) {
-        if (parent->type == YAML_MAPPING_START_EVENT) {
-          if (key == NULL) {
-            key = php_yaml_convert_to_char(*tmp_pp TSRMLS_CC);
+        if (SUCCESS == zend_hash_find(
+              Z_ARRVAL_P(aliases),
+              (char *) event.data.alias.anchor,
+              (uint) strlen((char *)event.data.alias.anchor) + 1,
+              (void **) &tmp_pp)) {
+          if (parent->type == YAML_MAPPING_START_EVENT) {
             if (key == NULL) {
-              code = Y_PARSER_FAILURE;
-              break;
+              key = php_yaml_convert_to_char(*tmp_pp TSRMLS_CC);
+              if (key == NULL) {
+                code = Y_PARSER_FAILURE;
+                break;
+              }
+            } else {
+              /* add a reference to tmp_pp's internal counter */
+              Z_ADDREF_PP(tmp_pp);
+              /* XXX: support << merge */
+              add_assoc_zval(retval, key, *tmp_pp);
+              efree(key);
+              key = NULL;
             }
           } else {
             Z_ADDREF_PP(tmp_pp);
-            add_assoc_zval(retval, key, *tmp_pp);
+            add_next_index_zval(retval, *tmp_pp);
+          }
+        } else {
+          php_error_docref(NULL TSRMLS_CC, E_WARNING,
+              "alias %s is not registered", (char *)event.data.alias.anchor);
+          code = Y_PARSER_FAILURE;
+        }
+        break;
+
+      case YAML_SCALAR_EVENT:
+        if (parent->type == YAML_MAPPING_START_EVENT) {
+          if (key == NULL) {
+            key = estrndup((char *)event.data.scalar.value,
+                event.data.scalar.length);
+          } else {
+            tmp_p = eval_func(event, callbacks TSRMLS_CC);
+            if (tmp_p == NULL) {
+              code = Y_PARSER_FAILURE;
+              break;
+            }
+            /* XXX: support << merge */
+            add_assoc_zval(retval, key, tmp_p);
             efree(key);
             key = NULL;
           }
-        } else {
-          Z_ADDREF_PP(tmp_pp);
-          add_next_index_zval(retval, *tmp_pp);
-        }
-      } else {
-        php_error_docref(NULL TSRMLS_CC, E_WARNING,
-            "alias %s is not registered", (char *)event.data.alias.anchor);
-        code = Y_PARSER_FAILURE;
-      }
-      break;
 
-      case YAML_SCALAR_EVENT:
-      if (parent->type == YAML_MAPPING_START_EVENT) {
-        if (key == NULL) {
-          key = estrndup((char *)event.data.scalar.value, event.data.scalar.length);
         } else {
           tmp_p = eval_func(event, callbacks TSRMLS_CC);
           if (tmp_p == NULL) {
             code = Y_PARSER_FAILURE;
             break;
           }
-          add_assoc_zval(retval, key, tmp_p);
-          efree(key);
-          key = NULL;
+          add_next_index_zval(retval, tmp_p);
         }
 
-      } else {
-        tmp_p = eval_func(event, callbacks TSRMLS_CC);
-        if (tmp_p == NULL) {
-          code = Y_PARSER_FAILURE;
-          break;
+        if (event.data.scalar.anchor != NULL) {
+          if (tmp_p == NULL) {
+            add_assoc_string(aliases, (char *)event.data.scalar.anchor, key, 1);
+          } else {
+            Z_ADDREF_P(tmp_p);
+            Z_SET_ISREF_P(tmp_p);
+            add_assoc_zval(aliases, (char *)event.data.scalar.anchor, tmp_p);
+          }
         }
-        add_next_index_zval(retval, tmp_p);
-      }
-
-      if (event.data.scalar.anchor != NULL) {
-        if (tmp_p == NULL) {
-          add_assoc_string(aliases, (char *)event.data.scalar.anchor, key, 1);
-        } else {
-          Z_ADDREF_P(tmp_p);
-          Z_SET_ISREF_P(tmp_p);
-          add_assoc_zval(aliases, (char *)event.data.scalar.anchor, tmp_p);
-        }
-      }
-      break;
+        break;
 
       default:
-      php_error_docref(NULL TSRMLS_CC, E_WARNING, "unknown event type");
-      code = Y_PARSER_FAILURE;
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "unknown event type");
+        code = Y_PARSER_FAILURE;
     }
 
     yaml_event_delete(&event);
@@ -741,7 +764,7 @@ php_yaml_apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRML
     break;
 
     default:
-    // don't care about other event types
+    /* don't care about other event types */
     tag = NULL;
     break;
   }
@@ -889,12 +912,12 @@ php_yaml_eval_scalar_with_callbacks(yaml_event_t event, HashTable *callbacks TSR
   zval **callback = NULL;
 
   if (YAML_PLAIN_SCALAR_STYLE == event.data.scalar.style && NULL == tag) {
-    // plain scalar with no specified type
+    /* plain scalar with no specified type */
     tag = detect_scalar_type(
         (char *)event.data.scalar.value, event.data.scalar.length, event);
   }
   if (NULL == tag) {
-    // couldn't/wouldn't detect tag type, assume string
+    /* couldn't/wouldn't detect tag type, assume string */
     tag = "tag:yaml.org,2002:str";
   }
 
@@ -936,7 +959,7 @@ php_yaml_eval_scalar_with_callbacks(yaml_event_t event, HashTable *callbacks TSR
     return retval;
   }
 
-  // no mapping, so handle raw
+  /* no mapping, so handle raw */
   return php_yaml_eval_scalar(event, NULL TSRMLS_CC);
 }
 /* }}} */
@@ -1192,8 +1215,8 @@ php_yaml_scalar_is_numeric(const char *value, size_t length,
     check_float:
     *ptr++ = *value++;
     if (value == end) {
-      // don't treat strings ending with a period as numbers
-      // mostly here to catch the degenerate case of `.` as input
+      /* don't treat strings ending with a period as numbers */
+      /* mostly here to catch the degenerate case of `.` as input */
       goto not_numeric;
     }
     if (type == (Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL)) {
@@ -1457,12 +1480,12 @@ detect_scalar_type(const char *value, size_t length, yaml_event_t event) {
   long lval = 0;
   double dval = 0.0;
 
-  // is value a null?
+  /* is value a null? */
   if (length == 0 || php_yaml_scalar_is_null(value, length, event)) {
     return "tag:yaml.org,2002:null";
   }
 
-  // is value numeric?
+  /* is value numeric? */
   flags = php_yaml_scalar_is_numeric(value, length, &lval, &dval, NULL);
   if (flags != Y_SCALAR_IS_NOT_NUMERIC) {
     return (flags & Y_SCALAR_IS_FLOAT)
@@ -1470,7 +1493,7 @@ detect_scalar_type(const char *value, size_t length, yaml_event_t event) {
       : "tag:yaml.org,2002:int";
   }
 
-  // is value boolean?
+  /* is value boolean? */
   flags = php_yaml_scalar_is_bool(value, length, event);
   if (-1 != flags) {
     return flags
@@ -1478,12 +1501,12 @@ detect_scalar_type(const char *value, size_t length, yaml_event_t event) {
       : "tag:yaml.org,2002:false";
   }
 
-  // is value a timestamp?
+  /* is value a timestamp? */
   if (php_yaml_scalar_is_timestamp(value, length)) {
     return "tag:yaml.org,2002:timestamp";
   }
 
-  // no guess
+  /* no guess */
   return NULL;
 }
 /* }}} */
@@ -1642,8 +1665,7 @@ php_yaml_eval_timestamp(zval **zpp, char *ts, int ts_len TSRMLS_DC)
 static int
 php_yaml_write_impl(yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 {
-  //XXX: Implement
-  //yaml_event_t event = {0};
+  /* XXX: Implement */
   return FAILURE;
 }
 /* }}} */
@@ -1742,8 +1764,9 @@ php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 }
 /* }}} */
 
+
 /* {{{ proto mixed yaml_parse(string input[, int pos[, int &ndocs[, array callbacks]]])
-   */
+ Takes a YAML encoded string and converts it to a PHP variable. */
 PHP_FUNCTION(yaml_parse)
 {
   char *input = NULL;
