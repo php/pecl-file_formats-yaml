@@ -421,7 +421,7 @@ static void php_yaml_handle_parser_error (
   }
 
   if (parser->problem != NULL) {
-    if (parser->context != NULL) {
+    if (parser->context) {
       php_error_docref(NULL TSRMLS_CC, E_WARNING,
           "%s error encountered during parsing: %s (line %d, column %d), "
           "context %s (line %d, column %d)",
@@ -824,9 +824,9 @@ php_yaml_eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC)
   }
 
   /* check for numeric (int or float) */
-  if (!event.data.scalar.quoted_implicit && (event.data.scalar.plain_implicit ||
-    SCALAR_TAG_IS(event, "int") || SCALAR_TAG_IS(event, "float")))
-  {
+  if (!event.data.scalar.quoted_implicit &&
+      (event.data.scalar.plain_implicit ||
+       SCALAR_TAG_IS(event, "int") || SCALAR_TAG_IS(event, "float"))) {
     long lval = 0;
     double dval = 0.0;
 
@@ -859,14 +859,16 @@ php_yaml_eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC)
   /* check for timestamp */
   if (event.data.scalar.plain_implicit || event.data.scalar.quoted_implicit) {
     if (php_yaml_scalar_is_timestamp(value, length)) {
-      if (php_yaml_eval_timestamp(&tmp, value, (int)length TSRMLS_CC) == FAILURE) {
+      if (FAILURE == php_yaml_eval_timestamp(
+            &tmp, value, (int)length TSRMLS_CC)) {
         zval_ptr_dtor(&tmp);
         return NULL;
       }
       return tmp;
     }
   } else if (SCALAR_TAG_IS(event, "timestamp")) {
-    if (php_yaml_eval_timestamp(&tmp, value, (int)length TSRMLS_CC) == FAILURE) {
+    if (FAILURE == php_yaml_eval_timestamp(
+          &tmp, value, (int)length TSRMLS_CC)) {
       zval_ptr_dtor(&tmp);
       return NULL;
     }
@@ -879,7 +881,8 @@ php_yaml_eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC)
       unsigned char *data = NULL;
       int data_len = 0;
 
-      data = php_base64_decode((const unsigned char *)value, (int)length, &data_len);
+      data = php_base64_decode(
+          (const unsigned char *)value, (int)length, &data_len);
       if (data == NULL) {
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to decode binary");
         ZVAL_NULL(tmp);
@@ -906,8 +909,8 @@ php_yaml_eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 /* {{{ php_yaml_eval_scalar_with_callbacks()
  */
 static zval *
-php_yaml_eval_scalar_with_callbacks(yaml_event_t event, HashTable *callbacks TSRMLS_DC)
-{
+php_yaml_eval_scalar_with_callbacks(
+    yaml_event_t event, HashTable *callbacks TSRMLS_DC) {
   char *tag = (char *)event.data.scalar.tag;
   zval **callback = NULL;
 
@@ -933,7 +936,8 @@ php_yaml_eval_scalar_with_callbacks(yaml_event_t event, HashTable *callbacks TSR
     zval *retval = NULL;
 
     MAKE_STD_ZVAL(arg1);
-    ZVAL_STRINGL(arg1, (char *)event.data.scalar.value, event.data.scalar.length, 1);
+    ZVAL_STRINGL(
+        arg1, (char *)event.data.scalar.value, event.data.scalar.length, 1);
     argv[0] = &arg1;
 
     MAKE_STD_ZVAL(arg2);
@@ -944,9 +948,10 @@ php_yaml_eval_scalar_with_callbacks(yaml_event_t event, HashTable *callbacks TSR
     ZVAL_LONG(arg3, event.data.scalar.style);
     argv[2] = &arg3;
 
-    if (call_user_function_ex(EG(function_table), NULL, *callback,
-        &retval, 3, argv, 0, NULL TSRMLS_CC) == FAILURE || retval == NULL)
-    {
+    if (FAILURE == call_user_function_ex(
+          EG(function_table), NULL, *callback, &retval,
+          3, argv, 0, NULL TSRMLS_CC) ||
+        retval == NULL) {
       php_error_docref(NULL TSRMLS_CC, E_WARNING,
           "Failed to evaluate value for tag '%s'"
           " with user defined function", tag);
