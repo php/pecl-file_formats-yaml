@@ -620,8 +620,11 @@ php_yaml_read_impl (yaml_parser_t *parser, yaml_event_t *parent,
       case YAML_SCALAR_EVENT:
         if (parent->type == YAML_MAPPING_START_EVENT) {
           if (key == NULL) {
-            key = estrndup((char *)event.data.scalar.value,
-                event.data.scalar.length);
+            tmp_p = eval_func(event, callbacks TSRMLS_CC);
+            key = php_yaml_convert_to_char(tmp_p TSRMLS_CC);
+            /* assign tmp_p to the alias-storage
+               tmp_p will be freed in its destructor */
+            add_next_index_zval(aliases, tmp_p);
           } else {
             tmp_p = eval_func(event, callbacks TSRMLS_CC);
             if (tmp_p == NULL) {
