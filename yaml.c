@@ -1380,21 +1380,21 @@ php_yaml_scalar_is_timestamp(const char *value, size_t length)
   /* skip leading space */
   ts_skip_space();
 
-  /* check year and separator */
+  /* check 4 digit year and separator */
   pos1 = pos2 = ptr;
   ts_skip_number();
   if (ptr == pos1 || ptr == end || ptr - pos2 != 4 || *ptr != '-') {
     return 0;
   }
 
-  /* check month and separator */
+  /* check 1 or 2 month and separator */
   pos2 = ++ptr;
   ts_skip_number();
   if (ptr == pos2 || ptr == end || ptr - pos2 > 2 || *ptr != '-') {
     return 0;
   }
 
-  /* check day and separator */
+  /* check 1 or 2 digit day */
   pos2 = ++ptr;
   ts_skip_number();
   if (ptr == pos2 || ptr - pos2 > 2) {
@@ -1403,42 +1403,45 @@ php_yaml_scalar_is_timestamp(const char *value, size_t length)
 
   /* check separator */
   pos2 = ptr;
-  ts_skip_space();
   if (ptr == end) {
+    /* date only format requires YYYY-MM-DD */
     return (pos2 - pos1 == 10) ? 1 : 0;
   }
+  /* time separator is T or whitespace */
   if (*ptr == 'T' || *ptr == 't') {
     ptr++;
+  } else {
+    ts_skip_space();
   }
 
-  /* check hour and separator */
+  /* check 1 or 2 digit hour and separator */
   pos1 = ptr;
   ts_skip_number();
   if (ptr == pos1 || ptr == end || ptr - pos1 > 2 || *ptr != ':') {
     return 0;
   }
 
-  /* check minute and separator */
+  /* check 2 digit minute and separator */
   pos1 = ++ptr;
   ts_skip_number();
   if (ptr == end || ptr - pos1 != 2 || *ptr != ':') {
     return 0;
   }
 
-  /* check second */
+  /* check 2 digit second */
   pos1 = ++ptr;
   ts_skip_number();
   if (ptr == end) {
     return (ptr - pos1 == 2) ? 1 : 0;
   }
 
-  /* check fraction */
+  /* check optional fraction */
   if (*ptr == '.') {
     ptr++;
     ts_skip_number();
   }
 
-  /* skip separator space */
+  /* skip optional separator space */
   ts_skip_space();
   if (ptr == end) {
     return 1;
@@ -1450,20 +1453,29 @@ php_yaml_scalar_is_timestamp(const char *value, size_t length)
     ts_skip_space();
     return (ptr == end) ? 1 : 0;
   }
+
+  /* check time zone offset sign */
   if (*ptr != '+' && *ptr != '-') {
+    return 0;
+  }
+  /* check 1 or 2 digit time zone hour */
+  pos1 = ++ptr;
+  ts_skip_number();
+  if (ptr == pos1 || ptr - pos1 > 2) {
+    return 0;
+  }
+  if (ptr == end) {
+    return 1;
+  }
+
+  /* optional time zone minute */
+  if (*ptr != ':') {
     return 0;
   }
   pos1 = ++ptr;
   ts_skip_number();
-  if (ptr - pos1 == 0 || ptr - pos1 > 4) {
+  if (ptr - pos1 != 2 ) {
     return 0;
-  }
-  if (ptr - pos1 < 3 && *ptr == ':') {
-    pos1 = ++ptr;
-    ts_skip_number();
-    if (ptr - pos1 != 2) {
-      return 0;
-    }
   }
 
   /* skip following space */
@@ -1556,7 +1568,9 @@ php_yaml_eval_sexagesimal_d(double dval, char *sg, char *eos)
 static int
 php_yaml_eval_timestamp(zval **zpp, char *ts, int ts_len TSRMLS_DC)
 {
-  if (YAML_G(timestamp_decoder) != NULL || YAML_G(decode_timestamp) == 1L || YAML_G(decode_timestamp) == 2L) {
+  if (YAML_G(timestamp_decoder) != NULL ||
+      YAML_G(decode_timestamp) == 1L ||
+      YAML_G(decode_timestamp) == 2L) {
     zval **argv[] = { NULL };
     zval *arg, *retval, *func, afunc;
     char *funcs[] = { "strtotime", "date_create" };
