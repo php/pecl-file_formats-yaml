@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Nested Mappings
+Yaml YtsBasicTests - Nested Mappings
 --DESCRIPTION--
 A value in a mapping can be another mapping.
 

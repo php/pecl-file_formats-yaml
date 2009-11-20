@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Sequence-Mapping Shortcut
+Yaml YtsBasicTests - Sequence-Mapping Shortcut
 --DESCRIPTION--
 If you are adding a mapping to a sequence, you
 can place the mapping on the same line as the

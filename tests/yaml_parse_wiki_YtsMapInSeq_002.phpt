@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsMapInSeq - Multiple keys
+Yaml YtsMapInSeq - Multiple keys
 --DESCRIPTION--
 Test a map with multiple keys.
 

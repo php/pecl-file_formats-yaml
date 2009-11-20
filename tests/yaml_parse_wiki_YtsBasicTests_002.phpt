@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Nested Sequences
+Yaml YtsBasicTests - Nested Sequences
 --DESCRIPTION--
 You can include a sequence within another
 sequence by giving the sequence an empty

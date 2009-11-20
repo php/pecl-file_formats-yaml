@@ -1,5 +1,5 @@
 --TEST--
-yaml_parse multiple documents
+yaml_parse - multiple documents
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
 --FILE--

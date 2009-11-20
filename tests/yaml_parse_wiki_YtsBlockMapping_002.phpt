@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBlockMapping - Multi Element Mapping
+Yaml YtsBlockMapping - Multi Element Mapping
 --DESCRIPTION--
 More than one key/value pair
 

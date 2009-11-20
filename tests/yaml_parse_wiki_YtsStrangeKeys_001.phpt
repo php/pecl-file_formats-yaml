@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsStrangeKeys - Quoted line noise key
+Yaml YtsStrangeKeys - Quoted line noise key
 --DESCRIPTION--
 Check that quoted line noise parses as key.
 

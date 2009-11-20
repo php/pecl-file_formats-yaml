@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Mixed Sequences
+Yaml YtsBasicTests - Mixed Sequences
 --DESCRIPTION--
 Sequences can contain any YAML data,
 including strings and other sequences.

@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Deeply Nested Sequences
+Yaml YtsBasicTests - Deeply Nested Sequences
 --DESCRIPTION--
 Sequences can be nested even deeper, with each
 level of indentation representing a level of

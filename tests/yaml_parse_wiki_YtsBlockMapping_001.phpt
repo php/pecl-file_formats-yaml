@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBlockMapping - One Element Mapping
+Yaml YtsBlockMapping - One Element Mapping
 --DESCRIPTION--
 A mapping with one key/value pair
 

@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsMapInSeq - Single key
+Yaml YtsMapInSeq - Single key
 --DESCRIPTION--
 Test maps with just one key.
 

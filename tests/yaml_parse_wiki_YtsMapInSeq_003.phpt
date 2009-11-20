@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsMapInSeq - Strange keys
+Yaml YtsMapInSeq - Strange keys
 --DESCRIPTION--
 Test a map with "line noise" keys.
 

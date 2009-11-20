@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Mixed Mapping
+Yaml YtsBasicTests - Mixed Mapping
 --DESCRIPTION--
 A mapping can contain any assortment
 of mappings and sequences as values.

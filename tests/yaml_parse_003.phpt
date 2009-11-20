@@ -1,5 +1,5 @@
 --TEST--
-yaml_parse parse errors
+yaml_parse - parse errors
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
 --FILE--

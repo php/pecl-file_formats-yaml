@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsStrangeKeys - Unquoted line noise key
+Yaml YtsStrangeKeys - Unquoted line noise key
 --DESCRIPTION--
 Check that unquoted line noise parses as key.
 This requires the line noise be tame enough

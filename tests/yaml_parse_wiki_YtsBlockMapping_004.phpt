@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBlockMapping - Colons aligned
+Yaml YtsBlockMapping - Colons aligned
 --DESCRIPTION--
 Spaces can come before the ': ' key/value separator.
 

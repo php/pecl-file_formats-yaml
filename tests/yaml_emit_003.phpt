@@ -1,5 +1,5 @@
 --TEST--
-yaml_emit
+yaml_emit - mappings
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
 --FILE--

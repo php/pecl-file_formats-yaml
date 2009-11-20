@@ -1,5 +1,5 @@
 --TEST--
-yaml_parse syck bug #12656
+yaml_parse - syck bug #12656
 --CREDITS--
 From syck bug #12656
 http://pecl.php.net/bugs/bug.php?id=12656

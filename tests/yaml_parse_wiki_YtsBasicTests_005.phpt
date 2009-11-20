@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Simple Mapping
+Yaml YtsBasicTests - Simple Mapping
 --DESCRIPTION--
 You can add a keyed list "also known as a dictionary or
 hash" to your document by placing each member of the

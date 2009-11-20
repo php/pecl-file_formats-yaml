@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Simple Sequence
+Yaml YtsBasicTests - Simple Sequence
 --DESCRIPTION--
 You can specify a list in YAML by placing each
 member of the list on a new line with an opening

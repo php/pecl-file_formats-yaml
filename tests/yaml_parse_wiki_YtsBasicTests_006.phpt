@@ -1,5 +1,5 @@
 --TEST--
-Yaml Wiki Test YtsBasicTests - Sequence in a Mapping
+Yaml YtsBasicTests - Sequence in a Mapping
 --DESCRIPTION--
 A value in a mapping can be a sequence.
 
