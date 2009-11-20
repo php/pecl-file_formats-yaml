@@ -369,7 +369,9 @@ static PHP_GINIT_FUNCTION(yaml)
 /* {{{ php_yaml_convert_to_char()
  * Convert a zval to a character array.
  */
-static char * php_yaml_convert_to_char (zval *zv TSRMLS_DC) {
+static char *
+php_yaml_convert_to_char (zval *zv TSRMLS_DC)
+{
   char *str = NULL;
 
   switch (Z_TYPE_P(zv)) {
@@ -463,8 +465,9 @@ static char * php_yaml_convert_to_char (zval *zv TSRMLS_DC) {
 /* {{{ php_yaml_handle_parser_error()
  * Emit a warning about a parser error
  */
-static void php_yaml_handle_parser_error (
-    const yaml_parser_t *parser TSRMLS_DC) {
+static void
+php_yaml_handle_parser_error (const yaml_parser_t *parser TSRMLS_DC)
+{
   const char *error_type;
   switch (parser->error) {
     case YAML_MEMORY_ERROR:
@@ -521,7 +524,8 @@ static void php_yaml_handle_parser_error (
 static zval *
 php_yaml_read_impl (yaml_parser_t *parser, yaml_event_t *parent,
     zval *aliases, zval *zv, long *ndocs,
-    eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC) {
+    eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC)
+{
   zval *retval = NULL;
   yaml_event_t event = {0};
   char *key = NULL;
@@ -759,7 +763,8 @@ php_yaml_read_impl (yaml_parser_t *parser, yaml_event_t *parent,
  */
 static zval *
 php_yaml_read_partial (yaml_parser_t *parser, long pos, long *ndocs,
-    eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC) {
+    eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC)
+{
   zval *retval = NULL;
   yaml_event_t event = {0};
   int code = Y_PARSER_CONTINUE;
@@ -833,7 +838,8 @@ php_yaml_read_partial (yaml_parser_t *parser, long pos, long *ndocs,
  */
 static int
 php_yaml_apply_filter (
-    zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC) {
+    zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
+{
   char *tag = NULL;
   zval **callback = NULL;
 
@@ -893,7 +899,8 @@ php_yaml_apply_filter (
  * All YAML scalar types found at http://yaml.org/type/index.html.
  */
 static zval *
-php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC) {
+php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC)
+{
   zval *tmp = NULL;
   char *value = (char *)event.data.scalar.value;
   size_t length = event.data.scalar.length;
@@ -1006,7 +1013,8 @@ php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC) {
  */
 static zval *
 php_yaml_eval_scalar_with_callbacks (
-    yaml_event_t event, HashTable *callbacks TSRMLS_DC) {
+    yaml_event_t event, HashTable *callbacks TSRMLS_DC)
+{
   char *tag = (char *)event.data.scalar.tag;
   zval **callback = NULL;
 
@@ -1070,7 +1078,8 @@ php_yaml_eval_scalar_with_callbacks (
  */
 static int
 php_yaml_scalar_is_null (
-    const char *value, size_t length, const yaml_event_t *event) {
+    const char *value, size_t length, const yaml_event_t *event)
+{
   if (NULL != event && event->data.scalar.quoted_implicit) {
     return 0;
   }
@@ -1095,7 +1104,8 @@ php_yaml_scalar_is_null (
  */
 static int
 php_yaml_scalar_is_bool (
-    const char *value, size_t length, const yaml_event_t *event) {
+    const char *value, size_t length, const yaml_event_t *event)
+{
   /* TODO: add ini setting to turn 'y'/'n' checks on/off */
   if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), "bool")) {
     if ((length == 1 && (*value == 'Y' || *value == 'y')) ||
@@ -1133,7 +1143,8 @@ php_yaml_scalar_is_bool (
  */
 static int
 php_yaml_scalar_is_numeric (
-    const char *value, size_t length, long *lval, double *dval, char **str) {
+    const char *value, size_t length, long *lval, double *dval, char **str)
+{
   const char* end = value + length;
   char *buf = NULL, *ptr = NULL;
   int negative = 0;
@@ -1485,7 +1496,9 @@ php_yaml_scalar_is_numeric (
  *
  * specification is found at http://yaml.org/type/timestamp.html.
  */
-static int php_yaml_scalar_is_timestamp (const char *value, size_t length) {
+static int
+php_yaml_scalar_is_timestamp (const char *value, size_t length)
+{
   const char *ptr = value;
   const char *end = value + length;
   const char *pos1, *pos2;
@@ -1602,7 +1615,8 @@ static int php_yaml_scalar_is_timestamp (const char *value, size_t length) {
  */
 static char *
 detect_scalar_type (
-    const char *value, size_t length, const yaml_event_t *event) {
+    const char *value, size_t length, const yaml_event_t *event)
+{
   int flags = 0;
   long lval = 0;
   double dval = 0.0;
@@ -1638,7 +1652,8 @@ detect_scalar_type (
  * Convert a base 60 number to a long
  */
 static long
-php_yaml_eval_sexagesimal_l (long lval, char *sg, char *eos) {
+php_yaml_eval_sexagesimal_l (long lval, char *sg, char *eos)
+{
   char *ep;
   while (sg < eos && (*sg < '0' || *sg > '9')) {
     sg++;
@@ -1684,7 +1699,8 @@ php_yaml_eval_sexagesimal_d (double dval, char *sg, char *eos)
  *  - yaml.decode_timestamp=2 for date_create parsing
  */
 static int
-php_yaml_eval_timestamp (zval **zpp, char *ts, int ts_len TSRMLS_DC) {
+php_yaml_eval_timestamp (zval **zpp, char *ts, int ts_len TSRMLS_DC)
+{
   if (YAML_G(timestamp_decoder) != NULL ||
       YAML_G(decode_timestamp) == 1L ||
       YAML_G(decode_timestamp) == 2L) {
@@ -1793,8 +1809,9 @@ php_yaml_eval_timestamp (zval **zpp, char *ts, int ts_len TSRMLS_DC) {
 /* {{{ php_yaml_handle_emitter_error()
  * Emit a warning about an emitter error
  */
-static void php_yaml_handle_emitter_error (
-    const yaml_emitter_t *emitter TSRMLS_DC) {
+static void
+php_yaml_handle_emitter_error (const yaml_emitter_t *emitter TSRMLS_DC)
+{
   switch (emitter->error) {
     case YAML_MEMORY_ERROR:
       php_error_docref(NULL TSRMLS_CC, E_WARNING,
@@ -1818,7 +1835,9 @@ static void php_yaml_handle_emitter_error (
 /* {{{ php_yaml_array_is_sequence()
  * Does the array encode a sequence?
  */
-static int php_yaml_array_is_sequence (HashTable *a) {
+static int
+php_yaml_array_is_sequence (HashTable *a)
+{
   ulong kidx, idx = 0;
   char *kstr;
   int key_type;
@@ -1845,7 +1864,9 @@ static int php_yaml_array_is_sequence (HashTable *a) {
 /* {{{ php_yaml_write_zval()
  * Write a php zval to the emitter
  */
-static int php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC) {
+static int
+php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
+{
   yaml_event_t event;
   char *res;
   int status;
@@ -2050,7 +2071,8 @@ event_error:
  */
 static int 
 php_yaml_write_impl (
-    yaml_emitter_t *emitter, zval *data, yaml_encoding_t encoding TSRMLS_DC) {
+    yaml_emitter_t *emitter, zval *data, yaml_encoding_t encoding TSRMLS_DC)
+{
   yaml_event_t event;
   int status;
 
@@ -2113,7 +2135,8 @@ php_yaml_write_to_buffer(void *data, unsigned char *buffer, size_t size)
  * Validate user supplied callback array contents
  */
 static int
-php_yaml_check_callbacks (HashTable *callbacks TSRMLS_DC) {
+php_yaml_check_callbacks (HashTable *callbacks TSRMLS_DC)
+{
   zval **entry = NULL;
 #ifdef IS_UNICODE
   zstr key;
