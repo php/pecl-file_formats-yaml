@@ -8,18 +8,21 @@ date.timezone=GMT
 --FILE--
 <?php
   var_dump(yaml_parse('
-canonical:        2001-12-15T02:59:43.1Z
-valid iso8601:    2001-12-14t21:59:43.10-05:00
-space separated:  2001-12-14 21:59:43.10 -5
-no time zone (Z): 2001-12-15 2:59:43.10
-date (00:00:00Z): 2002-12-14
+canonical:         2001-12-15T02:59:43.1Z
+valid iso8601:     2001-12-14t21:59:43.10-05:00
+alternate iso8601: 2001-12-14T21:59:43.10-0500
+space separated:   2001-12-14 21:59:43.10 -5
+no time zone (Z):  2001-12-15 2:59:43.10
+date (00:00:00Z):  2002-12-14
 '));
 ?>
 --EXPECT--
-array(5) {
+array(6) {
   ["canonical"]=>
   int(1008385183)
   ["valid iso8601"]=>
+  int(1008385183)
+  ["alternate iso8601"]=>
   int(1008385183)
   ["space separated"]=>
   int(1008385183)

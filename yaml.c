@@ -1587,7 +1587,7 @@ php_yaml_scalar_is_timestamp (const char *value, size_t length)
   /* check 1 or 2 digit time zone hour */
   pos1 = ++ptr;
   ts_skip_number();
-  if (ptr == pos1 || ptr - pos1 > 2) {
+  if (ptr == pos1 || ptr - pos1 == 3 || ptr - pos1 > 4) {
     return 0;
   }
   if (ptr == end) {
@@ -2038,12 +2038,84 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
       break;
 
     case IS_OBJECT:
+      {
+        char *clazz_name = NULL;
+        zend_uint name_len;
+        zend_class_entry *clazz;
+
+        clazz = Z_OBJCE_P(data);
+        zend_get_object_classname(data, &clazz_name, &name_len TSRMLS_CC);
+
+        if (strncmp(clazz_name, "DateTime", name_len) == 0) {
+          /* DateTime is encoded as timestamp */
+          zval *retval = NULL;
+          zval dtfmt;
+
+          /* get iso-8601 format specifier */
+#if ZEND_MODULE_API_NO >= 20071006
+          zend_get_constant_ex(
+              "DateTime::ISO8601", 17, &dtfmt, clazz, 0 TSRMLS_CC);
+#else
+          zend_get_constant_ex(
+              "DateTime::ISO8601", 17, &dtfmt, clazz TSRMLS_CC);
+#endif
+          /* format date as iso-8601 string */
+          zend_call_method_with_1_params(
+              &data, clazz, NULL, "format", &retval, &dtfmt);
+          zval_dtor(&dtfmt);
+
+          /* emit formatted date */
+          status = yaml_scalar_event_initialize(&event,
+              NULL, YAML_TIMESTAMP_TAG,
+              Z_STRVAL_P(retval), Z_STRLEN_P(retval),
+              1, 1, YAML_PLAIN_SCALAR_STYLE);
+          zval_dtor(retval);
+          efree(retval);
+          if (!status) goto event_error;
+          event_emit(&event);
+
+        } else {
+          /* tag and emit serialized version of object */
+          zval fname, serialized, *params[] = { data };
+
+
+          /* call serialize */
+          ZVAL_STRING(&fname, "serialize", 1);
+          status = call_user_function(EG(function_table), NULL,
+              &fname, &serialized, 1, params TSRMLS_CC);
+          zval_dtor(&fname);
+
+          if (SUCCESS == status) {
+            /* emit serialize object + tag */
+            status = yaml_scalar_event_initialize(&event,
+                NULL, "!php/object",
+                Z_STRVAL_P(&serialized), Z_STRLEN_P(&serialized),
+                0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+            zval_dtor(&serialized);
+            if (!status) goto event_error;
+            event_emit(&event);
+
+          } else {
+            zval_dtor(&serialized);
+            php_error_docref(NULL TSRMLS_CC, E_WARNING,
+                "Failed to call serialize() for instance of %s", clazz_name);
+          }
+        }
+
+        efree(clazz_name);
+      }
       break;
 
     case IS_RESOURCE:
+      /* unsupported object */
+      php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+          "Unable to emit PHP resources.");
       break;
 
     default:
+      /* something we didn't think of */
+      php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+          "Unsupported php zval type %d.", Z_TYPE_P(data));
       break;
   }
 
@@ -2051,14 +2123,12 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 
 
 emitter_error:
-  php_printf("entered emitter_error: block for php_yaml_write_zval\n");
   php_yaml_handle_emitter_error(emitter);
   yaml_event_delete(&event);
   return FAILURE;
 
 
 event_error:
-  php_printf("entered event_error: block for php_yaml_write_zval\n");
   php_error_docref(NULL TSRMLS_CC, E_WARNING,
       "Memory error: Not enough memory for creating an event (libyaml)");
   yaml_event_delete(&event);
@@ -2105,14 +2175,12 @@ php_yaml_write_impl (
 
 
 emitter_error:
-  php_printf("entered emitter_error: block for php_yaml_write_impl\n");
   php_yaml_handle_emitter_error(emitter);
   yaml_event_delete(&event);
   return FAILURE;
 
 
 event_error:
-  php_printf("entered event_error: block for php_yaml_write_impll\n");
   php_error_docref(NULL TSRMLS_CC, E_WARNING,
       "Memory error: Not enough memory for creating an event (libyaml)");
   yaml_event_delete(&event);

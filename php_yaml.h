@@ -51,7 +51,8 @@ extern "C" {
 #include <ext/standard/php_var.h>
 #include <ext/standard/php_smart_str.h>
 #include <Zend/zend_extensions.h>
-#include <zend_hash.h>
+#include <Zend/zend_hash.h>
+#include <Zend/zend_interfaces.h>
 #ifdef __cplusplus
 } // extern "C"
 #endif
