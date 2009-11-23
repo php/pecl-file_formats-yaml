@@ -4,6 +4,6 @@
 ARG_WITH('yaml', 'The YAML parser and emitter PHP extension', 'no');
 
 if (PHP_YAML == "yes") {
-  EXTENSION("yaml", "yaml.c");
+  EXTENSION("yaml", "yaml.c parse.c emit.c");
   AC_DEFINE("HAVE_YAML", 1, "yaml support");
 }
