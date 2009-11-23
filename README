@@ -1,3 +1,13 @@
+The Yaml PHP Extension proivides a wrapper to the LibYAML library.
+
+It gives the user the ability to parse YAML document streams into PHP
+constructs and emit PHP constructs as valid YAML 1.1 documents.
+
+For more information about LibYAML see http://pyyaml.org/wiki/LibYAML.
+For more information about YAML see http://yaml.org/
+
+Requirements:
+  * libyaml 0.1.x
 
 
 BUILDING ON UNIX etc.
@@ -9,8 +19,6 @@ To compile your new extension, you will have to execute the following steps:
 2.  $ ./configure [--with-yaml]
 3.  $ make
 4.  $ sudo make install
-
-   
 
 
 BUILDING ON WINDOWS
@@ -78,4 +86,18 @@ yaml_parse ($input, $pos=0, &$ndocs=null, $callbacks=null)
  */
 yaml_emit ($data, $encoding=YAML_ANY_ENCODING, $linebreak=YAML_ANY_BREAK)
 
+
+CREDITS
+========
+
+php-yaml v0.1.0 through v0.3.0 was developed by Ryusuke Sekiyama.
+
+Starting with v0.4.0 the extension has been maintained by Bryan Davis with
+support from Keynetics Inc [http://keynetics.com/].
+
+Inspiration and some implementation details have been taken from:
+  * php-syck [http://pecl.php.net/package/syck]
+  * MacRuby's libyaml wrapper
+      [http://www.macruby.org/trac/browser/MacRuby/trunk/ext/libyaml]
+  * LibYAML's examples [http://pyyaml.org/wiki/LibYAML]
 
