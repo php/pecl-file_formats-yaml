@@ -3,7 +3,7 @@ Yaml 1.1 Spec - binary
 --SKIPIF--
 <?php
   if(!extension_loaded('yaml')) die('skip yaml n/a');
-  if(!method_exists('md5')) die('skip md5 unavailable');
+  if(!function_exists('md5')) die('skip md5 unavailable');
 ?>
 --INI--
 yaml.decode_binary=1

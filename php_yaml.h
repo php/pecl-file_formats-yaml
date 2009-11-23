@@ -2,6 +2,7 @@
  * YAML parser and emitter PHP extension
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
+ * Copyright (c) 2009 Keynetics Inc. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any personobtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,7 +24,9 @@
  *
  * @package     php_yaml
  * @author      Ryusuke SEKIYAMA <rsky0711@gmail.com>
+ * @author      Bryan Davis <bpd@keynetics.com>
  * @copyright   2007 Ryusuke SEKIYAMA
+ * @copyright   2009 Keynetics Inc
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  * @version     SVN: $Id$
  */
@@ -56,12 +59,14 @@ extern "C" {
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
 #include <yaml.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define PHP_YAML_MODULE_VERSION "0.4.0"
+#define PHP_YAML_MODULE_VERSION "0.5.0-dev"
 
 #define Y_PARSER_CONTINUE 0
 #define Y_PARSER_SUCCESS  1
