@@ -40,7 +40,7 @@
 /* {{{ local macros
  */
 #define SCALAR_TAG_IS(event, name) \
-  !strcmp((const char *)event.data.scalar.tag, "tag:yaml.org,2002:" name)
+  !strcmp((const char *)event.data.scalar.tag, name)
 
 #define IS_NOT_IMPLICIT_AND_TAG_IS(event, name) \
   (!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))
@@ -656,7 +656,8 @@ php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC)
   /* check for numeric (int or float) */
   if (!event.data.scalar.quoted_implicit &&
       (event.data.scalar.plain_implicit ||
-       SCALAR_TAG_IS(event, "int") || SCALAR_TAG_IS(event, "float"))) {
+       SCALAR_TAG_IS(event, YAML_INT_TAG) ||
+       SCALAR_TAG_IS(event, YAML_FLOAT_TAG))) {
     long lval = 0;
     double dval = 0.0;
 
@@ -670,19 +671,21 @@ php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 
       if (event.data.scalar.plain_implicit) {
         /* pass */
-      } else if (SCALAR_TAG_IS(event, "float") && (flags & Y_SCALAR_IS_INT)) {
+      } else if (SCALAR_TAG_IS(event, YAML_FLOAT_TAG) &&
+          (flags & Y_SCALAR_IS_INT)) {
         convert_to_double(tmp);
-      } else if (SCALAR_TAG_IS(event, "int") && (flags & Y_SCALAR_IS_FLOAT)) {
+      } else if (SCALAR_TAG_IS(event, YAML_INT_TAG) &&
+          (flags & Y_SCALAR_IS_FLOAT)) {
         convert_to_long(tmp);
       }
       return tmp;
 
-    } else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, "float")) {
+    } else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_FLOAT_TAG)) {
       ZVAL_STRINGL(tmp, value, length, 1);
       convert_to_double(tmp);
       return tmp;
 
-    } else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, "int")) {
+    } else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_INT_TAG)) {
       ZVAL_STRINGL(tmp, value, length, 1);
       convert_to_long(tmp);
       return tmp;
@@ -700,7 +703,7 @@ php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC)
       return tmp;
     }
 
-  } else if (SCALAR_TAG_IS(event, "timestamp")) {
+  } else if (SCALAR_TAG_IS(event, YAML_TIMESTAMP_TAG)) {
     if (FAILURE == php_yaml_eval_timestamp(
           &tmp, value, (int)length TSRMLS_CC)) {
       zval_ptr_dtor(&tmp);
@@ -710,7 +713,7 @@ php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC)
   }
 
   /* check for binary */
-  if (IS_NOT_IMPLICIT_AND_TAG_IS(event, "binary")) {
+  if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_BINARY_TAG)) {
     if (YAML_G(decode_binary)) {
       unsigned char *data = NULL;
       int data_len = 0;
@@ -726,6 +729,26 @@ php_yaml_eval_scalar (yaml_event_t event, HashTable *callbacks TSRMLS_DC)
     } else {
       ZVAL_STRINGL(tmp, value, length, 1);
     }
+    return tmp;
+  }
+
+  /* check for php object */
+  if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_PHP_TAG)) {
+    const unsigned char *p;
+    php_unserialize_data_t var_hash;
+
+    p = (const unsigned char*) value;
+    PHP_VAR_UNSERIALIZE_INIT(var_hash);
+
+    if (!php_var_unserialize(&tmp, &p, p + (int) length, &var_hash TSRMLS_CC)) {
+      PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
+      php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+          "Failed to unserialize class");
+      /* return the serialized string directly */
+      ZVAL_STRINGL(tmp, value, length, 1);
+    }
+
+    PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
     return tmp;
   }
 
@@ -822,7 +845,7 @@ php_yaml_scalar_is_null (
         !strcmp("null", value)) {
       return 1;
     }
-  } else if (NULL != event && SCALAR_TAG_IS((*event), "null")) {
+  } else if (NULL != event && SCALAR_TAG_IS((*event), YAML_NULL_TAG)) {
     return 1;
   }
 
@@ -840,7 +863,7 @@ php_yaml_scalar_is_bool (
     const char *value, size_t length, const yaml_event_t *event)
 {
   /* TODO: add ini setting to turn 'y'/'n' checks on/off */
-  if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), "bool")) {
+  if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), YAML_BOOL_TAG)) {
     if ((length == 1 && (*value == 'Y' || *value == 'y')) ||
         !strcmp("YES", value) || !strcmp("Yes", value) ||
         !strcmp("yes", value) || !strcmp("TRUE", value) ||
@@ -856,7 +879,8 @@ php_yaml_scalar_is_bool (
       return 0;
     }
 
-  } else if (NULL != event && IS_NOT_IMPLICIT_AND_TAG_IS((*event), "bool")) {
+  } else if (NULL != event &&
+      IS_NOT_IMPLICIT_AND_TAG_IS((*event), YAML_BOOL_TAG)) {
     if (length == 0 || (length == 1 && *value == '0')) {
       return 0;
     } else {
@@ -1538,3 +1562,12 @@ php_yaml_eval_timestamp (zval **zpp, char *ts, int ts_len TSRMLS_DC)
   }
 }
 /* }}} */
+
+/*
+ * Local variables:
+ * tab-width: 2
+ * c-basic-offset: 2
+ * End:
+ * vim600: noet sw=2 ts=2 et fdm=marker
+ * vim<600: noet sw=2 ts=2 et
+ */

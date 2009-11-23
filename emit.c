@@ -325,9 +325,6 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 
         } else {
           /* tag and emit serialized version of object */
-
-
-          /* call serialize */
           php_serialize_data_t var_hash;
           smart_str buf = {0};
 
@@ -341,31 +338,6 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
               0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
           if (!status) goto event_error;
           event_emit(&event);
-
-          /*
-          zval fname, serialized, *params[] = { data };
-
-          ZVAL_STRING(&fname, "serialize", 1);
-          status = call_user_function(EG(function_table), NULL,
-              &fname, &serialized, 1, params TSRMLS_CC);
-          zval_dtor(&fname);
-
-          if (SUCCESS == status) {
-            / * emit serialize object + tag * /
-            status = yaml_scalar_event_initialize(&event,
-                NULL, "!php/object",
-                Z_STRVAL_P(&serialized), Z_STRLEN_P(&serialized),
-                0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
-            zval_dtor(&serialized);
-            if (!status) goto event_error;
-            event_emit(&event);
-
-          } else {
-            zval_dtor(&serialized);
-            php_error_docref(NULL TSRMLS_CC, E_WARNING,
-                "Failed to call serialize() for instance of %s", clazz_name);
-          }
-            */
         }
 
         efree(clazz_name);
@@ -465,4 +437,11 @@ php_yaml_write_to_buffer(void *data, unsigned char *buffer, size_t size)
 }
 /* }}} */
 
-
+/*
+ * Local variables:
+ * tab-width: 2
+ * c-basic-offset: 2
+ * End:
+ * vim600: noet sw=2 ts=2 et fdm=marker
+ * vim<600: noet sw=2 ts=2 et
+ */

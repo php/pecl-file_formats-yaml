@@ -41,6 +41,7 @@ extern "C" {
 
 /* {{{ ext/yaml macros
  */
+#define YAML_BINARY_TAG     "tag:yaml.org,2002:binary"
 #define YAML_PHP_TAG        "!php/object"
 
 /* }}} */
