@@ -37,6 +37,29 @@
 #include "zval_refcount.h" /* for PHP < 5.3 */ 
 #include "php_yaml_int.h"
 
+/* {{{ local macros
+ */
+#define SCALAR_TAG_IS(event, name) \
+  !strcmp((const char *)event.data.scalar.tag, "tag:yaml.org,2002:" name)
+
+#define IS_NOT_IMPLICIT_AND_TAG_IS(event, name) \
+  (!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))
+
+#define IS_NOT_QUOTED_OR_TAG_IS(event, name) \
+  (!event.data.scalar.quoted_implicit && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
+
+#define ts_skip_space() \
+  while (ptr < end && (*ptr == ' ' || *ptr == '\t')) { \
+    ptr++; \
+  }
+
+#define ts_skip_number() \
+  while (ptr < end && *ptr >= '0' && *ptr <= '9') { \
+    ptr++; \
+  }
+
+/* }}} */
+
 /* {{{ local prototypes
  */
 static char * php_yaml_convert_to_char (zval *zv TSRMLS_DC);

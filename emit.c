@@ -37,6 +37,15 @@
 #include "zval_refcount.h" /* for PHP < 5.3 */ 
 #include "php_yaml_int.h"
 
+/* {{{ local macros
+ */
+#define event_emit(e) \
+  if (!yaml_emitter_emit(emitter, e)) { \
+    goto emitter_error; \
+  }
+
+/* }}} */
+
 /* {{{ local prototypes
  */
 static void php_yaml_handle_emitter_error (

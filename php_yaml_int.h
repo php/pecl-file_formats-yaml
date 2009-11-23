@@ -41,34 +41,8 @@ extern "C" {
 
 /* {{{ ext/yaml macros
  */
-#define SCALAR_TAG_IS(event, name) \
-  !strcmp((const char *)event.data.scalar.tag, "tag:yaml.org,2002:" name)
-
-#define IS_NOT_IMPLICIT_AND_TAG_IS(event, name) \
-  (!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))
-
-#define IS_NOT_QUOTED_OR_TAG_IS(event, name) \
-  (!event.data.scalar.quoted_implicit && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
-
-#define ts_skip_space() \
-  while (ptr < end && (*ptr == ' ' || *ptr == '\t')) { \
-    ptr++; \
-  }
-
-#define ts_skip_number() \
-  while (ptr < end && *ptr >= '0' && *ptr <= '9') { \
-    ptr++; \
-  }
-
-#define php_yaml_read_all(parser, ndocs, eval_func, callbacks) \
-  php_yaml_read_impl((parser), NULL, NULL, NULL, (ndocs), (eval_func), (callbacks) TSRMLS_CC)
-
-#define event_emit(e) \
-  if (!yaml_emitter_emit(emitter, e)) { \
-    goto emitter_error; \
-  }
-
 #define YAML_PHP_TAG        "!php/object"
+
 /* }}} */
 
 /* {{{ ext/yaml prototypes

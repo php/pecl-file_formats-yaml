@@ -36,7 +36,14 @@
 #include "zval_refcount.h" /* for PHP < 5.3 */ 
 #include "php_yaml_int.h"
 
-/* {{{ ext/yaml prototypes
+/* {{{ local macros
+ */
+#define php_yaml_read_all(parser, ndocs, eval_func, callbacks) \
+  php_yaml_read_impl((parser), NULL, NULL, NULL, (ndocs), (eval_func), (callbacks) TSRMLS_CC)
+
+/* }}} */
+
+/* {{{ local prototypes
  */
 static int php_yaml_check_callbacks (HashTable *callbacks TSRMLS_DC);
 
