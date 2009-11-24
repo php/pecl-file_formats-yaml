@@ -66,7 +66,7 @@ extern "C" {
 extern "C" {
 #endif
 
-#define PHP_YAML_MODULE_VERSION "0.5.0-dev"
+#define PHP_YAML_MODULE_VERSION "0.5.0"
 
 #define Y_PARSER_CONTINUE 0
 #define Y_PARSER_SUCCESS  1
