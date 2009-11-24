@@ -13,7 +13,7 @@
   <para>
    This extension implements the <link xlink:href="&url.yaml;">YAML Ain't
    Markup Language (YAML)</link> data serialization standard. Parsing and
-   emiting are handled by the <linl xlink:href="&url.yaml.libyaml;">LibYAML
+   emiting are handled by the <link xlink:href="&url.yaml.libyaml;">LibYAML
    library</link>.
   </para>
  </preface>

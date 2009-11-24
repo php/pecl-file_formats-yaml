@@ -4,24 +4,21 @@
 <refentry xml:id="function.yaml-parse-url" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
  <refnamediv>
   <refname>yaml_parse_url</refname>
-  <refpurpose>Description</refpurpose>
+  <refpurpose>Parse a Yaml stream from a URL</refpurpose>
  </refnamediv>
 
  <refsect1 role="description">
   &reftitle.description;
   <methodsynopsis>
-   <type>ReturnType</type><methodname>yaml_parse_url</methodname>
+   <type>mixed</type><methodname>yaml_parse_url</methodname>
    <methodparam><type>string</type><parameter>url</parameter></methodparam>
-   <methodparam choice="opt"><type>string</type><parameter>pos</parameter></methodparam>
-   <methodparam choice="opt"><type>string</type><parameter role="reference">ndocs</parameter></methodparam>
+   <methodparam choice="opt"><type>int</type><parameter>pos</parameter><initializer>0</initializer></methodparam>
+   <methodparam choice="opt"><type>int</type><parameter role="reference">ndocs</parameter></methodparam>
    <methodparam choice="opt"><type>array</type><parameter>callbacks</parameter></methodparam>
   </methodsynopsis>
   <para>
-
+   Convert all or part of a YAML document stream read from a URL to a PHP variable.
   </para>
-
-  &warn.undocumented.func;
-
  </refsect1>
 
  <refsect1 role="parameters">
@@ -32,7 +29,11 @@
      <term><parameter>url</parameter></term>
      <listitem>
       <para>
-       
+       <parameter>url</parameter> should be of the form "scheme://...". PHP
+       will search for a protocol handler (also known as a wrapper) for that
+       scheme. If no wrappers for that protocol are registered, PHP will emit
+       a notice to help you track potential problems in your script and then
+       continue as though filename specifies a regular file.
       </para>
      </listitem>
     </varlistentry>
@@ -40,7 +41,8 @@
      <term><parameter>pos</parameter></term>
      <listitem>
       <para>
-       
+       Document to extract from stream (<literal>-1</literal> for all
+       documents, <literal>0</literal> for first document, ...).
       </para>
      </listitem>
     </varlistentry>
@@ -48,7 +50,8 @@
      <term><parameter>ndocs</parameter></term>
      <listitem>
       <para>
-       
+       If <parameter>ndocs</parameter> is provided, then it is filled with the
+       number of documents found in stream.
       </para>
      </listitem>
     </varlistentry>
@@ -56,7 +59,8 @@
      <term><parameter>callbacks</parameter></term>
      <listitem>
       <para>
-       
+       Content handlers for YAML nodes. Associative <type>array</type> of YAML
+       tag =&gt; <type>callback</type> mappings.
       </para>
      </listitem>
     </varlistentry>
@@ -67,34 +71,24 @@
  <refsect1 role="returnvalues">
   &reftitle.returnvalues;
   <para>
-
+   Returns the value encoded in <parameter>input</parameter> in appropriate
+   PHP type. &null; is returned if the <parameter>input</parameter> cannot be
+   decoded. If <parameter>pos</parameter> is <literal>-1</literal> an
+   <type>array</type> will be returned with one entry for each document found
+   in the stream.
   </para>
  </refsect1>
 
- <refsect1 role="examples">
-  &reftitle.examples;
+ <refsect1 role="seealso">
+  &reftitle.seealso;
   <para>
-   <example>
-    <title><function>yaml_parse_url</function> example</title>
-    <programlisting role="php">
-<![CDATA[
-<?php
-
-/* ... */
-
-?>
-]]>
-    </programlisting>
-    &example.outputs.similar;
-    <screen>
-<![CDATA[
-...
-]]>
-    </screen>
-   </example>
+   <simplelist>
+    <member><function>yaml_parse</function></member>
+    <member><function>yaml_parse_file</function></member>
+    <member><function>yaml_emit</function></member>
+   </simplelist>
   </para>
  </refsect1>
-
 
 </refentry>
 

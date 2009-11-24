@@ -7,19 +7,28 @@
  <section xml:id="yaml.requirements">
   &reftitle.required;
   <para>
-
+   This extension requires the <link xlink:href="&url.yaml.libyaml;">LibYAML C
+   library</link> version 0.1.0 or higher to be installed. 
   </para>
  </section>
 
  <section xml:id="yaml.installation">
   &reftitle.install;
-  &no.install;
+  <para>
+   &pecl.moved;
+  </para>
+  <para>
+   &pecl.info;
+   <link xlink:href="&url.pecl.package;yaml">&url.pecl.package;yaml</link>.
+  </para>
+  <para>
+   &pecl.windows.download;
+  </para>
  </section>
 
- <section xml:id="yaml.configuration">
-  &reftitle.runtime;
-  &no.config;
- </section>
+ <!-- {{{ Configuration -->
+ &reference.yaml.ini;
+ <!-- }}} -->
 
  <section xml:id="yaml.resources">
   &reftitle.resources;

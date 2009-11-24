@@ -6,11 +6,11 @@
 
 <versions>
  <!-- Functions -->
- <function name='yaml_parse' from='PECL yaml &gt;= Unknown'/>
- <function name='yaml_parse_file' from='PECL yaml &gt;= Unknown'/>
- <function name='yaml_parse_url' from='PECL yaml &gt;= Unknown'/>
- <function name='yaml_emit' from='PECL yaml &gt;= Unknown'/>
- <function name='yaml_emit_file' from='PECL yaml &gt;= Unknown'/>
+ <function name='yaml_parse' from='PECL yaml &gt;= 0.4.0'/>
+ <function name='yaml_parse_file' from='PECL yaml &gt;= 0.4.0'/>
+ <function name='yaml_parse_url' from='PECL yaml &gt;= 0.4.0'/>
+ <function name='yaml_emit' from='PECL yaml &gt;= 0.5.0'/>
+ <function name='yaml_emit_file' from='PECL yaml &gt;= 0.5.0'/>
 </versions>
 
 <!-- Keep this comment at the end of the file

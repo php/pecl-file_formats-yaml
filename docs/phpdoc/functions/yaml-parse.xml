@@ -13,8 +13,8 @@
    <type>mixed</type><methodname>yaml_parse</methodname>
    <methodparam><type>string</type><parameter>input</parameter></methodparam>
    <methodparam choice="opt"><type>int</type><parameter>pos</parameter><initializer>0</initializer></methodparam>
-   <methodparam choice="opt"><type>int</type><parameter role="reference">ndocs</parameter><initializer>null</initializer></methodparam>
-   <methodparam choice="opt"><type>array</type><parameter>callbacks</parameter><initializer>null</initializer></methodparam>
+   <methodparam choice="opt"><type>int</type><parameter role="reference">ndocs</parameter></methodparam>
+   <methodparam choice="opt"><type>array</type><parameter>callbacks</parameter></methodparam>
   </methodsynopsis>
   <para>
    Convert all or part of a YAML document stream to a PHP variable.
@@ -37,7 +37,8 @@
      <term><parameter>pos</parameter></term>
      <listitem>
       <para>
-       Document to extract from stream (-1 for all, 0 for first, ...).
+       Document to extract from stream (<literal>-1</literal> for all
+       documents, <literal>0</literal> for first document, ...).
       </para>
      </listitem>
     </varlistentry>
@@ -45,7 +46,8 @@
      <term><parameter>ndocs</parameter></term>
      <listitem>
       <para>
-       Number of documents found in stream.
+       If <parameter>ndocs</parameter> is provided, then it is filled with the
+       number of documents found in stream.
       </para>
      </listitem>
     </varlistentry>
@@ -53,8 +55,8 @@
      <term><parameter>callbacks</parameter></term>
      <listitem>
       <para>
-       Content handlers for YAML nodes. Associative <type>array</type> of tag
-       =&gt; handler mappings.
+       Content handlers for YAML nodes. Associative <type>array</type> of YAML
+       tag =&gt; <type>callback</type> mappings.
       </para>
      </listitem>
     </varlistentry>
@@ -81,16 +83,119 @@
     <programlisting role="php">
 <![CDATA[
 <?php
+$yaml = <<<EOD
+---
+invoice: 34843
+date: "2001-01-23"
+bill-to: &id001
+  given: Chris
+  family: Dumars
+  address:
+    lines: |-
+      458 Walkman Dr.
+              Suite #292
+    city: Royal Oak
+    state: MI
+    postal: 48046
+ship-to: *id001
+product:
+- sku: BL394D
+  quantity: 4
+  description: Basketball
+  price: 450
+- sku: BL4438H
+  quantity: 1
+  description: Super Hoop
+  price: 2392
+tax: 251.420000
+total: 4443.520000
+comments: Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.
+...
+EOD;
 
-/* ... */
-
+$parsed = yaml_parse($yaml);
+var_dump($parsed);
 ?>
 ]]>
     </programlisting>
     &example.outputs.similar;
     <screen>
 <![CDATA[
-...
+array(8) {
+  ["invoice"]=>
+  int(34843)
+  ["date"]=>
+  string(10) "2001-01-23"
+  ["bill-to"]=>
+  &array(3) {
+    ["given"]=>
+    string(5) "Chris"
+    ["family"]=>
+    string(6) "Dumars"
+    ["address"]=>
+    array(4) {
+      ["lines"]=>
+      string(34) "458 Walkman Dr.
+        Suite #292"
+      ["city"]=>
+      string(9) "Royal Oak"
+      ["state"]=>
+      string(2) "MI"
+      ["postal"]=>
+      int(48046)
+    }
+  }
+  ["ship-to"]=>
+  &array(3) {
+    ["given"]=>
+    string(5) "Chris"
+    ["family"]=>
+    string(6) "Dumars"
+    ["address"]=>
+    array(4) {
+      ["lines"]=>
+      string(34) "458 Walkman Dr.
+        Suite #292"
+      ["city"]=>
+      string(9) "Royal Oak"
+      ["state"]=>
+      string(2) "MI"
+      ["postal"]=>
+      int(48046)
+    }
+  }
+  ["product"]=>
+  array(2) {
+    [0]=>
+    array(4) {
+      ["sku"]=>
+      string(6) "BL394D"
+      ["quantity"]=>
+      int(4)
+      ["description"]=>
+      string(10) "Basketball"
+      ["price"]=>
+      int(450)
+    }
+    [1]=>
+    array(4) {
+      ["sku"]=>
+      string(7) "BL4438H"
+      ["quantity"]=>
+      int(1)
+      ["description"]=>
+      string(10) "Super Hoop"
+      ["price"]=>
+      int(2392)
+    }
+  }
+  ["tax"]=>
+  float(251.42)
+  ["total"]=>
+  float(4443.52)
+  ["comments"]=>
+  string(68) "Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338."
+}
 ]]>
     </screen>
    </example>
@@ -103,6 +208,7 @@
    <simplelist>
     <member><function>yaml_parse_file</function></member>
     <member><function>yaml_parse_url</function></member>
+    <member><function>yaml_emit</function></member>
    </simplelist>
   </para>
  </refsect1>

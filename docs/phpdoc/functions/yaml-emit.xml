@@ -4,23 +4,20 @@
 <refentry xml:id="function.yaml-emit" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink">
  <refnamediv>
   <refname>yaml_emit</refname>
-  <refpurpose>Description</refpurpose>
+  <refpurpose>Returns the YAML representation of a value</refpurpose>
  </refnamediv>
 
  <refsect1 role="description">
   &reftitle.description;
   <methodsynopsis>
-   <type>ReturnType</type><methodname>yaml_emit</methodname>
-   <methodparam><type>string</type><parameter>data</parameter></methodparam>
-   <methodparam choice="opt"><type>string</type><parameter>encoding</parameter></methodparam>
-   <methodparam choice="opt"><type>string</type><parameter>linebreak</parameter></methodparam>
+   <type>string</type><methodname>yaml_emit</methodname>
+   <methodparam><type>mixed</type><parameter>data</parameter></methodparam>
+   <methodparam choice="opt"><type>int</type><parameter>encoding</parameter><initializer>YAML_ANY_ENCODING</initializer></methodparam>
+   <methodparam choice="opt"><type>int</type><parameter>linebreak</parameter><initializer>YAML_ANY_BREAK</initializer></methodparam>
   </methodsynopsis>
   <para>
-
+   Generate a YAML representation of the provided <parameter>data</parameter>.
   </para>
-
-  &warn.undocumented.func;
-
  </refsect1>
 
  <refsect1 role="parameters">
@@ -31,7 +28,8 @@
      <term><parameter>data</parameter></term>
      <listitem>
       <para>
-       
+       The <parameter>data</parameter> being encoded. Can be any type except
+       a <type>resource</type>.
       </para>
      </listitem>
     </varlistentry>
@@ -39,7 +37,12 @@
      <term><parameter>encoding</parameter></term>
      <listitem>
       <para>
-       
+       Output character encoding chosen from
+       <constant>YAML_ANY_ENCODING</constant>,
+       <constant>YAML_UTF8_ENCODING</constant>,
+       <constant>YAML_UTF16LE_ENCODING</constant>,
+       <constant>YAML_UTF16BE_ENCODING</constant>. Defaults to
+       <constant>YAML_ANY_ENCODING</constant>.
       </para>
      </listitem>
     </varlistentry>
@@ -47,7 +50,12 @@
      <term><parameter>linebreak</parameter></term>
      <listitem>
       <para>
-       
+       Output linebreak style chosen from
+       <constant>YAML_ANY_BREAK</constant>,
+       <constant>YAML_CR_BREAK</constant>,
+       <constant>YAML_LN_BREAK</constant>,
+       <constant>YAML_CRLN_BREAK</constant>. Defaults to
+       <constant>YAML_ANY_BREAK</constant>.
       </para>
      </listitem>
     </varlistentry>
@@ -58,7 +66,7 @@
  <refsect1 role="returnvalues">
   &reftitle.returnvalues;
   <para>
-
+   Returns a YAML encoded <type>string</type> on success.
   </para>
  </refsect1>
 
@@ -68,24 +76,33 @@
    <example>
     <title><function>yaml_emit</function> example</title>
     <programlisting role="php">
-<![CDATA[
-<?php
+     <![CDATA[
+     <?php
 
-/* ... */
+     /* ... */
 
-?>
-]]>
+     ?>
+     ]]>
     </programlisting>
     &example.outputs.similar;
     <screen>
-<![CDATA[
-...
-]]>
+     <![CDATA[
+     ...
+     ]]>
     </screen>
    </example>
   </para>
  </refsect1>
 
+ <refsect1 role="seealso">
+  &reftitle.seealso;
+  <para>
+   <simplelist>
+    <member><function>yaml_emit_file</function></member>
+    <member><function>yaml_parse</function></member>
+   </simplelist>
+  </para>
+ </refsect1>
 
 </refentry>
 
