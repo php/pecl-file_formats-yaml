@@ -1,0 +1,21 @@
+FUTURE FEATURES
+===============
+
+Document parse callback syntax and usage.
+
+Add php ini setting to turn y/n boolean treatment on/off.
+  see http://www.kuwata-lab.com/materials/php_yaml-0.3.0.patch
+
+Other ini settings:
+  canonical_output = 0/1
+  indent = 1-10
+  output_width = -1,1-inf
+
+More tests for proper string emits
+
+Support << "merge" in mappings. Probably means refactoring the parser so that
+we retain more information about mapping keys.
+
+Add some sort of callback support for emitting objects. Hashtable keyed on
+classname? Callback would be responsible for transforming object into
+array/scalar data and providing a tag for the resulting serialization.
