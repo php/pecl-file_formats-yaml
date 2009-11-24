@@ -643,7 +643,7 @@ PHP_FUNCTION(yaml_parse_url)
 }
 /* }}} yaml_parse_url */
 
-/* {{{ proto string yaml_emit(mixed data[, string encoding[, string linebreak]])
+/* {{{ proto string yaml_emit(mixed data[, int encoding[, int linebreak]])
    */
 PHP_FUNCTION(yaml_emit)
 {

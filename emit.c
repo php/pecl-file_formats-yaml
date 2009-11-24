@@ -126,8 +126,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
   switch (Z_TYPE_P(data)) {
     case IS_NULL:
       status = yaml_scalar_event_initialize(&event,
-          NULL, YAML_NULL_TAG,
-          "~", strlen("~"),
+          NULL, (yaml_char_t *) YAML_NULL_TAG,
+          (yaml_char_t *) "~", strlen("~"),
           1, 1, YAML_PLAIN_SCALAR_STYLE);
       if (!status) goto event_error;
       event_emit(&event);
@@ -137,8 +137,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
       {
         res = Z_BVAL_P(data) ? "true" : "false";
         status = yaml_scalar_event_initialize(&event,
-            NULL, YAML_BOOL_TAG,
-            res, strlen(res),
+            NULL, (yaml_char_t *) YAML_BOOL_TAG,
+            (yaml_char_t *) res, strlen(res),
             1, 1, YAML_PLAIN_SCALAR_STYLE);
         if (!status) goto event_error;
         event_emit(&event);
@@ -153,8 +153,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
         res = emalloc(res_size + 1);
         snprintf(res, res_size + 1, "%ld", Z_LVAL_P(data));
         status = yaml_scalar_event_initialize(&event,
-            NULL, YAML_INT_TAG,
-            res, strlen(res),
+            NULL, (yaml_char_t *) YAML_INT_TAG,
+            (yaml_char_t *) res, strlen(res),
             1, 1, YAML_PLAIN_SCALAR_STYLE);
         efree(res);
         if (!status) goto event_error;
@@ -170,8 +170,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
         res = emalloc(res_size + 1);
         snprintf(res, res_size + 1, "%f", Z_DVAL_P(data));
         status = yaml_scalar_event_initialize(&event,
-            NULL, YAML_FLOAT_TAG,
-            res, strlen(res),
+            NULL, (yaml_char_t *) YAML_FLOAT_TAG,
+            (yaml_char_t *) res, strlen(res),
             1, 1, YAML_PLAIN_SCALAR_STYLE);
         efree(res);
         if (!status) goto event_error;
@@ -202,8 +202,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
         }
 
         status = yaml_scalar_event_initialize(&event,
-            NULL, YAML_STR_TAG,
-            Z_STRVAL_P(data), Z_STRLEN_P(data),
+            NULL, (yaml_char_t *) YAML_STR_TAG,
+            (yaml_char_t *) Z_STRVAL_P(data), Z_STRLEN_P(data),
             1, 1, style);
         if (!status) goto event_error;
         event_emit(&event);
@@ -221,7 +221,7 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
         if (0 == php_yaml_array_is_sequence(ht)) {
           /* start sequence */
           status = yaml_sequence_start_event_initialize(&event,
-              NULL, YAML_SEQ_TAG, 1, YAML_ANY_SEQUENCE_STYLE);
+              NULL, (yaml_char_t *) YAML_SEQ_TAG, 1, YAML_ANY_SEQUENCE_STYLE);
           if (!status) goto event_error;
           event_emit(&event);
 
@@ -244,11 +244,10 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
           zval key_zval;
           ulong kidx;
           char *kstr = NULL;
-          uint klen;
 
           /* start map */
           status = yaml_mapping_start_event_initialize(&event,
-              NULL, YAML_MAP_TAG, 1, YAML_ANY_MAPPING_STYLE);
+              NULL, (yaml_char_t *) YAML_MAP_TAG, 1, YAML_ANY_MAPPING_STYLE);
           if (!status) goto event_error;
           event_emit(&event);
 
@@ -315,8 +314,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 
           /* emit formatted date */
           status = yaml_scalar_event_initialize(&event,
-              NULL, YAML_TIMESTAMP_TAG,
-              Z_STRVAL_P(retval), Z_STRLEN_P(retval),
+              NULL, (yaml_char_t *) YAML_TIMESTAMP_TAG,
+              (yaml_char_t *) Z_STRVAL_P(retval), Z_STRLEN_P(retval),
               1, 1, YAML_PLAIN_SCALAR_STYLE);
           zval_dtor(retval);
           efree(retval);
@@ -333,8 +332,8 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
           PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
           status = yaml_scalar_event_initialize(&event,
-              NULL, YAML_PHP_TAG,
-              buf.c, strlen(buf.c),
+              NULL, (yaml_char_t *) YAML_PHP_TAG,
+              (yaml_char_t *) buf.c, buf.len,
               0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
           if (!status) goto event_error;
           event_emit(&event);

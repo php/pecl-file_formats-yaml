@@ -33,6 +33,7 @@ if test "$PHP_YAML" != "no"; then
   fi
 
   PHP_ADD_INCLUDE($PHP_YAML_DIR/include)
+  CFLAGS="-Wall -fno-strict-aliasing"
 
   export OLD_CPPFLAGS="$CPPFLAGS"
   export CPPFLAGS="$CPPFLAGS $INCLUDES -DHAVE_YAML"
