@@ -8,7 +8,7 @@
  http://pear.php.net/dtd/package-2.0
  http://pear.php.net/dtd/package-2.0.xsd">
  <name>yaml</name>
- <channel>php-yaml.googlecode.com/svn</channel>
+ <channel>php-yaml.googlecode.com/svn/pear</channel>
  <summary>YAML Ain&apos;t Markup Language</summary>
  <description>
   Support for YAML (YAML Ain&apos;t Markup Language) serialization using the
