@@ -19,7 +19,7 @@
   </para>
   <para>
    &pecl.info;
-   <link xlink:href="&url.pecl.package;yaml">&url.pecl.package;yaml</link>.
+   <link xlink:href="http://code.google.com/p/php-yaml/">http://code.google.com/p/php-yaml/</link>.
   </para>
   <para>
    &pecl.windows.download;
