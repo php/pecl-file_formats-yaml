@@ -1,0 +1,1479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>PHP Manual</title><link type="text/css" rel="stylesheet" href="site.css"/>
+    
+</head>
+<body>
+<div id="book.yaml" class="book">
+ <h1>YAML Data Serialization</h1><strong>Table of Contents</strong><ul class="chunklist chunklist_title">
+<li><a href="#intro.yaml">Introduction</a></li>
+<li><a href="#yaml.setup">Installing/Configuring</a><ul class="chunklist chunklist_title">
+<li><a href="#yaml.requirements">Requirements</a></li>
+<li><a href="#yaml.installation">Installation</a></li>
+<li><a href="#yaml.configuration">Runtime Configuration</a></li>
+<li><a href="#yaml.resources">Resource Types</a></li>
+</ul>
+</li>
+<li><a href="#yaml.constants">Predefined Constants</a></li>
+<li><a href="#yaml.examples">Examples</a></li>
+<li><a href="#ref.yaml">Yaml Functions</a><ul class="chunklist chunklist_title">
+<li><a href="#function.yaml-emit-file">yaml_emit_file</a> — Send the YAML representation of a value to a file</li>
+<li><a href="#function.yaml-emit">yaml_emit</a> — Returns the YAML representation of a value</li>
+<li><a href="#function.yaml-parse-file">yaml_parse_file</a> — Parse a YAML stream from a file</li>
+<li><a href="#function.yaml-parse-url">yaml_parse_url</a> — Parse a Yaml stream from a URL</li>
+<li><a href="#function.yaml-parse">yaml_parse</a> — Parse a YAML stream</li>
+</ul>
+</li>
+</ul>
+
+ 
+
+ 
+ 
+<div id="intro.yaml" class="preface">
+  <h1 class="title">Introduction</h1>
+  <p class="para">
+   This extension implements the <a href="http://yaml.org/" class="link external">&raquo; YAML Ain&#039;t
+   Markup Language (YAML)</a> data serialization standard. Parsing and
+   emiting are handled by the <a href="http://pyyaml.org/wiki/LibYAML" class="link external">&raquo; LibYAML
+   library</a>.
+  </p>
+ </div>
+<hr />
+
+ 
+
+ 
+
+
+
+<div id="yaml.setup" class="chapter">
+ <h1>Installing/Configuring</h1><strong>Table of Contents</strong><ul class="chunklist chunklist_title">
+<li><a href="#yaml.requirements">Requirements</a></li>
+<li><a href="#yaml.installation">Installation</a></li>
+<li><a href="#yaml.configuration">Runtime Configuration</a></li>
+<li><a href="#yaml.resources">Resource Types</a></li>
+</ul>
+
+
+ 
+<div id="yaml.requirements" class="section">
+  <h2 class="title">Requirements</h2>
+  <p class="para">
+   This extension requires the <a href="http://pyyaml.org/wiki/LibYAML" class="link external">&raquo; LibYAML C
+   library</a> version 0.1.0 or higher to be installed. 
+  </p>
+ </div>
+<hr />
+
+
+ 
+<div id="yaml.installation" class="section">
+  <h2 class="title">Installation</h2>
+  <p class="para">
+   This <a href="http://pecl.php.net/" class="link external">&raquo; PECL</a> extension
+is not bundled with PHP.
+  </p>
+  <p class="para">
+   Information for installing this PECL extension may be
+found in the manual chapter titled <a href="#install.pecl" class="link">Installation
+of PECL extensions</a>. Additional information such as new releases,
+downloads, source files, maintainer information, and a CHANGELOG, can be
+located here: 
+   <a href="http://pecl.php.net/package/yaml" class="link external">&raquo; http://pecl.php.net/package/yaml</a>.
+  </p>
+  <p class="para">
+   A <acronym class="acronym">DLL</acronym> for this
+<acronym class="acronym">PECL</acronym> extension is currently unavailable. See also the
+<a href="#install.windows.building" class="link">building on Windows</a>
+section.
+  </p>
+ </div>
+<hr />
+
+
+ 
+ 
+
+
+
+<div id="yaml.configuration" class="section">
+ <h2 class="title">Runtime Configuration</h2>
+ <p class="simpara">
+The behaviour of these functions is affected by settings in <var class="filename">php.ini</var>.
+</p>
+ <p class="para">
+  <table class="doctable table">
+   <caption><b>Yaml Configure Options</b></caption>
+   
+    <thead valign="middle">
+     <tr valign="middle">
+      <th>Name</th>
+      <th>Default</th>
+      <th>Changeable</th>
+      <th>Changelog</th>
+     </tr>
+
+    </thead>
+
+    <tbody valign="middle" class="tbody">
+     <tr valign="middle">
+      <td align="left">yaml.decode_binary</td>
+      <td align="left">0</td>
+      <td align="left">PHP_INI_ALL</td>
+      <td align="left"></td>
+     </tr>
+
+     <tr valign="middle">
+      <td align="left">yaml.decode_timestamp</td>
+      <td align="left">0</td>
+      <td align="left">PHP_INI_ALL</td>
+      <td align="left"></td>
+     </tr>
+
+</tbody>
+   
+  </table>
+
+ </p>
+
+ <p class="para">Here&#039;s a short explanation of
+the configuration directives.</p>
+
+ <p class="para">
+  <dl>
+
+   <dt id="ini.yaml.decode-binary">
+     <span class="term">
+      <i><tt class="parameter">yaml.decode_binary</tt></i>
+
+       <span class="type">boolean</span> 
+     </span>
+
+     <dd>
+
+      <p class="para">
+        Off by default, but can be set to on to cause base64 binary encoded entities which have the explicit tag &quot;tag:yaml.org,2002:binary&quot; to be decoded.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt id="ini.yaml.decode-timestamp">
+     <span class="term">
+      <i><tt class="parameter">yaml.decode_timestamp</tt></i>
+
+       <span class="type">integer</span> 
+     </span>
+
+     <dd>
+
+      <p class="para">
+        Controls the decoding of both implicit and explict &quot;tag:yaml.org,2002:timestamp&quot; scalars in the YAML document stream. The default setting of <i>0</i> will not apply any decoding. A setting of <i>1</i> will use <span class="function">strtotime</span> to parse the timestamp value as a Unix timestamp. A setting of <i>2</i> will use <span class="function">date_create</span> to parse the timestamp value as  <span class="type">DateTime</span>  object.
+      </p>
+     </dd>
+
+    </dt>
+
+
+  </dl>
+
+ </p>
+</div>
+<hr />
+
+
+ 
+
+ 
+<div id="yaml.resources" class="section">
+  <h2 class="title">Resource Types</h2>
+  <p class="para">
+
+  </p>
+ </div>
+<hr />
+
+
+</div>
+<hr />
+
+
+
+
+
+ 
+
+
+
+<div id="yaml.constants" class="appendix">
+ <h1>Predefined Constants</h1>
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+ <p class="para">
+ </p>
+
+ <dl>
+
+  <strong class="title">Scalar entity styles usable by <span class="function">yaml_parse</span>
+   callback methods.</strong>
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_ANY_SCALAR_STYLE</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_PLAIN_SCALAR_STYLE</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_SINGLE_QUOTED_SCALAR_STYLE</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_DOUBLE_QUOTED_SCALAR_STYLE</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_LITERAL_SCALAR_STYLE</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_FOLDED_SCALAR_STYLE</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+    </span>
+   </dd>
+
+  </dt>
+
+ </dl>
+
+
+ <dl>
+
+  <strong class="title">Common tags usable by <span class="function">yaml_parse</span>
+   callback methods.</strong>
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_NULL_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:null&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_BOOL_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:bool&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_STR_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:str&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_INT_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:int&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_FLOAT_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:float&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_TIMESTAMP_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:timestamp&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_SEQ_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:seq&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_MAP_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;tag:yaml.org,2002:map&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_PHP_TAG</tt></b>
+    ( <span class="type">string</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     &quot;!php/object&quot;
+    </span>
+   </dd>
+
+  </dt>
+
+ </dl>
+
+
+ <dl>
+
+  <strong class="title">Encoding types for <span class="function">yaml_emit</span></strong>
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_ANY_ENCODING</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Let the emitter choose an encoding.
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_UTF8_ENCODING</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Encode as UTF8.
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_UTF16LE_ENCODING</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Encode as UTF16LE.
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_UTF16BE_ENCODING</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Encode as UTF16BE.
+    </span>
+   </dd>
+
+  </dt>
+
+ </dl>
+
+
+ <dl>
+
+  <strong class="title">Linebreak types for <span class="function">yaml_emit</span></strong>
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_ANY_BREAK</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Let emitter choose linebreak character.
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_CR_BREAK</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Use <i>\r</i> as break character (Mac style).
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_LN_BREAK</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Use <i>\n</i> as break character (Unix style).
+    </span>
+   </dd>
+
+  </dt>
+
+  <dt>
+
+   <span class="term">
+    <b><tt>YAML_CRLN_BREAK</tt></b>
+    ( <span class="type">integer</span> )
+   </span>
+
+   <dd>
+
+    <span class="simpara">
+     Use <i>\r\n</i> as break character (DOS style).
+    </span>
+   </dd>
+
+  </dt>
+
+ </dl>
+
+
+</div>
+<hr />
+
+
+
+
+
+ 
+
+
+
+<div id="yaml.examples" class="chapter">
+ <h1>Examples</h1>
+ <div class="example">
+  <p><b>Example #1 Yaml Example</b></p>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$addr&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"given"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Chris"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"family"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Dumars"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"address"</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"lines"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"458&nbsp;Walkman&nbsp;Dr.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Suite&nbsp;#292"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"city"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Royal&nbsp;Oak"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"state"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"MI"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"postal"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">48046</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;);<br /></span><span style="color: #0000BB">$invoice&nbsp;</span><span style="color: #007700">=&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"invoice"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">34843</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"date"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"2001-01-23"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"bill-to"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$addr</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"ship-to"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$addr</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"product"</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"sku"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"BL394D"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"quantity"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">4</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"description"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Basketball"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"price"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">450</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"sku"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"BL4438H"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"quantity"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"description"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Super&nbsp;Hoop"</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"price"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">2392</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"tax"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">251.42</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"total"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">4443.52</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"comments"</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"Late&nbsp;afternoon&nbsp;is&nbsp;best.&nbsp;Backup&nbsp;contact&nbsp;is&nbsp;Nancy&nbsp;Billsmer&nbsp;@&nbsp;338-4338."</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /><br /></span><span style="color: #FF8000">//&nbsp;generate&nbsp;a&nbsp;YAML&nbsp;representation&nbsp;of&nbsp;the&nbsp;invoice<br /></span><span style="color: #0000BB">$yaml&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">yaml_emit</span><span style="color: #007700">(</span><span style="color: #0000BB">$invoice</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$yaml</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">//&nbsp;convert&nbsp;the&nbsp;YAML&nbsp;back&nbsp;into&nbsp;a&nbsp;PHP&nbsp;variable<br /></span><span style="color: #0000BB">$parsed&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">yaml_parse</span><span style="color: #007700">(</span><span style="color: #0000BB">$yaml</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">//&nbsp;check&nbsp;that&nbsp;roundtrip&nbsp;conversion&nbsp;produced&nbsp;an&nbsp;equivalent&nbsp;structure<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed&nbsp;</span><span style="color: #007700">==&nbsp;</span><span style="color: #0000BB">$invoice</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+  </div>
+
+  <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+string(631) &quot;---
+invoice: 34843
+date: &quot;2001-01-23&quot;
+bill-to:
+  given: Chris
+  family: Dumars
+  address:
+    lines: |-
+      458 Walkman Dr.
+              Suite #292
+    city: Royal Oak
+    state: MI
+    postal: 48046
+ship-to:
+  given: Chris
+  family: Dumars
+  address:
+    lines: |-
+      458 Walkman Dr.
+              Suite #292
+    city: Royal Oak
+    state: MI
+    postal: 48046
+product:
+- sku: BL394D
+  quantity: 4
+  description: Basketball
+  price: 450
+- sku: BL4438H
+  quantity: 1
+  description: Super Hoop
+  price: 2392
+tax: 251.420000
+total: 4443.520000
+comments: Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.
+...
+&quot;
+bool(true)
+</pre></div>
+  </div>
+ </div>
+</div>
+<hr />
+
+
+
+
+
+ 
+
+
+
+<div id="ref.yaml" class="reference">
+ <h1 class="title">Yaml Functions</h1>
+
+ 
+
+
+
+<div id="function.yaml-emit-file" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">yaml_emit_file</h1>
+  <p class="refpurpose">Send the YAML representation of a value to a file</p>
+ </div>
+
+ <div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+    <span class="type">bool</span>  <span class="methodname">yaml_emit_file</span>
+    ( <span class="methodparam"> <span class="type">string</span>  <tt class="parameter">$filename</tt></span>
+   , <span class="methodparam"> <span class="type">mixed</span>  <tt class="parameter">$data</tt></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$encoding</tt><span class="initializer"> = YAML_ANY_ENCODING</span></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$linebreak</tt><span class="initializer"> = YAML_ANY_BREAK</span></span>
+  ]] )</div>
+
+  <p class="para rdfs-comment">
+   Generate a YAML representation of the provided <i><tt class="parameter">data</tt></i>
+
+   in the <i><tt class="parameter">filename</tt></i>
+.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">filename</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Path to the file.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">data</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       The <i><tt class="parameter">data</tt></i>
+ being encoded. Can be any type except
+       a  <span class="type">resource</span> .
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">encoding</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Output character encoding chosen from
+       <b><tt>YAML_ANY_ENCODING</tt></b>,
+       <b><tt>YAML_UTF8_ENCODING</tt></b>,
+       <b><tt>YAML_UTF16LE_ENCODING</tt></b>,
+       <b><tt>YAML_UTF16BE_ENCODING</tt></b>. Defaults to
+       <b><tt>YAML_ANY_ENCODING</tt></b>.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">linebreak</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Output linebreak style chosen from
+       <b><tt>YAML_ANY_BREAK</tt></b>,
+       <b><tt>YAML_CR_BREAK</tt></b>,
+       <b><tt>YAML_LN_BREAK</tt></b>,
+       <b><tt>YAML_CRLN_BREAK</tt></b>. Defaults to
+       <b><tt>YAML_ANY_BREAK</tt></b>.
+      </p>
+     </dd>
+
+    </dt>
+
+   </dl>
+
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+  Returns <i>TRUE</i> on success.
+  </p>
+ </div>
+
+
+
+ <div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li class="member"><span class="function">yaml_emit</span></li>
+    <li class="member"><span class="function">yaml_parse</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div>
+<hr />
+
+
+
+
+
+
+
+
+<div id="function.yaml-emit" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">yaml_emit</h1>
+  <p class="refpurpose">Returns the YAML representation of a value</p>
+ </div>
+
+ <div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+    <span class="type">string</span>  <span class="methodname">yaml_emit</span>
+    ( <span class="methodparam"> <span class="type">mixed</span>  <tt class="parameter">$data</tt></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$encoding</tt><span class="initializer"> = YAML_ANY_ENCODING</span></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$linebreak</tt><span class="initializer"> = YAML_ANY_BREAK</span></span>
+  ]] )</div>
+
+  <p class="para rdfs-comment">
+   Generate a YAML representation of the provided <i><tt class="parameter">data</tt></i>
+.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">data</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       The <i><tt class="parameter">data</tt></i>
+ being encoded. Can be any type except
+       a  <span class="type">resource</span> .
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">encoding</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Output character encoding chosen from
+       <b><tt>YAML_ANY_ENCODING</tt></b>,
+       <b><tt>YAML_UTF8_ENCODING</tt></b>,
+       <b><tt>YAML_UTF16LE_ENCODING</tt></b>,
+       <b><tt>YAML_UTF16BE_ENCODING</tt></b>. Defaults to
+       <b><tt>YAML_ANY_ENCODING</tt></b>.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">linebreak</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Output linebreak style chosen from
+       <b><tt>YAML_ANY_BREAK</tt></b>,
+       <b><tt>YAML_CR_BREAK</tt></b>,
+       <b><tt>YAML_LN_BREAK</tt></b>,
+       <b><tt>YAML_CRLN_BREAK</tt></b>. Defaults to
+       <b><tt>YAML_ANY_BREAK</tt></b>.
+      </p>
+     </dd>
+
+    </dt>
+
+   </dl>
+
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns a YAML encoded  <span class="type">string</span>  on success.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example">
+    <p><b>Example #1 <span class="function">yaml_emit</span> example</b></p>
+    <div class="example-contents">
+     <div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/*&nbsp;...&nbsp;*/<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+    <div class="example-contents screen">
+     <div class="cdata"><pre>
+     ...
+     </pre></div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li class="member"><span class="function">yaml_emit_file</span></li>
+    <li class="member"><span class="function">yaml_parse</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div>
+<hr />
+
+
+
+
+
+
+
+
+<div id="function.yaml-parse-file" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">yaml_parse_file</h1>
+  <p class="refpurpose">Parse a YAML stream from a file</p>
+ </div>
+
+ <div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+    <span class="type">mixed</span>  <span class="methodname">yaml_parse_file</span>
+    ( <span class="methodparam"> <span class="type">string</span>  <tt class="parameter">$filename</tt></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$pos</tt><span class="initializer"> = 0</span></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter reference">&$ndocs</tt></span>
+   [, <span class="methodparam"> <span class="type">array</span>  <tt class="parameter">$callbacks</tt></span>
+  ]]] )</div>
+
+  <p class="para rdfs-comment">
+   Convert all or part of a YAML document stream read from a file to a PHP variable.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">filename</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Path to the file.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">pos</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Document to extract from stream (<i>-1</i> for all
+       documents, <i>0</i> for first document, ...).
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">ndocs</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       If <i><tt class="parameter">ndocs</tt></i>
+ is provided, then it is filled with the
+       number of documents found in stream.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">callbacks</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Content handlers for YAML nodes. Associative  <span class="type">array</span>  of YAML
+       tag =&gt;  <span class="type">callback</span>  mappings.
+      </p>
+     </dd>
+
+    </dt>
+
+   </dl>
+
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the value encoded in <i><tt class="parameter">input</tt></i>
+ in appropriate
+   PHP type. <b><tt>NULL</tt></b> is returned if the <i><tt class="parameter">input</tt></i>
+ cannot be
+   decoded. If <i><tt class="parameter">pos</tt></i>
+ is <i>-1</i> an
+    <span class="type">array</span>  will be returned with one entry for each document found
+   in the stream.
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li class="member"><span class="function">yaml_parse</span></li>
+    <li class="member"><span class="function">yaml_parse_url</span></li>
+    <li class="member"><span class="function">yaml_emit</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div>
+<hr />
+
+
+
+
+
+
+
+
+<div id="function.yaml-parse-url" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">yaml_parse_url</h1>
+  <p class="refpurpose">Parse a Yaml stream from a URL</p>
+ </div>
+
+ <div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+    <span class="type">mixed</span>  <span class="methodname">yaml_parse_url</span>
+    ( <span class="methodparam"> <span class="type">string</span>  <tt class="parameter">$url</tt></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$pos</tt><span class="initializer"> = 0</span></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter reference">&$ndocs</tt></span>
+   [, <span class="methodparam"> <span class="type">array</span>  <tt class="parameter">$callbacks</tt></span>
+  ]]] )</div>
+
+  <p class="para rdfs-comment">
+   Convert all or part of a YAML document stream read from a URL to a PHP variable.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">url</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       <i><tt class="parameter">url</tt></i>
+ should be of the form &quot;scheme://...&quot;. PHP
+       will search for a protocol handler (also known as a wrapper) for that
+       scheme. If no wrappers for that protocol are registered, PHP will emit
+       a notice to help you track potential problems in your script and then
+       continue as though filename specifies a regular file.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">pos</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Document to extract from stream (<i>-1</i> for all
+       documents, <i>0</i> for first document, ...).
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">ndocs</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       If <i><tt class="parameter">ndocs</tt></i>
+ is provided, then it is filled with the
+       number of documents found in stream.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">callbacks</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Content handlers for YAML nodes. Associative  <span class="type">array</span>  of YAML
+       tag =&gt;  <span class="type">callback</span>  mappings.
+      </p>
+     </dd>
+
+    </dt>
+
+   </dl>
+
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the value encoded in <i><tt class="parameter">input</tt></i>
+ in appropriate
+   PHP type. <b><tt>NULL</tt></b> is returned if the <i><tt class="parameter">input</tt></i>
+ cannot be
+   decoded. If <i><tt class="parameter">pos</tt></i>
+ is <i>-1</i> an
+    <span class="type">array</span>  will be returned with one entry for each document found
+   in the stream.
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li class="member"><span class="function">yaml_parse</span></li>
+    <li class="member"><span class="function">yaml_parse_file</span></li>
+    <li class="member"><span class="function">yaml_emit</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div>
+<hr />
+
+
+
+
+
+
+
+
+<div id="function.yaml-parse" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">yaml_parse</h1>
+  <p class="refpurpose">Parse a YAML stream</p>
+ </div>
+
+ <div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+    <span class="type">mixed</span>  <span class="methodname">yaml_parse</span>
+    ( <span class="methodparam"> <span class="type">string</span>  <tt class="parameter">$input</tt></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter">$pos</tt><span class="initializer"> = 0</span></span>
+   [, <span class="methodparam"> <span class="type">int</span>  <tt class="parameter reference">&$ndocs</tt></span>
+   [, <span class="methodparam"> <span class="type">array</span>  <tt class="parameter">$callbacks</tt></span>
+  ]]] )</div>
+
+  <p class="para rdfs-comment">
+   Convert all or part of a YAML document stream to a PHP variable.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">input</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       The  <span class="type">string</span>  to parse as a YAML document stream.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">pos</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Document to extract from stream (<i>-1</i> for all
+       documents, <i>0</i> for first document, ...).
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">ndocs</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       If <i><tt class="parameter">ndocs</tt></i>
+ is provided, then it is filled with the
+       number of documents found in stream.
+      </p>
+     </dd>
+
+    </dt>
+
+    <dt>
+
+     <span class="term"><i><tt class="parameter">callbacks</tt></i>
+</span>
+
+     <dd>
+
+      <p class="para">
+       Content handlers for YAML nodes. Associative  <span class="type">array</span>  of YAML
+       tag =&gt;  <span class="type">callback</span>  mappings.
+      </p>
+     </dd>
+
+    </dt>
+
+   </dl>
+
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the value encoded in <i><tt class="parameter">input</tt></i>
+ in appropriate
+   PHP type. <b><tt>NULL</tt></b> is returned if the <i><tt class="parameter">input</tt></i>
+ cannot be
+   decoded. If <i><tt class="parameter">pos</tt></i>
+ is <i>-1</i> an
+    <span class="type">array</span>  will be returned with one entry for each document found
+   in the stream.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example">
+    <p><b>Example #1 <span class="function">yaml_parse</span> example</b></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$yaml&nbsp;</span><span style="color: #007700">=&nbsp;&lt;&lt;&lt;EOD<br /></span><span style="color: #DD0000">---<br />invoice:&nbsp;34843<br />date:&nbsp;"2001-01-23"<br />bill-to:&nbsp;&amp;id001<br />&nbsp;&nbsp;given:&nbsp;Chris<br />&nbsp;&nbsp;family:&nbsp;Dumars<br />&nbsp;&nbsp;address:<br />&nbsp;&nbsp;&nbsp;&nbsp;lines:&nbsp;|-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;458&nbsp;Walkman&nbsp;Dr.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Suite&nbsp;#292<br />&nbsp;&nbsp;&nbsp;&nbsp;city:&nbsp;Royal&nbsp;Oak<br />&nbsp;&nbsp;&nbsp;&nbsp;state:&nbsp;MI<br />&nbsp;&nbsp;&nbsp;&nbsp;postal:&nbsp;48046<br />ship-to:&nbsp;*id001<br />product:<br />-&nbsp;sku:&nbsp;BL394D<br />&nbsp;&nbsp;quantity:&nbsp;4<br />&nbsp;&nbsp;description:&nbsp;Basketball<br />&nbsp;&nbsp;price:&nbsp;450<br />-&nbsp;sku:&nbsp;BL4438H<br />&nbsp;&nbsp;quantity:&nbsp;1<br />&nbsp;&nbsp;description:&nbsp;Super&nbsp;Hoop<br />&nbsp;&nbsp;price:&nbsp;2392<br />tax:&nbsp;251.420000<br />total:&nbsp;4443.520000<br />comments:&nbsp;Late&nbsp;afternoon&nbsp;is&nbsp;best.&nbsp;Backup&nbsp;contact&nbsp;is&nbsp;Nancy&nbsp;Billsmer&nbsp;@&nbsp;338-4338.<br />...<br /></span><span style="color: #007700">EOD;<br /><br /></span><span style="color: #0000BB">$parsed&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">yaml_parse</span><span style="color: #007700">(</span><span style="color: #0000BB">$yaml</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+array(8) {
+  [&quot;invoice&quot;]=&gt;
+  int(34843)
+  [&quot;date&quot;]=&gt;
+  string(10) &quot;2001-01-23&quot;
+  [&quot;bill-to&quot;]=&gt;
+  &amp;array(3) {
+    [&quot;given&quot;]=&gt;
+    string(5) &quot;Chris&quot;
+    [&quot;family&quot;]=&gt;
+    string(6) &quot;Dumars&quot;
+    [&quot;address&quot;]=&gt;
+    array(4) {
+      [&quot;lines&quot;]=&gt;
+      string(34) &quot;458 Walkman Dr.
+        Suite #292&quot;
+      [&quot;city&quot;]=&gt;
+      string(9) &quot;Royal Oak&quot;
+      [&quot;state&quot;]=&gt;
+      string(2) &quot;MI&quot;
+      [&quot;postal&quot;]=&gt;
+      int(48046)
+    }
+  }
+  [&quot;ship-to&quot;]=&gt;
+  &amp;array(3) {
+    [&quot;given&quot;]=&gt;
+    string(5) &quot;Chris&quot;
+    [&quot;family&quot;]=&gt;
+    string(6) &quot;Dumars&quot;
+    [&quot;address&quot;]=&gt;
+    array(4) {
+      [&quot;lines&quot;]=&gt;
+      string(34) &quot;458 Walkman Dr.
+        Suite #292&quot;
+      [&quot;city&quot;]=&gt;
+      string(9) &quot;Royal Oak&quot;
+      [&quot;state&quot;]=&gt;
+      string(2) &quot;MI&quot;
+      [&quot;postal&quot;]=&gt;
+      int(48046)
+    }
+  }
+  [&quot;product&quot;]=&gt;
+  array(2) {
+    [0]=&gt;
+    array(4) {
+      [&quot;sku&quot;]=&gt;
+      string(6) &quot;BL394D&quot;
+      [&quot;quantity&quot;]=&gt;
+      int(4)
+      [&quot;description&quot;]=&gt;
+      string(10) &quot;Basketball&quot;
+      [&quot;price&quot;]=&gt;
+      int(450)
+    }
+    [1]=&gt;
+    array(4) {
+      [&quot;sku&quot;]=&gt;
+      string(7) &quot;BL4438H&quot;
+      [&quot;quantity&quot;]=&gt;
+      int(1)
+      [&quot;description&quot;]=&gt;
+      string(10) &quot;Super Hoop&quot;
+      [&quot;price&quot;]=&gt;
+      int(2392)
+    }
+  }
+  [&quot;tax&quot;]=&gt;
+  float(251.42)
+  [&quot;total&quot;]=&gt;
+  float(4443.52)
+  [&quot;comments&quot;]=&gt;
+  string(68) &quot;Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.&quot;
+}
+</pre></div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li class="member"><span class="function">yaml_parse_file</span></li>
+    <li class="member"><span class="function">yaml_parse_url</span></li>
+    <li class="member"><span class="function">yaml_emit</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div>
+<hr />
+
+
+
+
+
+
+<strong>Table of Contents</strong><ul class="chunklist chunklist_reference">
+<li><a href="#function.yaml-emit-file">yaml_emit_file</a> — Send the YAML representation of a value to a file</li>
+<li><a href="#function.yaml-emit">yaml_emit</a> — Returns the YAML representation of a value</li>
+<li><a href="#function.yaml-parse-file">yaml_parse_file</a> — Parse a YAML stream from a file</li>
+<li><a href="#function.yaml-parse-url">yaml_parse_url</a> — Parse a Yaml stream from a URL</li>
+<li><a href="#function.yaml-parse">yaml_parse</a> — Parse a YAML stream</li>
+</ul>
+</ol>
+</div>
+<hr />
+
+
+
+
+
+
+</div>
+<hr />
+</body>
+</html>
