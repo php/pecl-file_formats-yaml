@@ -228,8 +228,8 @@ php_yaml_handle_parser_error (const yaml_parser_t *parser TSRMLS_DC)
   if (parser->problem != NULL) {
     if (parser->context) {
       php_error_docref(NULL TSRMLS_CC, E_WARNING,
-          "%s error encountered during parsing: %s (line %d, column %d), "
-          "context %s (line %d, column %d)",
+          "%s error encountered during parsing: %s (line %ld, column %ld), "
+          "context %s (line %ld, column %ld)",
           error_type,
           parser->problem,
           parser->problem_mark.line + 1, parser->problem_mark.column + 1,
@@ -237,7 +237,7 @@ php_yaml_handle_parser_error (const yaml_parser_t *parser TSRMLS_DC)
           parser->context_mark.line + 1, parser->context_mark.column + 1);
     } else {
       php_error_docref(NULL TSRMLS_CC, E_WARNING,
-          "%s error encountered during parsing: %s (line %d, column %d)",
+          "%s error encountered during parsing: %s (line %ld, column %ld)",
           error_type,
           parser->problem,
           parser->problem_mark.line + 1, parser->problem_mark.column + 1);
