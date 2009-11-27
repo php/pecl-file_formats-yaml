@@ -282,7 +282,7 @@ php_yaml_read_impl (yaml_parser_t *parser, yaml_event_t *parent,
 
     if (!yaml_parser_parse(parser, &event)) {
       /* error encountered parsing input */
-      php_yaml_handle_parser_error(parser);
+      php_yaml_handle_parser_error(parser TSRMLS_CC);
       code = Y_PARSER_FAILURE;
       /* break out of do-while and continue to cleanup code */
       break;
@@ -503,7 +503,7 @@ php_yaml_read_partial (yaml_parser_t *parser, long pos, long *ndocs,
 
   do {
     if (!yaml_parser_parse(parser, &event)) {
-      php_yaml_handle_parser_error(parser);
+      php_yaml_handle_parser_error(parser TSRMLS_CC);
       code = Y_PARSER_FAILURE;
       break;
     }

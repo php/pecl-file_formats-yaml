@@ -229,7 +229,7 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
           zend_hash_internal_pointer_reset(ht);
           while (SUCCESS == zend_hash_has_more_elements(ht)) {
             if (SUCCESS == zend_hash_get_current_data(ht, (void**) &elm)) {
-              status = php_yaml_write_zval(emitter, (*elm));
+              status = php_yaml_write_zval(emitter, (*elm) TSRMLS_CC);
               if (SUCCESS != status) return FAILURE;
             }
             zend_hash_move_forward(ht);
@@ -264,13 +264,13 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
             }
 
             /* emit key */
-            status = php_yaml_write_zval(emitter, &key_zval);
+            status = php_yaml_write_zval(emitter, &key_zval TSRMLS_CC);
             zval_dtor(&key_zval);
             if (SUCCESS != status) return FAILURE;
 
             /* emit value */
             if (SUCCESS == zend_hash_get_current_data(ht, (void**) &elm)) {
-              status = php_yaml_write_zval(emitter, (*elm));
+              status = php_yaml_write_zval(emitter, (*elm) TSRMLS_CC);
               if (SUCCESS != status) return FAILURE;
             }
 
@@ -360,7 +360,7 @@ php_yaml_write_zval (yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 
 
 emitter_error:
-  php_yaml_handle_emitter_error(emitter);
+  php_yaml_handle_emitter_error(emitter TSRMLS_CC);
   yaml_event_delete(&event);
   return FAILURE;
 
@@ -395,7 +395,7 @@ php_yaml_write_impl (
   event_emit(&event);
 
   /* output data */
-  status = php_yaml_write_zval(emitter, data);
+  status = php_yaml_write_zval(emitter, data TSRMLS_CC);
   if (SUCCESS != status) return FAILURE;
   
   /* end document */
@@ -412,7 +412,7 @@ php_yaml_write_impl (
 
 
 emitter_error:
-  php_yaml_handle_emitter_error(emitter);
+  php_yaml_handle_emitter_error(emitter TSRMLS_CC);
   yaml_event_delete(&event);
   return FAILURE;
 

@@ -101,6 +101,8 @@ ZEND_BEGIN_MODULE_GLOBALS(yaml)
 #endif
 ZEND_END_MODULE_GLOBALS(yaml)
 
+ZEND_EXTERN_MODULE_GLOBALS(yaml)
+
 #ifdef ZTS
 #define YAML_G(v) TSRMG(yaml_globals_id, zend_yaml_globals *, v)
 #else

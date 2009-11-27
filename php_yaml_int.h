@@ -74,11 +74,11 @@ int php_yaml_write_to_buffer (
 
 /* }}} */
 
-/* {{{ globals */
-
-ZEND_DECLARE_MODULE_GLOBALS(yaml)
-
-/* }}} */
+#if (PHP_MAJOR_VERSION > 5) || ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION >= 3))
+# define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
+#else
+# define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
+#endif
 
 #ifdef __cplusplus
 } // extern "C"

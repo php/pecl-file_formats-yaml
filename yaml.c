@@ -66,6 +66,12 @@ static PHP_FUNCTION(yaml_emit_file);
 
 /* }}} */
 
+/* {{{ globals */
+
+PHPAPI ZEND_DECLARE_MODULE_GLOBALS(yaml);
+
+/* }}} */
+
 /* {{{ ini entries */
 
 #ifndef ZEND_ENGINE_2
@@ -84,34 +90,34 @@ PHP_INI_END()
 /* {{{ argument informations */
 
 #ifdef ZEND_BEGIN_ARG_INFO
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_parse, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_parse, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
   ZEND_ARG_INFO(0, input)
   ZEND_ARG_INFO(0, pos)
   ZEND_ARG_INFO(1, ndocs)
   ZEND_ARG_ARRAY_INFO(0, callbacks, 0)
 ZEND_END_ARG_INFO()
 
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_parse_file, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_parse_file, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
   ZEND_ARG_INFO(0, filename)
   ZEND_ARG_INFO(0, pos)
   ZEND_ARG_INFO(1, ndocs)
   ZEND_ARG_ARRAY_INFO(0, callbacks, 0)
 ZEND_END_ARG_INFO()
 
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_parse_url, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_parse_url, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
   ZEND_ARG_INFO(0, url)
   ZEND_ARG_INFO(0, pos)
   ZEND_ARG_INFO(1, ndocs)
   ZEND_ARG_ARRAY_INFO(0, callbacks, 0)
 ZEND_END_ARG_INFO()
 
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
   ZEND_ARG_INFO(0, data)
   ZEND_ARG_INFO(0, encoding)
   ZEND_ARG_INFO(0, linebreak)
 ZEND_END_ARG_INFO()
 
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit_file, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit_file, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 2)
   ZEND_ARG_INFO(0, filename)
   ZEND_ARG_INFO(0, data)
   ZEND_ARG_INFO(0, encoding)
@@ -356,7 +362,7 @@ php_yaml_check_callbacks (HashTable *callbacks TSRMLS_DC)
     if (key_type == HASH_KEY_IS_STRING) {
       char *name;
 
-      if (!zend_is_callable(*entry, 0, &name)) {
+      if (!IS_CALLABLE(*entry, 0, &name)) {
         if (name != NULL) {
           php_error_docref(NULL TSRMLS_CC, E_WARNING,
               "Callback for tag '%s', '%s' is not valid", key, name);
@@ -670,7 +676,7 @@ PHP_FUNCTION(yaml_emit)
   yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
   if (SUCCESS == php_yaml_write_impl(
-        &emitter, data, (yaml_encoding_t) encoding)) {
+        &emitter, data, (yaml_encoding_t) encoding TSRMLS_CC)) {
 #ifdef IS_UNICODE
     RETVAL_U_STRINGL(UG(utf8_conv), str.c, str.len, ZSTR_DUPLICATE);
 #else
@@ -734,7 +740,7 @@ PHP_FUNCTION(yaml_emit_file)
   yaml_emitter_set_output_file(&emitter, fp);
 
   RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
-          &emitter, data, YAML_ANY_ENCODING)));
+          &emitter, data, YAML_ANY_ENCODING TSRMLS_CC)));
 
   yaml_emitter_delete(&emitter);
   php_stream_close(stream);
