@@ -6,11 +6,6 @@ Document parse callback syntax and usage.
 Add php ini setting to turn y/n boolean treatment on/off.
   see http://www.kuwata-lab.com/materials/php_yaml-0.3.0.patch
 
-Other ini settings:
-  canonical_output = 0/1
-  indent = 1-10
-  output_width = -1,1-inf
-
 More tests for proper string emits
 
 Support << "merge" in mappings. Probably means refactoring the parser so that

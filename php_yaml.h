@@ -96,6 +96,9 @@ ZEND_BEGIN_MODULE_GLOBALS(yaml)
 	zend_bool decode_binary;
 	long decode_timestamp;
 	zval *timestamp_decoder;
+	zend_bool output_canonical;
+	long output_indent;
+	long output_width;
 #ifdef IS_UNICODE
 	UConverter *orig_runtime_encoding_conv;
 #endif

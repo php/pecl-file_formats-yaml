@@ -86,6 +86,12 @@ PHP_INI_BEGIN()
 			decode_binary, zend_yaml_globals, yaml_globals)
 	STD_PHP_INI_ENTRY("yaml.decode_timestamp", "0", PHP_INI_ALL, OnUpdateLong,
 			decode_timestamp, zend_yaml_globals, yaml_globals)
+	STD_PHP_INI_ENTRY("yaml.output_canonical", "0", PHP_INI_ALL, OnUpdateBool,
+			output_canonical, zend_yaml_globals, yaml_globals)
+	STD_PHP_INI_ENTRY("yaml.output_indent", "2", PHP_INI_ALL, OnUpdateLong,
+			output_indent, zend_yaml_globals, yaml_globals)
+	STD_PHP_INI_ENTRY("yaml.output_width", "80", PHP_INI_ALL, OnUpdateLong,
+			output_width, zend_yaml_globals, yaml_globals)
 PHP_INI_END()
 
 /* }}} */
@@ -288,6 +294,9 @@ static PHP_GINIT_FUNCTION(yaml)
 	yaml_globals->decode_binary = 0;
 	yaml_globals->decode_timestamp = 0;
 	yaml_globals->timestamp_decoder = NULL;
+	yaml_globals->output_canonical = 0;
+	yaml_globals->output_indent = 2;
+	yaml_globals->output_width = 80;
 #ifdef IS_UNICODE
 	yaml_globals->orig_runtime_encoding_conv = NULL;
 #endif
@@ -686,10 +695,9 @@ PHP_FUNCTION(yaml_emit)
 			&emitter, &php_yaml_write_to_buffer, (void *) &str);
 	yaml_emitter_set_encoding(&emitter, (yaml_encoding_t) encoding);
 	yaml_emitter_set_break(&emitter, (yaml_break_t) linebreak);
-	/* TODO: let user set these via ini settings */
-	yaml_emitter_set_canonical(&emitter, 0);
-	yaml_emitter_set_indent(&emitter, 2);
-	yaml_emitter_set_width(&emitter, 80);
+	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
+	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
+	yaml_emitter_set_width(&emitter, YAML_G(output_width));
 	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
 	if (SUCCESS == php_yaml_write_impl(
@@ -760,6 +768,12 @@ PHP_FUNCTION(yaml_emit_file)
 
 	yaml_emitter_initialize(&emitter);
 	yaml_emitter_set_output_file(&emitter, fp);
+	yaml_emitter_set_encoding(&emitter, (yaml_encoding_t) encoding);
+	yaml_emitter_set_break(&emitter, (yaml_break_t) linebreak);
+	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
+	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
+	yaml_emitter_set_width(&emitter, YAML_G(output_width));
+	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
 			&emitter, data, YAML_ANY_ENCODING TSRMLS_CC)));
