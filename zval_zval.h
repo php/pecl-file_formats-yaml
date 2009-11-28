@@ -21,24 +21,33 @@
 #ifndef ZVAL_ZVAL
 
 #define ZVAL_ZVAL(z, zv, copy, dtor) {  \
-		int is_ref, refcount;           \
-		is_ref = (z)->is_ref;           \
-		refcount = (z)->refcount;       \
-		*(z) = *(zv);                   \
-		if (copy) {                     \
-			zval_copy_ctor(z);          \
-		}                               \
-		if (dtor) {                     \
-			if (!copy) {                \
-				ZVAL_NULL(zv);          \
-			}                           \
-			zval_ptr_dtor(&zv);         \
-		}                               \
-		(z)->is_ref = is_ref;           \
-		(z)->refcount = refcount;       \
-	}
+	int is_ref, refcount;           \
+	is_ref = (z)->is_ref;           \
+	refcount = (z)->refcount;       \
+	*(z) = *(zv);                   \
+	if (copy) {                     \
+		zval_copy_ctor(z);          \
+	}                               \
+	if (dtor) {                     \
+		if (!copy) {                \
+			ZVAL_NULL(zv);          \
+		}                           \
+		zval_ptr_dtor(&zv);         \
+	}                               \
+	(z)->is_ref = is_ref;           \
+	(z)->refcount = refcount;       \
+}
 
 #define RETVAL_ZVAL(zv, copy, dtor) ZVAL_ZVAL(return_value, zv, copy, dtor)
 #define RETURN_ZVAL(zv, copy, dtor) { RETVAL_ZVAL(zv, copy, dtor); return; }
 
 #endif /* ZVAL_ZVAL */
+
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ * vim600: noet sw=4 ts=4 fdm=marker
+ * vim<600: noet sw=4 ts=4 
+ */

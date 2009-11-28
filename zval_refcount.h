@@ -46,7 +46,7 @@
 #define Z_UNSET_ISREF(z)          ((z).is_ref = 0)
 #define Z_SET_ISREF_TO(z, isref)  ((z).is_ref = isref)
 
-#endif /* Z_REFCOUNT_P */
+#endif							/* Z_REFCOUNT_P */
 
 /*
  * Local variables:

@@ -40,57 +40,55 @@ extern "C" {
 #endif
 
 /* {{{ ext/yaml macros
- */
+*/
 #define YAML_BINARY_TAG     "tag:yaml.org,2002:binary"
 #define YAML_PHP_TAG        "!php/object"
 
 /* }}} */
 
 /* {{{ ext/yaml prototypes
- */
-zval * php_yaml_read_impl (
-    yaml_parser_t *parser, yaml_event_t *parent,
-    zval *aliases, zval *zv, long *ndocs,
-    eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC);
+*/
+zval *php_yaml_read_impl(yaml_parser_t * parser, yaml_event_t * parent,
+		zval * aliases, zval * zv, long *ndocs,
+		eval_scalar_func_t eval_func, HashTable * callbacks TSRMLS_DC);
 
-zval * php_yaml_read_partial (
-    yaml_parser_t *parser, long pos, long *ndocs,
-    eval_scalar_func_t eval_func, HashTable *callbacks TSRMLS_DC);
+zval *php_yaml_read_partial(yaml_parser_t * parser, long pos,
+		long *ndocs, eval_scalar_func_t eval_func,
+		HashTable * callbacks TSRMLS_DC);
 
-zval * php_yaml_eval_scalar (
-    yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+zval *php_yaml_eval_scalar(
+		yaml_event_t event, HashTable * callbacks TSRMLS_DC);
 
-zval * php_yaml_eval_scalar_with_callbacks (
-    yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+zval *php_yaml_eval_scalar_with_callbacks(
+		yaml_event_t event, HashTable * callbacks TSRMLS_DC);
 
-char * php_yaml_detect_scalar_type (
-    const char *value, size_t length, const yaml_event_t *event);
+char *php_yaml_detect_scalar_type(
+		const char *value, size_t length, const yaml_event_t * event);
 
-int php_yaml_write_impl (
-    yaml_emitter_t *emitter, zval *data, yaml_encoding_t encoding TSRMLS_DC);
+int php_yaml_write_impl(yaml_emitter_t * emitter, zval * data,
+		yaml_encoding_t encoding TSRMLS_DC);
 
-int php_yaml_write_to_buffer (
-    void *data, unsigned char *buffer, size_t size);
+int php_yaml_write_to_buffer(
+		void *data, unsigned char *buffer, size_t size);
 
 /* }}} */
 
 #if (PHP_MAJOR_VERSION > 5) || ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION >= 3))
-# define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
+#	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
 #else
-# define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
+#	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
 #endif
 
 #ifdef __cplusplus
-} // extern "C"
+} /* extern "C" */
 #endif
-
 #endif /* PHP_YAML_INT_H */
 
 /*
  * Local variables:
- * tab-width: 2
- * c-basic-offset: 2
+ * tab-width: 4
+ * c-basic-offset: 4
  * End:
- * vim600: et sw=2 ts=2 fdm=marker
- * vim<600: et sw=2 ts=2
+ * vim600: noet sw=4 ts=4 fdm=marker
+ * vim<600: noet sw=4 ts=4
  */
