@@ -60,6 +60,7 @@
 
 /* }}} */
 
+
 /* {{{ local prototypes
  */
 static char *php_yaml_convert_to_char(zval * zv TSRMLS_DC);
@@ -94,6 +95,7 @@ static int php_yaml_eval_timestamp(
 
 /* }}} */
 
+
 /* {{{ php_yaml_convert_to_char()
  * Convert a zval to a character array.
  */
@@ -113,6 +115,7 @@ static char *php_yaml_convert_to_char(zval * zv TSRMLS_DC)
 	case IS_DOUBLE:
 		{
 			char buf[64] = { '\0' };
+
 			(void) snprintf(buf, 64, "%G", Z_DVAL_P(zv));
 			str = estrdup(buf);
 		}
@@ -121,6 +124,7 @@ static char *php_yaml_convert_to_char(zval * zv TSRMLS_DC)
 	case IS_LONG:
 		{
 			char buf[32] = { '\0' };
+
 			(void) snprintf(buf, 32, "%ld", Z_LVAL_P(zv));
 			str = estrdup(buf);
 		}
@@ -172,6 +176,7 @@ static char *php_yaml_convert_to_char(zval * zv TSRMLS_DC)
 			}
 		}
 #endif
+		break;
 
 	default:
 		{
@@ -184,6 +189,7 @@ static char *php_yaml_convert_to_char(zval * zv TSRMLS_DC)
 
 			str = buf.c;
 		}
+		break;
 	}
 
 	if (NULL == str) {
@@ -193,8 +199,8 @@ static char *php_yaml_convert_to_char(zval * zv TSRMLS_DC)
 
 	return str;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_handle_parser_error()
  * Emit a warning about a parser error
@@ -252,8 +258,8 @@ php_yaml_handle_parser_error(const yaml_parser_t * parser TSRMLS_DC)
 				"%s error encountred during parsing", error_type);
 	}
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_read_impl()
  * Process events from yaml parser
@@ -479,6 +485,7 @@ zval *php_yaml_read_impl(yaml_parser_t * parser, yaml_event_t * parent,
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"unknown event type");
 			code = Y_PARSER_FAILURE;
+			break;
 		}
 
 		yaml_event_delete(&event);
@@ -503,8 +510,8 @@ zval *php_yaml_read_impl(yaml_parser_t * parser, yaml_event_t * parent,
 
 	return retval;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_read_partial()
  * Read a particular document from the parser's document stream.
@@ -528,6 +535,7 @@ zval *php_yaml_read_partial(yaml_parser_t * parser, long pos, long *ndocs,
 				/* we're reached the document that the user is interested in */
 				zval *tmp_p = NULL;
 				zval *aliases = NULL;
+
 				MAKE_STD_ZVAL(aliases);
 				array_init(aliases);
 #ifdef IS_UNICODE
@@ -578,8 +586,8 @@ zval *php_yaml_read_partial(yaml_parser_t * parser, long pos, long *ndocs,
 
 	return retval;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_apply_filter()
  * Apply user supplied hander to node
@@ -638,8 +646,8 @@ php_yaml_apply_filter(zval ** zpp, yaml_event_t event,
 		return Y_FILTER_NONE;
 	}
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_eval_scalar()
  * Convert a scalar node to the proper PHP data type.
@@ -681,19 +689,23 @@ zval *php_yaml_eval_scalar(yaml_event_t event,
 		if (flags != Y_SCALAR_IS_NOT_NUMERIC) {
 			if (flags & Y_SCALAR_IS_FLOAT) {
 				ZVAL_DOUBLE(tmp, dval);
+
 			} else {
 				ZVAL_LONG(tmp, lval);
 			}
 
 			if (event.data.scalar.plain_implicit) {
 				/* pass */
+
 			} else if (SCALAR_TAG_IS(event, YAML_FLOAT_TAG) &&
 					(flags & Y_SCALAR_IS_INT)) {
 				convert_to_double(tmp);
+
 			} else if (SCALAR_TAG_IS(event, YAML_INT_TAG) &&
 					(flags & Y_SCALAR_IS_FLOAT)) {
 				convert_to_long(tmp);
 			}
+
 			return tmp;
 
 		} else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_FLOAT_TAG)) {
@@ -741,12 +753,15 @@ zval *php_yaml_eval_scalar(yaml_event_t event,
 				php_error_docref(NULL TSRMLS_CC, E_WARNING,
 						"Failed to decode binary");
 				ZVAL_NULL(tmp);
+
 			} else {
 				ZVAL_STRINGL(tmp, (char *) data, data_len, 0);
 			}
+
 		} else {
 			ZVAL_STRINGL(tmp, value, length, 1);
 		}
+
 		return tmp;
 	}
 
@@ -780,8 +795,8 @@ zval *php_yaml_eval_scalar(yaml_event_t event,
 
 	return tmp;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_eval_scalar_with_callbacks()
  * Convert a scalar node to the proper PHP data type using user supplied input 
@@ -844,8 +859,8 @@ zval *php_yaml_eval_scalar_with_callbacks(yaml_event_t event,
 	/* no mapping, so handle raw */
 	return php_yaml_eval_scalar(event, NULL TSRMLS_CC);
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_scalar_is_null(const char *,size_t,yaml_event_t)
  * Does this scalar encode a NULL value?
@@ -859,20 +874,22 @@ php_yaml_scalar_is_null(const char *value, size_t length,
 	if (NULL != event && event->data.scalar.quoted_implicit) {
 		return 0;
 	}
+
 	if (NULL == event || event->data.scalar.plain_implicit) {
 		if ((length == 1 && *value == '~') || length == 0 ||
 				!strcmp("NULL", value) || !strcmp("Null", value) ||
 				!strcmp("null", value)) {
 			return 1;
 		}
+
 	} else if (NULL != event && SCALAR_TAG_IS((*event), YAML_NULL_TAG)) {
 		return 1;
 	}
 
 	return 0;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_scalar_is_bool(const char *,size_t,yaml_event_t)
  * Does this scalar encode a BOOL value?
@@ -893,6 +910,7 @@ php_yaml_scalar_is_bool(const char *value, size_t length,
 				!strcmp("on", value)) {
 			return 1;
 		}
+
 		if ((length == 1 && (*value == 'N' || *value == 'n')) ||
 				!strcmp("NO", value) || !strcmp("No", value) || 
 				!strcmp("no", value) || !strcmp("FALSE", value) || 
@@ -913,8 +931,8 @@ php_yaml_scalar_is_bool(const char *value, size_t length,
 
 	return -1;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_scalar_is_numeric()
  * Does this scalar encode a NUMERIC value?
@@ -939,9 +957,11 @@ php_yaml_scalar_is_numeric(const char *value, size_t length, long *lval,
 	while (value < end && (*(end - 1) == ' ' || *(end - 1) == '\t')) {
 		end--;
 	}
+
 	while (value < end && (*value == ' ' || *value == '\t')) {
 		value++;
 	}
+
 	if (value == end) {
 		goto not_numeric;
 	}
@@ -956,10 +976,12 @@ php_yaml_scalar_is_numeric(const char *value, size_t length, long *lval,
 	/* sign */
 	if (*value == '+') {
 		value++;
+
 	} else if (*value == '-') {
 		negative = 1;
 		value++;
 	}
+
 	if (value == end) {
 		goto not_numeric;
 	}
@@ -992,48 +1014,61 @@ php_yaml_scalar_is_numeric(const char *value, size_t length, long *lval,
 			if (value == end) {
 				goto not_numeric;
 			}
+
 			while (value < end && (*value == '_' || *value == '0')) {
 				value++;
 			}
+
 			if (value == end) {
 				goto return_zero;
 			}
+
 			/* check the sequence */
 			while (value < end) {
 				if (*value == '_') {
 					value++;
+
 				} else if (*value == '0' || *value == '1') {
 					*ptr++ = *value++;
+
 				} else {
 					goto not_numeric;
 				}
 			}
+
 			type = Y_SCALAR_IS_INT | Y_SCALAR_IS_BINARY;
 
 		} else if (*value == 'x') {
 			/* hexadecimal integer */
 			*ptr++ = *value++;
+
 			if (value == end) {
 				goto not_numeric;
 			}
+
 			while (value < end && (*value == '_' || *value == '0')) {
 				value++;
 			}
+
 			if (value == end) {
 				goto return_zero;
 			}
+
 			/* check the sequence */
 			while (value < end) {
 				if (*value == '_') {
 					value++;
+
 				} else if ((*value >= '0' && *value <= '9') ||
 						(*value >= 'A' && *value <= 'F') ||
 						(*value >= 'a' && *value <= 'f')) {
 					*ptr++ = *value++;
+
 				} else {
 					goto not_numeric;
 				}
 			}
+
 			type = Y_SCALAR_IS_INT | Y_SCALAR_IS_HEXADECIMAL;
 
 		} else if (*value == '_' || (*value >= '0' && *value <= '7')) {
@@ -1041,12 +1076,15 @@ php_yaml_scalar_is_numeric(const char *value, size_t length, long *lval,
 			while (value < end) {
 				if (*value == '_') {
 					value++;
+
 				} else if (*value >= '0' && *value <= '7') {
 					*ptr++ = *value++;
+
 				} else {
 					goto not_numeric;
 				}
 			}
+
 			type = Y_SCALAR_IS_INT | Y_SCALAR_IS_OCTAL;
 
 		} else if (*value == '.') {
@@ -1062,51 +1100,66 @@ php_yaml_scalar_is_numeric(const char *value, size_t length, long *lval,
 		while (value < end) {
 			if (*value == '_' || *value == ',') {
 				value++;
+
 			} else if (*value >= '0' && *value <= '9') {
 				*ptr++ = *value++;
+
 			} else if (*value == ':') {
 				goto check_sexa;
+
 			} else if (*value == '.') {
 				goto check_float;
+
 			} else {
 				goto not_numeric;
+
 			}
 		}
+
 		type = Y_SCALAR_IS_INT | Y_SCALAR_IS_DECIMAL;
 
 	} else if (*value == ':') {
 		/* sexagecimal */
+
 check_sexa:
 		while (value < end - 2) {
 			if (*value == '.') {
 				type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL;
 				goto check_float;
 			}
+
 			if (*value != ':') {
 				goto not_numeric;
 			}
+
 			*ptr++ = *value++;
 			if (*(value + 1) == ':') {
 				if (*value >= '0' && *value <= '9') {
 					*ptr++ = *value++;
+
 				} else {
 					goto not_numeric;
 				}
+
 			} else {
 				if ((*value >= '0' && *value <= '5') &&
 						(*(value + 1) >= '0' && *(value + 1) <= '9')) {
 					*ptr++ = *value++;
 					*ptr++ = *value++;
+
 				} else {
 					goto not_numeric;
 				}
 			}
 		}
+
 		if (*value == '.') {
 			type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL;
 			goto check_float;
+
 		} else if (value == end) {
 			type = Y_SCALAR_IS_INT | Y_SCALAR_IS_SEXAGECIMAL;
+
 		} else {
 			goto not_numeric;
 		}
@@ -1114,6 +1167,7 @@ check_sexa:
 	} else if (*value == '.') {
 		/* float */
 		*ptr++ = '0';
+
 check_float:
 		*ptr++ = *value++;
 		if (value == end) {
@@ -1121,64 +1175,80 @@ check_float:
 			/* mostly here to catch the degenerate case of `.` as input */
 			goto not_numeric;
 		}
+
 		if (type == (Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL)) {
 			/* sexagecimal float */
 			while (value < end && (*(end - 1) == '_' || *(end - 1) == '0')) {
 				end--;
 			}
+
 			if (value == end) {
 				*ptr++ = '0';
 			}
+
 			while (value < end) {
 				if (*value == '_') {
 					value++;
+
 				} else if (*value >= '0' && *value <= '9') {
 					*ptr++ = *value++;
+
 				} else {
 					goto not_numeric;
 				}
 			}
+
 		} else {
 			/* decimal float */
 			int is_exp = 0;
 			while (value < end) {
 				if (*value == '_') {
 					value++;
+
 				} else if (*value >= '0' && *value <= '9') {
 					*ptr++ = *value++;
+
 				} else if (*value == 'E' || *value == 'e') {
 					/* exponential */
 					is_exp = 1;
+
 					*ptr++ = *value++;
 					if (value == end || (*value != '+' && *value != '-')) {
 						goto not_numeric;
 					}
+
 					*ptr++ = *value++;
 					if (value == end || *value < '0' || *value > '9' ||
 							(*value == '0' && value + 1 == end)) {
 						goto not_numeric;
 					}
+
 					*ptr++ = *value++;
 					while (value < end) {
 						if (*value >= '0' && *value <= '9') {
 							*ptr++ = *value++;
+
 						} else {
 							goto not_numeric;
 						}
 					}
+
 				} else {
 					goto not_numeric;
 				}
 			}
+
 			/* trim */
 			if (!is_exp) {
 				while (*(ptr - 1) == '0') {
 					ptr--;
 				}
+
 				if (*(ptr - 1) == '.') {
 					*ptr++ = '0';
 				}
 			}
+
 			type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_DECIMAL;
 		}
 
@@ -1198,26 +1268,33 @@ finish:
 			if (*ptr == 'b') {
 				ptr++;
 			}
+
 			*lval = strtol(ptr, (char **) NULL, 2);
 			if (*buf == '-') {
 				*lval *= -1L;
 			}
 			break;
+
 		case Y_SCALAR_IS_OCTAL:
 			*lval = strtol(buf, (char **) NULL, 8);
 			break;
+
 		case Y_SCALAR_IS_HEXADECIMAL:
 			*lval = strtol(buf, (char **) NULL, 16);
 			break;
+
 		case Y_SCALAR_IS_SEXAGECIMAL:
 			*lval = php_yaml_eval_sexagesimal_l(0, buf, ptr);
 			if (*buf == '-') {
 				*lval *= -1L;
 			}
 			break;
+
 		default:
 			*lval = atol(buf);
+			break;
 		}
+
 	} else if ((type & Y_SCALAR_IS_FLOAT) && dval != NULL) {
 		switch (type & Y_SCALAR_FORMAT_MASK) {
 		case Y_SCALAR_IS_SEXAGECIMAL:
@@ -1226,22 +1303,29 @@ finish:
 				*dval *= -1.0;
 			}
 			break;
+
 		case Y_SCALAR_IS_INFINITY_P:
 			*dval = php_get_inf();
 			break;
+
 		case Y_SCALAR_IS_INFINITY_N:
 			*dval = -php_get_inf();
 			break;
+
 		case Y_SCALAR_IS_NAN:
 			*dval = php_get_nan();
 			break;
+
 		default:
 			*dval = atof(buf);
+			break;
 		}
 	}
+
 	if (buf != NULL) {
 		if (str != NULL) {
 			*str = buf;
+
 		} else {
 			efree(buf);
 		}
@@ -1250,26 +1334,32 @@ finish:
 	/* return */
 	return type;
 
+
 return_zero:
 	if (lval != NULL) {
 		*lval = 0;
 	}
+
 	if (dval != NULL) {
 		*dval = 0.0;
 	}
+
 	if (buf != NULL) {
 		efree(buf);
 	}
+
 	return (Y_SCALAR_IS_INT | Y_SCALAR_IS_ZERO);
+
 
 not_numeric:
 	if (buf != NULL) {
 		efree(buf);
 	}
+
 	return Y_SCALAR_IS_NOT_NUMERIC;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_scalar_is_timestamp(const char *,size_t)
  * Does this scalar encode a TIMESTAMP value?
@@ -1312,9 +1402,11 @@ static int php_yaml_scalar_is_timestamp(const char *value, size_t length)
 		/* date only format requires YYYY-MM-DD */
 		return (pos2 - pos1 == 10) ? 1 : 0;
 	}
+
 	/* time separator is T or whitespace */
 	if (*ptr == 'T' || *ptr == 't') {
 		ptr++;
+
 	} else {
 		ts_skip_space();
 	}
@@ -1363,12 +1455,14 @@ static int php_yaml_scalar_is_timestamp(const char *value, size_t length)
 	if (*ptr != '+' && *ptr != '-') {
 		return 0;
 	}
+
 	/* check 1 or 2 digit time zone hour */
 	pos1 = ++ptr;
 	ts_skip_number();
 	if (ptr == pos1 || ptr - pos1 == 3 || ptr - pos1 > 4) {
 		return 0;
 	}
+
 	if (ptr == end) {
 		return 1;
 	}
@@ -1377,8 +1471,10 @@ static int php_yaml_scalar_is_timestamp(const char *value, size_t length)
 	if (*ptr != ':') {
 		return 0;
 	}
+
 	pos1 = ++ptr;
 	ts_skip_number();
+
 	if (ptr - pos1 != 2) {
 		return 0;
 	}
@@ -1387,8 +1483,8 @@ static int php_yaml_scalar_is_timestamp(const char *value, size_t length)
 	ts_skip_space();
 	return (ptr == end) ? 1 : 0;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_detect_scalar_type(const char *, size_t, yaml_event_t)
  * Guess what datatype the scalar encodes
@@ -1425,8 +1521,8 @@ char *php_yaml_detect_scalar_type(const char *value, size_t length,
 	/* no guess */
 	return NULL;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_eval_sexagesimal_l()
  * Convert a base 60 number to a long
@@ -1434,21 +1530,25 @@ char *php_yaml_detect_scalar_type(const char *value, size_t length,
 static long php_yaml_eval_sexagesimal_l(long lval, char *sg, char *eos)
 {
 	char *ep;
+
 	while (sg < eos && (*sg < '0' || *sg > '9')) {
 		sg++;
 	}
+
 	ep = sg;
 	while (ep < eos && *ep >= '0' && *ep <= '9') {
 		ep++;
 	}
+
 	if (sg == eos) {
 		return lval;
 	}
+
 	return php_yaml_eval_sexagesimal_l(
 			lval * 60 + strtol(sg, (char **) NULL, 10), ep, eos);
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_eval_sexagesimal_d()
  * Convert a base 60 number to a double
@@ -1456,21 +1556,25 @@ static long php_yaml_eval_sexagesimal_l(long lval, char *sg, char *eos)
 static double php_yaml_eval_sexagesimal_d(double dval, char *sg, char *eos)
 {
 	char *ep;
+
 	while (sg < eos && *sg != '.' && (*sg < '0' || *sg > '9')) {
 		sg++;
 	}
+
 	ep = sg;
 	while (ep < eos && *ep >= '0' && *ep <= '9') {
 		ep++;
 	}
+
 	if (sg == eos || *sg == '.') {
 		return dval;
 	}
+
 	return php_yaml_eval_sexagesimal_d(
 			dval * 60.0 + strtod(sg, (char **) NULL), ep, eos);
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_eval_timestamp()
  * Convert a timestamp
@@ -1494,9 +1598,11 @@ php_yaml_eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 		if (NULL == YAML_G(timestamp_decoder)) {
 			if (2L == YAML_G(decode_timestamp)) {
 				ZVAL_STRING(&afunc, funcs[1], 0);
+
 			} else {
 				ZVAL_STRING(&afunc, funcs[0], 0);
 			}
+
 			func = &afunc;
 		} else {
 			func = YAML_G(timestamp_decoder);
@@ -1522,6 +1628,7 @@ php_yaml_eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 						(*(src + 1) >= '0' && *(src + 1) <= '9')) {
 					src++;
 					*dst++ = ' ';
+
 				} else if (*src == ':' && src > ts + 2 && (
 						((*(src - 2) == '+' || *(src - 2) == '-') && 
 						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
@@ -1529,16 +1636,19 @@ php_yaml_eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
 						 (*(src - 1) >= '0' || *(src - 1) <= '9')))) {
 					src++;
+
 				} else {
 					*dst++ = *src++;
 				}
 			}
+
 			if (src < end && *src == '.') {
 				src++;
 				while (src < end && *src >= '0' && *src <= '9') {
 					src++;
 				}
 			}
+
 			while (src < end) {
 				if (*src == ':' && src > ts + 2 && (
 						((*(src - 2) == '+' || *(src - 2) == '-') &&
@@ -1547,15 +1657,18 @@ php_yaml_eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
 						 (*(src - 1) >= '0' || *(src - 1) <= '9')))) {
 					src++;
+
 				} else {
 					*dst++ = *src++;
 				}
 			}
+
 			*dst = '\0';
 
 			ZVAL_STRINGL(arg, buf, dst - buf, 0);
 		}
 #endif
+
 		argv[0] = &arg;
 
 		if (FAILURE == call_user_function_ex(EG(function_table), NULL, func,
@@ -1571,6 +1684,7 @@ php_yaml_eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 			ZVAL_ZVAL(*zpp, retval, 1, 1);
 			return SUCCESS;
 		}
+
 	} else {
 		zval_dtor(*zpp);
 #ifdef IS_UNICODE
@@ -1581,8 +1695,8 @@ php_yaml_eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 		return SUCCESS;
 	}
 }
-
 /* }}} */
+
 
 /*
  * Local variables:

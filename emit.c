@@ -67,20 +67,24 @@ php_yaml_handle_emitter_error(const yaml_emitter_t * emitter TSRMLS_DC)
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Memory error: Not enough memory for emitting");
 		break;
+
 	case YAML_WRITER_ERROR:
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Writer error: %s", emitter->problem);
 		break;
+
 	case YAML_EMITTER_ERROR:
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Emitter error: %s", emitter->problem);
 		break;
+
 	default:
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Internal error");
+		break;
 	}
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_array_is_sequence()
  * Does the array encode a sequence?
@@ -108,8 +112,8 @@ static int php_yaml_array_is_sequence(HashTable * a)
 	};
 	return 0;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_write_zval()
  * Write a php zval to the emitter
@@ -395,20 +399,20 @@ php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
 	return SUCCESS;
 
 
-  emitter_error:
+emitter_error:
 	php_yaml_handle_emitter_error(emitter TSRMLS_CC);
 	yaml_event_delete(&event);
 	return FAILURE;
 
 
-  event_error:
+event_error:
 	php_error_docref(NULL TSRMLS_CC, E_WARNING,
 			"Memory error: Not enough memory for creating an event (libyaml)");
 	yaml_event_delete(&event);
 	return FAILURE;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_write_impl()
  * Common stream writing logic shared by yaml_emit and yaml_emit_file.
@@ -460,20 +464,20 @@ php_yaml_write_impl(yaml_emitter_t * emitter, zval * data,
 	return SUCCESS;
 
 
-  emitter_error:
+emitter_error:
 	php_yaml_handle_emitter_error(emitter TSRMLS_CC);
 	yaml_event_delete(&event);
 	return FAILURE;
 
 
-  event_error:
+event_error:
 	php_error_docref(NULL TSRMLS_CC, E_WARNING,
 			"Memory error: Not enough memory for creating an event (libyaml)");
 	yaml_event_delete(&event);
 	return FAILURE;
 }
-
 /* }}} */
+
 
 /* {{{ php_yaml_write_to_buffer()
  * Emitter string buffer
@@ -484,8 +488,8 @@ php_yaml_write_to_buffer(void *data, unsigned char *buffer, size_t size)
 	smart_str_appendl((smart_str *) data, (char *) buffer, size);
 	return 1;
 }
-
 /* }}} */
+
 
 /*
  * Local variables:
