@@ -528,26 +528,27 @@ static zval *handle_scalar(parser_state_t *state TSRMLS_DC) {
  * Handle an alias event
  */
 static zval *handle_alias(parser_state_t *state TSRMLS_DC) {
-	zval *retval = { 0 };
+	zval **retval = { 0 };
 	char *anchor = (char *) state->event.data.alias.anchor;
 
-	if (SUCCESS == zend_hash_find(Z_ARRVAL_P(state->aliases),
+	if (FAILURE == zend_hash_find(Z_ARRVAL_P(state->aliases),
 			anchor, (uint) strlen(anchor) + 1,
 			(void **) &retval)) {
-		/* add a reference to retval's internal counter */
-		Z_ADDREF_P(retval);
-		Z_SET_ISREF_P(retval);
-
-	} else {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"alias %s is not registered "
 				"(line %ld, column %ld)",
 				anchor,
 				state->parser.mark.line + 1,
 				state->parser.mark.column + 1);
+
+		return NULL;
 	}
 
-	return retval;
+	/* add a reference to retval's internal counter */
+	Z_ADDREF_PP(retval);
+	Z_SET_ISREF_PP(retval);
+
+	return (*retval);
 }
 /* }}} */
 
