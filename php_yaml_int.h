@@ -58,6 +58,7 @@ typedef struct parser_state_s {
 /* {{{ ext/yaml macros
 */
 #define YAML_BINARY_TAG     "tag:yaml.org,2002:binary"
+#define YAML_MERGE_TAG      "tag:yaml.org,2002:merge"
 #define YAML_PHP_TAG        "!php/object"
 
 #define Y_SCALAR_IS_NOT_NUMERIC 0x00
@@ -88,7 +89,7 @@ typedef struct parser_state_s {
 	(!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))
 
 #define IS_NOT_QUOTED_OR_TAG_IS(event, name) \
-	(!event.data.scalar.quoted_implicit && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
+	((YAML_PLAIN_SCALAR_STYLE == event.data.scalar.style || YAML_ANY_SCALAR_STYLE == event.data.scalar.style) && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
 
 /* }}} */
 
