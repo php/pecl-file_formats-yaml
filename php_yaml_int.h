@@ -39,45 +39,92 @@
 extern "C" {
 #endif
 
+/* {{{ ext/yaml types
+*/
+typedef zval *(*eval_scalar_func_t)(yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+
+typedef struct parser_state_s {
+	yaml_parser_t parser;
+	yaml_event_t event;
+	int have_event;
+	zval *aliases;
+	eval_scalar_func_t eval_func;
+	HashTable *callbacks;
+} parser_state_t;
+
+/* }}} */
+
+
 /* {{{ ext/yaml macros
 */
 #define YAML_BINARY_TAG     "tag:yaml.org,2002:binary"
 #define YAML_PHP_TAG        "!php/object"
 
-/* }}} */
+#define Y_SCALAR_IS_NOT_NUMERIC 0x00
+#define Y_SCALAR_IS_INT         0x10
+#define Y_SCALAR_IS_FLOAT       0x20
+#define Y_SCALAR_IS_ZERO        0x00
+#define Y_SCALAR_IS_BINARY      0x01
+#define Y_SCALAR_IS_OCTAL       0x02
+#define Y_SCALAR_IS_DECIMAL     0x03
+#define Y_SCALAR_IS_HEXADECIMAL 0x04
+#define Y_SCALAR_IS_SEXAGECIMAL 0x05
+#define Y_SCALAR_IS_INFINITY_P  0x06
+#define Y_SCALAR_IS_INFINITY_N  0x07
+#define Y_SCALAR_IS_NAN         0x08
+#define Y_SCALAR_FORMAT_MASK    0x0F
 
-/* {{{ ext/yaml prototypes
-*/
-zval *php_yaml_read_impl(yaml_parser_t * parser, yaml_event_t * parent,
-		zval * aliases, zval * zv, long *ndocs,
-		eval_scalar_func_t eval_func, HashTable * callbacks TSRMLS_DC);
-
-zval *php_yaml_read_partial(yaml_parser_t * parser, long pos,
-		long *ndocs, eval_scalar_func_t eval_func,
-		HashTable * callbacks TSRMLS_DC);
-
-zval *php_yaml_eval_scalar(
-		yaml_event_t event, HashTable * callbacks TSRMLS_DC);
-
-zval *php_yaml_eval_scalar_with_callbacks(
-		yaml_event_t event, HashTable * callbacks TSRMLS_DC);
-
-char *php_yaml_detect_scalar_type(
-		const char *value, size_t length, const yaml_event_t * event);
-
-int php_yaml_write_impl(yaml_emitter_t * emitter, zval * data,
-		yaml_encoding_t encoding TSRMLS_DC);
-
-int php_yaml_write_to_buffer(
-		void *data, unsigned char *buffer, size_t size);
-
-/* }}} */
 
 #if (PHP_MAJOR_VERSION > 5) || ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION >= 3))
 #	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
 #else
 #	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
 #endif
+
+#define SCALAR_TAG_IS(event, name) \
+	!strcmp((const char *)event.data.scalar.tag, name)
+
+#define IS_NOT_IMPLICIT_AND_TAG_IS(event, name) \
+	(!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))
+
+#define IS_NOT_QUOTED_OR_TAG_IS(event, name) \
+	(!event.data.scalar.quoted_implicit && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
+
+/* }}} */
+
+/* {{{ ext/yaml prototypes
+*/
+zval *php_yaml_read_all(parser_state_t *state, long *ndocs TSRMLS_DC);
+
+zval *php_yaml_read_partial(
+		parser_state_t *state, long pos, long *ndocs TSRMLS_DC);
+
+zval *eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+
+zval *eval_scalar_with_callbacks(
+		yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+
+char *detect_scalar_type(
+		const char *value, size_t length, const yaml_event_t *event);
+
+int scalar_is_null(
+		const char *value, size_t length, const yaml_event_t *event);
+
+int scalar_is_bool(
+		const char *value, size_t length, const yaml_event_t *event);
+
+int scalar_is_numeric(
+		const char *value, size_t length, long *lval, double *dval, char **str);
+
+int scalar_is_timestamp(const char *value, size_t length);
+
+int php_yaml_write_impl(yaml_emitter_t *emitter, zval *data,
+		yaml_encoding_t encoding TSRMLS_DC);
+
+int php_yaml_write_to_buffer(
+		void *data, unsigned char *buffer, size_t size);
+
+/* }}} */
 
 #ifdef __cplusplus
 } /* extern "C" */

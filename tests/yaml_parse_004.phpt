@@ -16,5 +16,5 @@ reference: *broken_pointer_to_define
 '));
 ?>
 --EXPECTF--
-Warning: yaml_parse(): alias broken_pointer_to_define is not registered in %syaml_parse_004.php on line 8
+Warning: yaml_parse(): alias broken_pointer_to_define is not registered (line 6, column 37) in %syaml_parse_004.php on line 8
 bool(false)

@@ -68,28 +68,6 @@ extern "C" {
 
 #define PHP_YAML_MODULE_VERSION "0.6.0-dev"
 
-#define Y_PARSER_CONTINUE 0
-#define Y_PARSER_SUCCESS  1
-#define Y_PARSER_FAILURE -1
-
-#define Y_FILTER_NONE     0
-#define Y_FILTER_SUCCESS  1
-#define Y_FILTER_FAILURE -1
-
-#define Y_SCALAR_IS_NOT_NUMERIC 0x00
-#define Y_SCALAR_IS_INT         0x10
-#define Y_SCALAR_IS_FLOAT       0x20
-#define Y_SCALAR_IS_ZERO        0x00
-#define Y_SCALAR_IS_BINARY      0x01
-#define Y_SCALAR_IS_OCTAL       0x02
-#define Y_SCALAR_IS_DECIMAL     0x03
-#define Y_SCALAR_IS_HEXADECIMAL 0x04
-#define Y_SCALAR_IS_SEXAGECIMAL 0x05
-#define Y_SCALAR_IS_INFINITY_P  0x06
-#define Y_SCALAR_IS_INFINITY_N  0x07
-#define Y_SCALAR_IS_NAN         0x08
-#define Y_SCALAR_FORMAT_MASK    0x0F
-
 /* {{{ module globals */
 
 ZEND_BEGIN_MODULE_GLOBALS(yaml)
@@ -111,9 +89,6 @@ ZEND_EXTERN_MODULE_GLOBALS(yaml)
 #	define YAML_G(v) (yaml_globals.v)
 #endif
 /* }}} */
-
-typedef zval *(*eval_scalar_func_t) (yaml_event_t event,
-		HashTable * callbacks TSRMLS_DC);
 
 #ifdef __cplusplus
 } /* extern "C" */
