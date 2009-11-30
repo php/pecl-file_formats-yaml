@@ -173,8 +173,8 @@ zend_module_entry yaml_module_entry = {	/* {{{ */
 	yaml_functions,
 	PHP_MINIT(yaml),
 	PHP_MSHUTDOWN(yaml),
-	NULL,
-	NULL,
+	NULL, /* RINIT */
+	NULL, /* RSHUTDOWN */
 	PHP_MINFO(yaml),
 	PHP_YAML_MODULE_VERSION,
 #if ZEND_EXTENSION_API_NO >= 220060519
@@ -470,7 +470,12 @@ PHP_FUNCTION(yaml_parse)
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
+	if (zcallbacks != NULL) {
+		zval_dtor(zcallbacks);
+	}
+
 	if (zndocs != NULL) {
+		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
@@ -571,7 +576,12 @@ PHP_FUNCTION(yaml_parse_file)
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
+	if (zcallbacks != NULL) {
+		zval_dtor(zcallbacks);
+	}
+
 	if (zndocs != NULL) {
+		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
@@ -664,7 +674,12 @@ PHP_FUNCTION(yaml_parse_url)
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
+	if (zcallbacks != NULL) {
+		zval_dtor(zcallbacks);
+	}
+
 	if (zndocs != NULL) {
+		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
