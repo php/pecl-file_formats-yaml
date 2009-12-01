@@ -131,7 +131,7 @@ zval *php_yaml_read_all(parser_state_t *state, long *ndocs TSRMLS_DC)
 
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"expected DOCUMENT_START event, got %d "
-					"(line %ld, column %ld)",
+					"(line %zd, column %zd)",
 					state->event.type,
 					state->parser.mark.line + 1,
 					state->parser.mark.column + 1);
@@ -249,8 +249,8 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 		if (parser->context) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"%s error encountered during parsing: %s "
-					"(line %ld, column %ld), "
-					"context %s (line %ld, column %ld)",
+					"(line %zd, column %zd), "
+					"context %s (line %zd, column %zd)",
 					error_type,
 					parser->problem,
 					parser->problem_mark.line + 1,
@@ -260,7 +260,7 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 		} else {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"%s error encountered during parsing: %s "
-					"(line %ld, column %ld)",
+					"(line %zd, column %zd)",
 					error_type,
 					parser->problem,
 					parser->problem_mark.line + 1,
@@ -345,7 +345,7 @@ static zval *get_next_element(parser_state_t *state TSRMLS_DC)
 		/* any other event is an error */
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Unexpected event type %d "
-				"(line %ld, column %ld)",
+				"(line %zd, column %zd)",
 				state->event.type,
 				state->parser.mark.line + 1,
 				state->parser.mark.column + 1);
@@ -565,7 +565,7 @@ static zval *handle_alias(parser_state_t *state TSRMLS_DC) {
 			(void **) &retval)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"alias %s is not registered "
-				"(line %ld, column %ld)",
+				"(line %zd, column %zd)",
 				anchor,
 				state->parser.mark.line + 1,
 				state->parser.mark.column + 1);
