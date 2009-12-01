@@ -59,8 +59,8 @@ static int php_yaml_write_zval(
 /* {{{ php_yaml_handle_emitter_error()
  * Emit a warning about an emitter error
  */
-static void
-php_yaml_handle_emitter_error(const yaml_emitter_t * emitter TSRMLS_DC)
+static void php_yaml_handle_emitter_error(
+		const yaml_emitter_t *emitter TSRMLS_DC)
 {
 	switch (emitter->error) {
 	case YAML_MEMORY_ERROR:
@@ -89,15 +89,15 @@ php_yaml_handle_emitter_error(const yaml_emitter_t * emitter TSRMLS_DC)
 /* {{{ php_yaml_array_is_sequence()
  * Does the array encode a sequence?
  */
-static int php_yaml_array_is_sequence(HashTable * a)
+static int php_yaml_array_is_sequence(HashTable *ht)
 {
 	ulong kidx, idx = 0;
 	char *kstr;
 	int key_type;
 
-	zend_hash_internal_pointer_reset(a);
-	while (SUCCESS == zend_hash_has_more_elements(a)) {
-		key_type = zend_hash_get_current_key(a, (char **) &kstr, &kidx, 0);
+	zend_hash_internal_pointer_reset(ht);
+	while (SUCCESS == zend_hash_has_more_elements(ht)) {
+		key_type = zend_hash_get_current_key(ht, (char **) &kstr, &kidx, 0);
 		if (HASH_KEY_IS_LONG != key_type) {
 			/* non-numeric key found */
 			return 1;
@@ -108,7 +108,7 @@ static int php_yaml_array_is_sequence(HashTable * a)
 		}
 
 		idx++;
-		zend_hash_move_forward(a);
+		zend_hash_move_forward(ht);
 	};
 	return 0;
 }
@@ -118,15 +118,13 @@ static int php_yaml_array_is_sequence(HashTable * a)
 /* {{{ php_yaml_write_zval()
  * Write a php zval to the emitter
  */
-static int
-php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
+static int php_yaml_write_zval(yaml_emitter_t *emitter, zval *data TSRMLS_DC)
 {
 	yaml_event_t event;
-	char *res;
+	char *res = { 0 };
 	int status;
 
 	memset(&event, 0, sizeof(event));
-	res = NULL;
 
 	switch (Z_TYPE_P(data)) {
 	case IS_NULL:
@@ -198,8 +196,8 @@ php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
 			const char *ptr, *end;
 			end = Z_STRVAL_P(data) + Z_STRLEN_P(data);
 
-			if (NULL != php_yaml_detect_scalar_type(Z_STRVAL_P(data),
-							Z_STRLEN_P(data), NULL)) {
+			if (NULL != detect_scalar_type(
+					Z_STRVAL_P(data), Z_STRLEN_P(data), NULL)) {
 				/* looks like some other type to us, make sure it's quoted */
 				style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
 
@@ -266,7 +264,7 @@ php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
 			} else {
 				zval key_zval;
 				ulong kidx;
-				char *kstr = NULL;
+				char *kstr = { 0 };
 
 				/* start map */
 				status = yaml_mapping_start_event_initialize(&event,
@@ -322,7 +320,7 @@ php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
 
 	case IS_OBJECT:
 		{
-			char *clazz_name = NULL;
+			char *clazz_name = { 0 };
 			zend_uint name_len;
 			zend_class_entry *clazz;
 
@@ -332,7 +330,7 @@ php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
 
 			if (strncmp(clazz_name, "DateTime", name_len) == 0) {
 				/* DateTime is encoded as timestamp */
-				zval *retval = NULL;
+				zval *retval = { 0 };
 				zval dtfmt;
 
 				/* get iso-8601 format specifier */
@@ -373,6 +371,8 @@ php_yaml_write_zval(yaml_emitter_t * emitter, zval * data TSRMLS_DC)
 						NULL, (yaml_char_t *) YAML_PHP_TAG,
 						(yaml_char_t *) buf.c, buf.len,
 						0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+
+				smart_str_free(&buf);
 				if (!status) {
 					goto event_error;
 				}

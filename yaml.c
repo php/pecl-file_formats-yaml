@@ -38,8 +38,10 @@
 
 /* {{{ local macros
  */
-#define php_yaml_read_all(parser, ndocs, eval_func, callbacks) \
-  php_yaml_read_impl((parser), NULL, NULL, NULL, (ndocs), (eval_func), (callbacks) TSRMLS_CC)
+#if ZEND_EXTENSION_API_NO < 220060519
+#define PHP_GINIT_FUNCTION(yaml) \
+  void php_yaml_init_globals(zend_yaml_globals *yaml_globals)
+#endif
 
 /* }}} */
 
@@ -51,11 +53,6 @@ static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC);
 static PHP_MINIT_FUNCTION(yaml);
 static PHP_MSHUTDOWN_FUNCTION(yaml);
 static PHP_MINFO_FUNCTION(yaml);
-
-#if ZEND_EXTENSION_API_NO < 220060519
-#define PHP_GINIT_FUNCTION(yaml) \
-  void php_yaml_init_globals(zend_yaml_globals *yaml_globals)
-#endif
 
 static PHP_GINIT_FUNCTION(yaml);
 
@@ -176,8 +173,8 @@ zend_module_entry yaml_module_entry = {	/* {{{ */
 	yaml_functions,
 	PHP_MINIT(yaml),
 	PHP_MSHUTDOWN(yaml),
-	NULL,
-	NULL,
+	NULL, /* RINIT */
+	NULL, /* RSHUTDOWN */
 	PHP_MINFO(yaml),
 	PHP_YAML_MODULE_VERSION,
 #if ZEND_EXTENSION_API_NO >= 220060519
@@ -238,6 +235,10 @@ static PHP_MINIT_FUNCTION(yaml)
 	REGISTER_STRING_CONSTANT("YAML_MAP_TAG", YAML_MAP_TAG,
 			CONST_PERSISTENT | CONST_CS);
 	REGISTER_STRING_CONSTANT("YAML_PHP_TAG", YAML_PHP_TAG,
+			CONST_PERSISTENT | CONST_CS);
+	REGISTER_STRING_CONSTANT("YAML_MERGE_TAG", YAML_MERGE_TAG,
+			CONST_PERSISTENT | CONST_CS);
+	REGISTER_STRING_CONSTANT("YAML_BINARY_TAG", YAML_BINARY_TAG,
 			CONST_PERSISTENT | CONST_CS);
 
 	/* encoding constants */
@@ -309,11 +310,11 @@ static PHP_GINIT_FUNCTION(yaml)
  */
 static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC)
 {
-	zval **entry = NULL;
+	zval **entry = { 0 };
 #ifdef IS_UNICODE
 	zstr key;
 #else
-	char *key = NULL;
+	char *key = { 0 };
 #endif
 	uint key_len = 0;
 	ulong idx = 0L;
@@ -405,17 +406,20 @@ static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC)
  Takes a YAML encoded string and converts it to a PHP variable. */
 PHP_FUNCTION(yaml_parse)
 {
-	char *input = NULL;
+	char *input = { 0 };
 	int input_len = 0;
 	long pos = 0;
-	zval *zndocs = NULL;
-	zval *zcallbacks = NULL;
-	HashTable *callbacks = NULL;
-	eval_scalar_func_t eval_func;
+	zval *zndocs = { 0 };
+	zval *zcallbacks = { 0 };
 
-	yaml_parser_t parser = { 0 };
-	zval *yaml = NULL;
+	parser_state_t state;
+	zval *yaml = { 0 };
 	long ndocs = 0;
+
+	memset(&state, 0, sizeof(&state));
+	state.have_event = 0;
+	state.aliases = NULL;
+	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
 	YAML_G(orig_runtime_encoding_conv) = UG(runtime_encoding_conv);
@@ -437,40 +441,45 @@ PHP_FUNCTION(yaml_parse)
 #endif
 
 	if (zcallbacks != NULL) {
-		callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+		state.callbacks = Z_ARRVAL_P(zcallbacks);
+		if (FAILURE == php_yaml_check_callbacks(state.callbacks TSRMLS_CC)) {
 			RETURN_FALSE;
 		}
 
-		eval_func = php_yaml_eval_scalar_with_callbacks;
+		state.eval_func = eval_scalar_with_callbacks;
 
 	} else {
-		eval_func = php_yaml_eval_scalar;
+		state.eval_func = eval_scalar;
 	}
 
 #ifdef IS_UNICODE
 	UG(runtime_encoding_conv) = UG(utf8_conv);
 #endif
 
-	yaml_parser_initialize(&parser);
+	yaml_parser_initialize(&state.parser);
 	yaml_parser_set_input_string(
-			&parser, (unsigned char *) input, (size_t) input_len);
+			&state.parser, (unsigned char *) input, (size_t) input_len);
+
 
 	if (pos < 0) {
-		yaml = php_yaml_read_all(&parser, &ndocs, eval_func, callbacks);
+		yaml = php_yaml_read_all(&state, &ndocs TSRMLS_CC);
 
 	} else {
-		yaml = php_yaml_read_partial(&parser, pos, &ndocs,
-				eval_func, callbacks TSRMLS_CC);
+		yaml = php_yaml_read_partial(&state, pos, &ndocs TSRMLS_CC);
 	}
 
-	yaml_parser_delete(&parser);
+	yaml_parser_delete(&state.parser);
 
 #ifdef IS_UNICODE
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
+	if (zcallbacks != NULL) {
+		zval_dtor(zcallbacks);
+	}
+
 	if (zndocs != NULL) {
+		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
@@ -488,20 +497,23 @@ PHP_FUNCTION(yaml_parse)
    */
 PHP_FUNCTION(yaml_parse_file)
 {
-	char *filename = NULL;
+	char *filename = { 0 };
 	int filename_len = 0;
 	long pos = 0;
-	zval *zndocs = NULL;
-	zval *zcallbacks = NULL;
-	HashTable *callbacks = NULL;
-	eval_scalar_func_t eval_func;
+	zval *zndocs = { 0 };
+	zval *zcallbacks = { 0 };
 
-	php_stream *stream = NULL;
-	FILE *fp = NULL;
+	php_stream *stream = { 0 };
+	FILE *fp = { 0 };
 
-	yaml_parser_t parser = { 0 };
-	zval *yaml = NULL;
+	parser_state_t state;
+	zval *yaml = { 0 };
 	long ndocs = 0;
+
+	memset(&state, 0, sizeof(&state));
+	state.have_event = 0;
+	state.aliases = NULL;
+	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
 	YAML_G(orig_runtime_encoding_conv) = UG(runtime_encoding_conv);
@@ -524,15 +536,15 @@ PHP_FUNCTION(yaml_parse_file)
 #endif
 
 	if (zcallbacks != NULL) {
-		callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+		state.callbacks = Z_ARRVAL_P(zcallbacks);
+		if (FAILURE == php_yaml_check_callbacks(state.callbacks TSRMLS_CC)) {
 			RETURN_FALSE;
 		}
 
-		eval_func = php_yaml_eval_scalar_with_callbacks;
+		state.eval_func = eval_scalar_with_callbacks;
 
 	} else {
-		eval_func = php_yaml_eval_scalar;
+		state.eval_func = eval_scalar;
 	}
 
 	if (NULL == (stream = php_stream_open_wrapper(filename, "rb",
@@ -551,25 +563,29 @@ PHP_FUNCTION(yaml_parse_file)
 	UG(runtime_encoding_conv) = UG(utf8_conv);
 #endif
 
-	yaml_parser_initialize(&parser);
-	yaml_parser_set_input_file(&parser, fp);
+	yaml_parser_initialize(&state.parser);
+	yaml_parser_set_input_file(&state.parser, fp);
 
 	if (pos < 0) {
-		yaml = php_yaml_read_all(&parser, &ndocs, eval_func, callbacks);
+		yaml = php_yaml_read_all(&state, &ndocs TSRMLS_CC);
 
 	} else {
-		yaml = php_yaml_read_partial(&parser, pos, &ndocs,
-				eval_func, callbacks TSRMLS_CC);
+		yaml = php_yaml_read_partial(&state, pos, &ndocs TSRMLS_CC);
 	}
 
-	yaml_parser_delete(&parser);
+	yaml_parser_delete(&state.parser);
 	php_stream_close(stream);
 
 #ifdef IS_UNICODE
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
+	if (zcallbacks != NULL) {
+		zval_dtor(zcallbacks);
+	}
+
 	if (zndocs != NULL) {
+		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
@@ -587,21 +603,24 @@ PHP_FUNCTION(yaml_parse_file)
    */
 PHP_FUNCTION(yaml_parse_url)
 {
-	char *url = NULL;
+	char *url = { 0 };
 	int url_len = 0;
 	long pos = 0;
-	zval *zndocs = NULL;
-	zval *zcallbacks = NULL;
-	HashTable *callbacks = NULL;
-	eval_scalar_func_t eval_func;
+	zval *zndocs = { 0 };
+	zval *zcallbacks = { 0 };
 
-	php_stream *stream = NULL;
-	char *input = NULL;
+	php_stream *stream = { 0 };
+	char *input = { 0 };
 	size_t size = 0;
 
-	yaml_parser_t parser = { 0 };
-	zval *yaml = NULL;
+	parser_state_t state;
+	zval *yaml = { 0 };
 	long ndocs = 0;
+
+	memset(&state, 0, sizeof(&state));
+	state.have_event = 0;
+	state.aliases = NULL;
+	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
 	YAML_G(orig_runtime_encoding_conv) = UG(runtime_encoding_conv);
@@ -614,15 +633,15 @@ PHP_FUNCTION(yaml_parse_url)
 	}
 
 	if (zcallbacks != NULL) {
-		callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+		state.callbacks = Z_ARRVAL_P(zcallbacks);
+		if (FAILURE == php_yaml_check_callbacks(state.callbacks TSRMLS_CC)) {
 			RETURN_FALSE;
 		}
 
-		eval_func = php_yaml_eval_scalar_with_callbacks;
+		state.eval_func = eval_scalar_with_callbacks;
 
 	} else {
-		eval_func = php_yaml_eval_scalar;
+		state.eval_func = eval_scalar;
 	}
 
 	if (NULL == (stream = php_stream_open_wrapper(url, "rb",
@@ -641,18 +660,17 @@ PHP_FUNCTION(yaml_parse_url)
 	UG(runtime_encoding_conv) = UG(utf8_conv);
 #endif
 
-	yaml_parser_initialize(&parser);
-	yaml_parser_set_input_string(&parser, (unsigned char *) input, size);
+	yaml_parser_initialize(&state.parser);
+	yaml_parser_set_input_string(&state.parser, (unsigned char *)input, size);
 
 	if (pos < 0) {
-		yaml = php_yaml_read_all(&parser, &ndocs, eval_func, callbacks);
+		yaml = php_yaml_read_all(&state, &ndocs TSRMLS_CC);
 
 	} else {
-		yaml = php_yaml_read_partial(
-				&parser, pos, &ndocs, eval_func, callbacks TSRMLS_CC);
+		yaml = php_yaml_read_partial(&state, pos, &ndocs TSRMLS_CC);
 	}
 
-	yaml_parser_delete(&parser);
+	yaml_parser_delete(&state.parser);
 	php_stream_close(stream);
 	efree(input);
 
@@ -660,7 +678,12 @@ PHP_FUNCTION(yaml_parse_url)
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
+	if (zcallbacks != NULL) {
+		zval_dtor(zcallbacks);
+	}
+
 	if (zndocs != NULL) {
+		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
@@ -678,7 +701,7 @@ PHP_FUNCTION(yaml_parse_url)
    */
 PHP_FUNCTION(yaml_emit)
 {
-	zval *data = NULL;
+	zval *data = { 0 };
 	long encoding = YAML_ANY_ENCODING;
 	long linebreak = YAML_ANY_BREAK;
 
@@ -722,14 +745,14 @@ PHP_FUNCTION(yaml_emit)
    */
 PHP_FUNCTION(yaml_emit_file)
 {
-	char *filename = NULL;
+	char *filename = { 0 };
 	int filename_len = 0;
-	php_stream *stream = NULL;
-	FILE *fp = NULL;
-	zval *data = NULL;
-	const char *encoding = NULL;
+	php_stream *stream = { 0 };
+	FILE *fp = { 0 };
+	zval *data = { 0 };
+	const char *encoding = { 0 };
 	int encoding_len = 0;
-	const char *linebreak = NULL;
+	const char *linebreak = { 0 };
 	int linebreak_len = 0;
 
 	yaml_emitter_t emitter = { 0 };

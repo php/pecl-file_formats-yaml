@@ -50,5 +50,5 @@ if test "$PHP_YAML" != "no"; then
 
   PHP_SUBST(YAML_SHARED_LIBADD)
   AC_DEFINE(HAVE_YAML, 1, [ ])
-  PHP_NEW_EXTENSION(yaml, yaml.c parse.c emit.c , $ext_shared)
+  PHP_NEW_EXTENSION(yaml, yaml.c parse.c emit.c detect.c , $ext_shared)
 fi
