@@ -82,8 +82,11 @@ typedef struct parser_state_s {
 #	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
 #endif
 
+#define STR_EQ(a, b)\
+	(0 == strcmp(a, b))
+
 #define SCALAR_TAG_IS(event, name) \
-	!strcmp((const char *)event.data.scalar.tag, name)
+	STR_EQ((const char *)event.data.scalar.tag, name)
 
 #define IS_NOT_IMPLICIT_AND_TAG_IS(event, name) \
 	(!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))

@@ -49,6 +49,22 @@
 
 #define NEXT_EVENT() yaml_next_event(state TSRMLS_CC)
 
+#define COPY_EVENT(dest, state) \
+	memcpy(&dest, &state->event, sizeof(yaml_event_t)); \
+	state->have_event = 0; \
+	memset(&state->event, 0, sizeof(yaml_event_t))
+
+
+#ifdef IS_UNICODE
+#define MAKE_ARRAY(var) \
+	MAKE_STD_ZVAL(var); \
+	array_init(var); \
+	Z_ARRVAL_P(var)->unicode = UG(unicode)
+#else
+#define MAKE_ARRAY(var) \
+	MAKE_STD_ZVAL(var); \
+	array_init(var)
+#endif
 /* }}} */
 
 
@@ -90,11 +106,7 @@ zval *php_yaml_read_all(parser_state_t *state, long *ndocs TSRMLS_DC)
 	int code = Y_PARSER_CONTINUE;
 
 	/* create an empty array to hold results */
-	MAKE_STD_ZVAL(retval);
-	array_init(retval);
-#ifdef IS_UNICODE
-	Z_ARRVAL_P(retval)->unicode = UG(unicode);
-#endif
+	MAKE_ARRAY(retval);
 
 	while (Y_PARSER_CONTINUE == code) {
 
@@ -192,7 +204,7 @@ zval *php_yaml_read_partial(
 	}
 
 	if (Y_PARSER_FAILURE == code) {
-		if (retval != NULL) {
+		if (NULL != retval) {
 			zval_ptr_dtor(&retval);
 		}
 		retval = NULL;
@@ -233,7 +245,7 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 		break;
 	}
 
-	if (parser->problem != NULL) {
+	if (NULL != parser->problem) {
 		if (parser->context) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"%s error encountered during parsing: %s "
@@ -354,11 +366,7 @@ static zval *handle_document(parser_state_t *state TSRMLS_DC)
 	zval *retval = { 0 };
 
 	/* make a new array to hold aliases */
-	MAKE_STD_ZVAL(aliases);
-	array_init(aliases);
-#ifdef IS_UNICODE
-	Z_ARRVAL_P(aliases)->unicode = UG(unicode);
-#endif
+	MAKE_ARRAY(aliases);
 	state->aliases = aliases;
 
 	/* document consists of next element */
@@ -370,7 +378,7 @@ static zval *handle_document(parser_state_t *state TSRMLS_DC)
 
 	/* assert that end event is next in stream */
 	if (NULL != retval && NEXT_EVENT() &&
-			state->event.type != YAML_DOCUMENT_END_EVENT) {
+			YAML_DOCUMENT_END_EVENT != state->event.type) {
 		zval_ptr_dtor(&retval);
 		retval = NULL;
 	}
@@ -386,54 +394,81 @@ static zval *handle_document(parser_state_t *state TSRMLS_DC)
 static zval *handle_mapping(parser_state_t *state TSRMLS_DC)
 {
 	zval *retval = { 0 };
-	yaml_event_t src_event = { 0 };
+	yaml_event_t src_event = { 0 }, key_event = { 0 };
 	zval *key = { 0 };
 	char *key_str;
 	zval *value = { 0 };
 
 	/* save copy of mapping start event */
-	memcpy(&src_event, &state->event, sizeof(&state->event));
-	state->have_event = 0;
-	memset(&state->event, 0, sizeof(&state->event));
+	COPY_EVENT(src_event, state);
 
 	/* make a new array to hold mapping */
-	MAKE_STD_ZVAL(retval);
-	array_init(retval);
-#ifdef IS_UNICODE
-	Z_ARRVAL_P(retval)->unicode = UG(unicode);
-#endif
+	MAKE_ARRAY(retval);
 
-	if (state->event.data.mapping_start.anchor != NULL) {
+	if (NULL != src_event.data.mapping_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
 		add_assoc_zval(state->aliases,
-				(char *) state->event.data.mapping_start.anchor,
+				(char *) src_event.data.mapping_start.anchor,
 				retval);
 	}
 
 	while (NULL != (key = get_next_element(state TSRMLS_CC))) {
+		COPY_EVENT(key_event, state);
+		key_str = convert_to_char(key TSRMLS_CC);
+		zval_ptr_dtor(&key);
 
-		/* XXX: check for '<<' and handle merge */
-		/* zend_hash_merge */
 		value = get_next_element(state TSRMLS_CC);
 
 		if (NULL == value) {
-			zval_ptr_dtor(&key);
 			zval_ptr_dtor(&retval);
 			yaml_event_delete(&src_event);
+			efree(key_str);
+			yaml_event_delete(&key_event);
 			return NULL;
 		}
 
-		/* add key => value to retval */
-		key_str = convert_to_char(key TSRMLS_CC);
-		zval_ptr_dtor(&key);
-		add_assoc_zval(retval, key_str, value);
-		if (NULL != key_str) {
-			efree(key_str);
+		/* check for '<<' and handle merge */
+		if (IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) && 
+				STR_EQ("<<", key_str)) {
+			/* zend_hash_merge */
+			/*
+			 * value is either a single ref or a simple array of refs
+			 */
+			if (YAML_ALIAS_EVENT == state->event.type) {
+				/* single ref */
+				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(value),
+						(void (*)(void *pData)) zval_add_ref,
+						NULL, sizeof(zval*), 0);
+
+			} else {
+				/* array of refs */
+				HashTable *ht = Z_ARRVAL_P(value);
+				zval **zvalpp;
+
+				zend_hash_internal_pointer_reset(ht);
+				while (SUCCESS == zend_hash_has_more_elements(ht)) {
+					zend_hash_get_current_data(ht, (void**)&zvalpp);
+					zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_PP(zvalpp),
+							(void (*)(void *pData)) zval_add_ref,
+						NULL, sizeof(zval*), 0);
+					zend_hash_move_forward(ht);
+				};
+			}
+
+			zval_ptr_dtor(&value);
+
+		} else {
+
+			/* add key => value to retval */
+			add_assoc_zval(retval, key_str, value);
 		}
+
+		efree(key_str);
+		yaml_event_delete(&key_event);
 	}
 
-	if (state->event.type != YAML_MAPPING_END_EVENT) {
+	if (YAML_MAPPING_END_EVENT != state->event.type) {
 		zval_ptr_dtor(&retval);
 		retval = NULL;
 	}
@@ -462,22 +497,16 @@ static zval *handle_sequence (parser_state_t *state TSRMLS_DC) {
 	zval *value = { 0 };
 
 	/* save copy of sequence start event */
-	memcpy(&src_event, &state->event, sizeof(&state->event));
-	state->have_event = 0;
-	memset(&state->event, 0, sizeof(&state->event));
+	COPY_EVENT(src_event, state);
 
 	/* make a new array to hold mapping */
-	MAKE_STD_ZVAL(retval);
-	array_init(retval);
-#ifdef IS_UNICODE
-	Z_ARRVAL_P(retval)->unicode = UG(unicode);
-#endif
+	MAKE_ARRAY(retval);
 
-	if (state->event.data.sequence_start.anchor != NULL) {
+	if (NULL != src_event.data.sequence_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
 		add_assoc_zval(state->aliases,
-				(char *) state->event.data.sequence_start.anchor,
+				(char *) src_event.data.sequence_start.anchor,
 				retval);
 	}
 
@@ -485,7 +514,7 @@ static zval *handle_sequence (parser_state_t *state TSRMLS_DC) {
 		add_next_index_zval(retval, value);
 	}
 
-	if (state->event.type != YAML_SEQUENCE_END_EVENT) {
+	if (YAML_SEQUENCE_END_EVENT != state->event.type) {
 		zval_ptr_dtor(&retval);
 		retval = NULL;
 	}
@@ -513,7 +542,7 @@ static zval *handle_scalar(parser_state_t *state TSRMLS_DC) {
 
 	retval = state->eval_func(state->event, state->callbacks TSRMLS_CC);
 
-	if (NULL != retval && state->event.data.scalar.anchor != NULL) {
+	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
 		add_assoc_zval(state->aliases,
@@ -635,7 +664,7 @@ zval *eval_scalar(yaml_event_t event,
 	}
 
 	/* check for bool */
-	if ((flags = scalar_is_bool(value, length, &event)) != -1) {
+	if (-1 != (flags = scalar_is_bool(value, length, &event))) {
 		ZVAL_BOOL(retval, (zend_bool) flags);
 		return retval;
 	}
@@ -685,8 +714,7 @@ zval *eval_scalar(yaml_event_t event,
 	}
 
 	/* check for timestamp */
-	if (event.data.scalar.plain_implicit ||
-			event.data.scalar.quoted_implicit) {
+	if (event.data.scalar.plain_implicit || event.data.scalar.quoted_implicit) {
 		if (scalar_is_timestamp(value, length)) {
 			if (FAILURE == eval_timestamp(
 					&retval, value, (int) length TSRMLS_CC)) {
@@ -943,7 +971,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 static int
 eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 {
-	if (YAML_G(timestamp_decoder) != NULL ||
+	if (NULL != YAML_G(timestamp_decoder) ||
 			1L == YAML_G(decode_timestamp) ||
 			2L == YAML_G(decode_timestamp)) {
 		zval **argv[] = { NULL };

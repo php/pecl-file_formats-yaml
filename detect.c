@@ -113,8 +113,8 @@ scalar_is_null(const char *value, size_t length,
 
 	if (NULL == event || event->data.scalar.plain_implicit) {
 		if ((length == 1 && *value == '~') || length == 0 ||
-				!strcmp("NULL", value) || !strcmp("Null", value) ||
-				!strcmp("null", value)) {
+				STR_EQ("NULL", value) || STR_EQ("Null", value) ||
+				STR_EQ("null", value)) {
 			return 1;
 		}
 
@@ -139,20 +139,20 @@ scalar_is_bool(const char *value, size_t length,
 	/* TODO: add ini setting to turn 'y'/'n' checks on/off */
 	if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), YAML_BOOL_TAG)) {
 		if ((length == 1 && (*value == 'Y' || *value == 'y')) ||
-				!strcmp("YES", value) || !strcmp("Yes", value) ||
-				!strcmp("yes", value) || !strcmp("TRUE", value) ||
-				!strcmp("True", value) || !strcmp("true", value) ||
-				!strcmp("ON", value) || !strcmp("On", value) ||
-				!strcmp("on", value)) {
+				STR_EQ("YES", value) || STR_EQ("Yes", value) ||
+				STR_EQ("yes", value) || STR_EQ("TRUE", value) ||
+				STR_EQ("True", value) || STR_EQ("true", value) ||
+				STR_EQ("ON", value) || STR_EQ("On", value) ||
+				STR_EQ("on", value)) {
 			return 1;
 		}
 
 		if ((length == 1 && (*value == 'N' || *value == 'n')) ||
-				!strcmp("NO", value) || !strcmp("No", value) || 
-				!strcmp("no", value) || !strcmp("FALSE", value) || 
-				!strcmp("False", value) || !strcmp("false", value) ||
-				!strcmp("OFF", value) || !strcmp("Off", value) ||
-				!strcmp("off", value)) {
+				STR_EQ("NO", value) || STR_EQ("No", value) || 
+				STR_EQ("no", value) || STR_EQ("FALSE", value) || 
+				STR_EQ("False", value) || STR_EQ("false", value) ||
+				STR_EQ("OFF", value) || STR_EQ("Off", value) ||
+				STR_EQ("off", value)) {
 			return 0;
 		}
 
@@ -203,8 +203,8 @@ scalar_is_numeric(const char *value, size_t length, long *lval,
 	}
 
 	/* not a number */
-	if (!strcmp(".NAN", value) || !strcmp(".NaN", value) ||
-			!strcmp(".nan", value)) {
+	if (STR_EQ(".NAN", value) || STR_EQ(".NaN", value) ||
+			STR_EQ(".nan", value)) {
 		type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_NAN;
 		goto finish;
 	}
@@ -223,8 +223,8 @@ scalar_is_numeric(const char *value, size_t length, long *lval,
 	}
 
 	/* infinity */
-	if (!strcmp(".INF", value) || !strcmp(".Inf", value) ||
-			!strcmp(".inf", value)) {
+	if (STR_EQ(".INF", value) || STR_EQ(".Inf", value) ||
+			STR_EQ(".inf", value)) {
 		type = Y_SCALAR_IS_FLOAT;
 		type |= (negative ? Y_SCALAR_IS_INFINITY_N : Y_SCALAR_IS_INFINITY_P);
 		goto finish;
