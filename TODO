@@ -3,12 +3,12 @@ FUTURE FEATURES
 
 Document parse callback syntax and usage.
 Document merge support.
-Document new ini settings for emit.
 
 More tests for proper string emits
 tests for yaml_parse_file
 tests for yaml_parse_url
 tests for yaml_emit_file
+tests for parse callbacks
 
 Add some sort of callback support for emitting objects. Hashtable keyed on
 classname? Callback would be responsible for transforming object into
@@ -16,11 +16,4 @@ array/scalar data and providing a tag for the resulting serialization.
 
 Add php ini setting to turn y/n boolean treatment on/off.
   see http://www.kuwata-lab.com/materials/php_yaml-0.3.0.patch
-
-Add reference checking in emit so that recursive structures are handled 
-corectly. Example:
-<?php
-  $recurse = array("a" => 1, "b" => 2);
-  $recurse["c"] = $recurse;
-  var_dump(yaml_emit($recurse));
 
