@@ -52,6 +52,11 @@ typedef struct parser_state_s {
 	HashTable *callbacks;
 } parser_state_t;
 
+typedef struct y_emit_state_s {
+	yaml_emitter_t *emitter;
+	HashTable *recursive;
+} y_emit_state_t;
+
 /* }}} */
 
 
