@@ -26,19 +26,19 @@
   <email>rsky0711@gmail.com</email>
   <active>no</active>
  </lead>
- <date>2009-11-24</date>
+ <date>2010-01-25</date>
  <version>
-  <release>0.5.0</release>
-  <api>0.5.0</api>
+  <release>0.6.0</release>
+  <api>0.6.0</api>
  </version>
  <stability>
-  <release>alpha</release>
-  <api>alpha</api>
+  <release>beta</release>
+  <api>beta</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Implemented yaml_emit and yaml_emit_file. Wrote basic phpdoc content. Lots
-  and lots of new unit tests.
+  Support for '&lt;&lt;' (merge) in mappings. Fixed issues with php 5.3 and
+  ZTS compilation. Added support for emitting recursive arrays.
  </notes>
  <contents>
   <dir name="/">
@@ -123,6 +123,21 @@
  <providesextension>yaml</providesextension>
  <extsrcrelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.6.0</release>
+    <api>0.6.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-01-25</date>
+   <notes>
+    Support for '&lt;&lt;' (merge) in mappings. Fixed issues with php 5.3 and
+    ZTS compilation. Added support for emitting recursive arrays.
+   </notes>
+  </release>
   <release>
    <version>
     <release>0.5.0</release>
