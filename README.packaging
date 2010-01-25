@@ -11,6 +11,12 @@ To create a .deb:
   `dh-make-pecl \
     --depends libyaml-0-1 \
     --build-depends libyaml-dev \
-    --maintainer "bpd <bpd@keynetics.com>" \
     --only 5 \
     yaml-<version_number>.tgz`
+
+To add to pecl channel:
+  `cd extras/pear`
+  `php ~/bin/pearscs.phar release ../../yaml-<version_number>.tgz <lead>`
+  add new files to svn
+  `find . -name '*.xml' | xargs svn propset svn:mime-type application/xml`
+

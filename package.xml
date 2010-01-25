@@ -28,8 +28,8 @@
  </lead>
  <date>2010-01-25</date>
  <version>
-  <release>0.6.0</release>
-  <api>0.6.0</api>
+  <release>0.7.0-dev</release>
+  <api>0.7.0-dev</api>
  </version>
  <stability>
   <release>beta</release>
@@ -37,8 +37,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Support for '&lt;&lt;' (merge) in mappings. Fixed issues with php 5.3 and
-  ZTS compilation. Added support for emitting recursive arrays.
+  svn trunk
  </notes>
  <contents>
   <dir name="/">
