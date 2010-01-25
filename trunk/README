@@ -1,0 +1,103 @@
+The Yaml PHP Extension proivides a wrapper to the LibYAML library.
+
+It gives the user the ability to parse YAML document streams into PHP
+constructs and emit PHP constructs as valid YAML 1.1 documents.
+
+For more information about LibYAML see http://pyyaml.org/wiki/LibYAML.
+For more information about YAML see http://yaml.org/
+
+Requirements:
+  * libyaml 0.1.x
+
+
+BUILDING ON UNIX etc.
+=====================
+
+To compile your new extension, you will have to execute the following steps:
+
+1.  $ phpize
+2.  $ ./configure [--with-yaml]
+3.  $ make
+4.  $ sudo make install
+
+
+BUILDING ON WINDOWS
+===================
+
+The extension provides the VisualStudio V6 project file 
+
+  yaml.dsp
+To compile the extension you open this file using VisualStudio,
+select the apropriate configuration for your installation
+(either "Release_TS" or "Debug_TS") and create "php_yaml.dll"
+
+After successfull compilation you have to copy the newly
+created "php_yaml.dll" to the PHP
+extension directory (default: C:\PHP\extensions).
+
+
+TESTING
+========
+
+You can now load the extension using a php.ini directive
+
+  extension="php_yaml.[so|dll]"
+
+or load it at runtime using the dl() function
+
+  dl("php_yaml.[so|dll]");
+
+The extension should now be available, you can test this
+using the extension_loaded() function:
+
+  if (extension_loaded(yaml))
+    echo "yaml loaded :)";
+  else
+    echo "something is wrong :(";
+
+The extension will also add its own block to the output
+of phpinfo();
+
+
+CONFIGURATION
+=============
+ini settings:
+  yaml.decode_timestamp=0 for no timestamp parsing
+  yaml.decode_timestamp=1 for strtotime parsing
+  yaml.decode_timestamp=2 for date_create parsing
+
+  yaml.decode_binary=0 for no binary decoding
+  yaml.decode_binary=1 for base64 binary decoding
+
+/**
+ * @param string $input String to parse as YAML document stream
+ * @param int $pos Document to extract from stream (-1 for all, 0 for first, ...)
+ * @param int $ndocs Number of documents found in stream
+ * @param array $callbacks Content handlers for YAML nodes. Array of tag => handler
+ * @return mixed Parsed data
+ */
+yaml_parse ($input, $pos=0, &$ndocs=null, $callbacks=null)
+
+/**
+ * @param mixed $data Data to encode
+ * @param int $encoding Output encoding
+ * @param int $linebreak Output linebreak
+ * @return string Encoded data
+ */
+yaml_emit ($data, $encoding=YAML_ANY_ENCODING, $linebreak=YAML_ANY_BREAK)
+
+
+CREDITS
+========
+
+php-yaml v0.1.0 through v0.3.0 was developed by Ryusuke Sekiyama.
+
+Starting with v0.4.0 the extension has been maintained by Bryan Davis with
+support from Keynetics Inc [http://keynetics.com/].
+
+Inspiration and some implementation details have been taken from:
+  * php-syck [http://pecl.php.net/package/syck]
+  * MacRuby's libyaml wrapper
+      [http://www.macruby.org/trac/browser/MacRuby/trunk/ext/libyaml]
+  * LibYAML's examples [http://pyyaml.org/wiki/LibYAML]
+

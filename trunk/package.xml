@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.8.0" version="2.0"
+ xmlns="http://pear.php.net/dtd/package-2.0"
+ xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+ http://pear.php.net/dtd/tasks-1.0.xsd
+ http://pear.php.net/dtd/package-2.0
+ http://pear.php.net/dtd/package-2.0.xsd">
+ <name>yaml</name>
+ <channel>php-yaml.googlecode.com/svn/pear</channel>
+ <summary>YAML Ain&apos;t Markup Language</summary>
+ <description>
+  Support for YAML (YAML Ain&apos;t Markup Language) serialization using the
+  LibYAML library.
+ </description>
+ <lead>
+  <name>Bryan Davis</name>
+  <user>bpd</user>
+  <email>bpd@keynetics.com</email>
+  <active>yes</active>
+ </lead>
+ <lead>
+  <name>Ryusuke Sekiyama</name>
+  <user>rsky</user>
+  <email>rsky0711@gmail.com</email>
+  <active>no</active>
+ </lead>
+ <date>2010-01-25</date>
+ <version>
+  <release>0.6.0</release>
+  <api>0.6.0</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+ <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
+ <notes>
+  Support for '&lt;&lt;' (merge) in mappings. Fixed issues with php 5.3 and
+  ZTS compilation. Added support for emitting recursive arrays.
+ </notes>
+ <contents>
+  <dir name="/">
+   <dir name="tests">
+    <file name="yaml_001.phpt" role="test" />
+    <file name="yaml_002.phpt" role="test" />
+    <file name="yaml_emit_001.phpt" role="test" />
+    <file name="yaml_emit_002.phpt" role="test" />
+    <file name="yaml_emit_003.phpt" role="test" />
+    <file name="yaml_emit_004.phpt" role="test" />
+    <file name="yaml_emit_005.phpt" role="test" />
+    <file name="yaml_parse_001.phpt" role="test" />
+    <file name="yaml_parse_002.phpt" role="test" />
+    <file name="yaml_parse_003.phpt" role="test" />
+    <file name="yaml_parse_004.phpt" role="test" />
+    <file name="yaml_parse_005.phpt" role="test" />
+    <file name="yaml_parse_006.phpt" role="test" />
+    <file name="yaml_parse_007.phpt" role="test" />
+    <file name="yaml_parse_spec_binary.phpt" role="test" />
+    <file name="yaml_parse_spec_bool.phpt" role="test" />
+    <file name="yaml_parse_spec_float.phpt" role="test" />
+    <file name="yaml_parse_spec_int.phpt" role="test" />
+    <file name="yaml_parse_spec_map.phpt" role="test" />
+    <file name="yaml_parse_spec_null.phpt" role="test" />
+    <file name="yaml_parse_spec_omap.phpt" role="test" />
+    <file name="yaml_parse_spec_pairs.phpt" role="test" />
+    <file name="yaml_parse_spec_seq.phpt" role="test" />
+    <file name="yaml_parse_spec_set.phpt" role="test" />
+    <file name="yaml_parse_spec_str.phpt" role="test" />
+    <file name="yaml_parse_spec_timestamp.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_001.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_002.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_003.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_004.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_005.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_006.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_007.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_008.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBasicTests_009.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBlockMapping_001.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBlockMapping_002.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBlockMapping_003.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsBlockMapping_004.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsMapInSeq_001.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsMapInSeq_002.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsMapInSeq_003.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsStrangeKeys_001.phpt" role="test" />
+    <file name="yaml_parse_wiki_YtsStrangeKeys_002.phpt" role="test" />
+   </dir> <!-- /tests -->
+   <file name="CREDITS" role="doc" />
+   <file name="EXPERIMENTAL" role="doc" />
+   <file name="LICENSE" role="doc" />
+   <file name="README" role="doc" />
+   <file name="config.m4" role="src" />
+   <file name="config.w32" role="src" />
+   <file name="emit.c" role="src" />
+   <file name="package.xml" role="src" />
+   <file name="parse.c" role="src" />
+   <file name="php_yaml.h" role="src" />
+   <file name="php_yaml_int.h" role="src" />
+   <file name="yaml.c" role="src" />
+   <file name="yaml.dsp" role="src" />
+   <file name="zval_refcount.h" role="src" />
+   <file name="zval_zval.h" role="src" />
+  </dir> <!-- / -->
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.2.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0b1</min>
+   </pearinstaller>
+  </required>
+  <optional>
+   <extension>
+    <name>date</name>
+   </extension>
+  </optional>
+ </dependencies>
+ <providesextension>yaml</providesextension>
+ <extsrcrelease />
+ <changelog>
+  <release>
+   <version>
+    <release>0.6.0</release>
+    <api>0.6.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-01-25</date>
+   <notes>
+    Support for '&lt;&lt;' (merge) in mappings. Fixed issues with php 5.3 and
+    ZTS compilation. Added support for emitting recursive arrays.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.5.0</release>
+    <api>0.5.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2009-11-24</date>
+   <notes>
+    Implemented yaml_emit and yaml_emit_file. Wrote basic phpdoc content. Lots
+    and lots of new unit tests.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.4.0</release>
+    <api>0.4.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2009-11-12</date>
+   <notes>
+    Initial release of fork from rsky&apos;s 0.3.0 tarball found at
+    http://www.opendogs.org/pub/php_yaml-0.3.0.tgz
+   </notes>
+  </release>
+ </changelog>
+</package>
+<!-- Keep this comment at the end of the file
+vim600: syn=xml fen fdm=syntax fdl=2 si
+vim: et tw=78 syn=xml
+vi: ts=1 sw=1
+-->
