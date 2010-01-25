@@ -101,87 +101,156 @@ section.
 
 
 <div id="yaml.configuration" class="section">
- <h2 class="title">Runtime Configuration</h2>
- <p class="simpara">
+  <h2 class="title">Runtime Configuration</h2>
+  <p class="simpara">
 The behaviour of these functions is affected by settings in <var class="filename">php.ini</var>.
 </p>
- <p class="para">
-  <table class="doctable table">
-   <caption><b>Yaml Configure Options</b></caption>
-   
-    <thead valign="middle">
-     <tr valign="middle">
-      <th>Name</th>
-      <th>Default</th>
-      <th>Changeable</th>
-      <th>Changelog</th>
-     </tr>
+  <p class="para">
+    <table class="doctable table">
+      <caption><b>Yaml Configure Options</b></caption>
+      
+        <thead valign="middle">
+          <tr valign="middle">
+            <th>Name</th>
+            <th>Default</th>
+            <th>Changeable</th>
+            <th>Changelog</th>
+          </tr>
 
-    </thead>
+        </thead>
 
-    <tbody valign="middle" class="tbody">
-     <tr valign="middle">
-      <td align="left">yaml.decode_binary</td>
-      <td align="left">0</td>
-      <td align="left">PHP_INI_ALL</td>
-      <td align="left"></td>
-     </tr>
+        <tbody valign="middle" class="tbody">
+          <tr valign="middle">
+            <td align="left">yaml.decode_binary</td>
+            <td align="left">0</td>
+            <td align="left">PHP_INI_ALL</td>
+            <td align="left"></td>
+          </tr>
 
-     <tr valign="middle">
-      <td align="left">yaml.decode_timestamp</td>
-      <td align="left">0</td>
-      <td align="left">PHP_INI_ALL</td>
-      <td align="left"></td>
-     </tr>
+          <tr valign="middle">
+            <td align="left">yaml.decode_timestamp</td>
+            <td align="left">0</td>
+            <td align="left">php_ini_all</td>
+            <td align="left"></td>
+          </tr>
 
-</tbody>
-   
-  </table>
+          <tr valign="middle">
+            <td align="left">yaml.output_canonical</td>
+            <td align="left">0</td>
+            <td align="left">php_ini_all</td>
+            <td align="left"></td>
+          </tr>
 
- </p>
+          <tr valign="middle">
+            <td align="left">yaml.output_indent</td>
+            <td align="left">2</td>
+            <td align="left">php_ini_all</td>
+            <td align="left"></td>
+          </tr>
 
- <p class="para">Here&#039;s a short explanation of
+          <tr valign="middle">
+            <td align="left">yaml.output_width</td>
+            <td align="left">80</td>
+            <td align="left">php_ini_all</td>
+            <td align="left"></td>
+          </tr>
+
+        </tbody>
+      
+    </table>
+
+  </p>
+
+  <p class="para">Here&#039;s a short explanation of
 the configuration directives.</p>
 
- <p class="para">
-  <dl>
+  <p class="para">
+    <dl>
 
-   <dt id="ini.yaml.decode-binary">
-     <span class="term">
-      <i><tt class="parameter">yaml.decode_binary</tt></i>
+      <dt id="ini.yaml.decode-binary">
+        <span class="term">
+          <i><tt class="parameter">yaml.decode_binary</tt></i>
 
-       <span class="type">boolean</span> 
-     </span>
+           <span class="type">boolean</span> 
+        </span>
 
-     <dd>
+        <dd>
 
-      <p class="para">
-        Off by default, but can be set to on to cause base64 binary encoded entities which have the explicit tag &quot;tag:yaml.org,2002:binary&quot; to be decoded.
-      </p>
-     </dd>
+          <p class="para">
+            Off by default, but can be set to on to cause base64 binary encoded entities which have the explicit tag &quot;tag:yaml.org,2002:binary&quot; to be decoded.
+          </p>
+        </dd>
 
-    </dt>
+      </dt>
 
-    <dt id="ini.yaml.decode-timestamp">
-     <span class="term">
-      <i><tt class="parameter">yaml.decode_timestamp</tt></i>
+      <dt id="ini.yaml.decode-timestamp">
+        <span class="term">
+          <i><tt class="parameter">yaml.decode_timestamp</tt></i>
 
-       <span class="type">integer</span> 
-     </span>
+           <span class="type">integer</span> 
+        </span>
 
-     <dd>
+        <dd>
 
-      <p class="para">
-        Controls the decoding of both implicit and explict &quot;tag:yaml.org,2002:timestamp&quot; scalars in the YAML document stream. The default setting of <i>0</i> will not apply any decoding. A setting of <i>1</i> will use <span class="function">strtotime</span> to parse the timestamp value as a Unix timestamp. A setting of <i>2</i> will use <span class="function">date_create</span> to parse the timestamp value as  <span class="type">DateTime</span>  object.
-      </p>
-     </dd>
+          <p class="para">
+            Controls the decoding of both implicit and explict &quot;tag:yaml.org,2002:timestamp&quot; scalars in the YAML document stream. The default setting of <i>0</i> will not apply any decoding. A setting of <i>1</i> will use <span class="function">strtotime</span> to parse the timestamp value as a Unix timestamp. A setting of <i>2</i> will use <span class="function">date_create</span> to parse the timestamp value as  <span class="type">DateTime</span>  object.
+          </p>
+        </dd>
 
-    </dt>
+      </dt>
 
+      <dt id="ini.yaml.output-canonical">
+        <span class="term">
+          <i><tt class="parameter">yaml.output_canonical</tt></i>
 
-  </dl>
+           <span class="type">boolean</span> 
+        </span>
 
- </p>
+        <dd>
+
+          <p class="para">
+            Off by default, but can be set to on to cause canonical form output.
+          </p>
+        </dd>
+
+      </dt>
+
+      <dt id="ini.yaml.output-indent">
+        <span class="term">
+          <i><tt class="parameter">yaml.output_indent</tt></i>
+
+           <span class="type">integer</span> 
+        </span>
+
+        <dd>
+
+          <p class="para">
+            Number of spaces to indent sections. Value should be between
+            <i>1</i> and <i>10</i>.
+          </p>
+        </dd>
+
+      </dt>
+
+      <dt id="ini.yaml.output-width">
+        <span class="term">
+          <i><tt class="parameter">yaml.output_width</tt></i>
+
+           <span class="type">integer</span> 
+        </span>
+
+        <dd>
+
+          <p class="para">
+            Set the preferred line width. <i>-1</i> means unlimited.
+          </p>
+        </dd>
+
+      </dt>
+
+    </dl>
+
+  </p>
 </div>
 <hr />
 
