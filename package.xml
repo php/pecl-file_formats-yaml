@@ -28,8 +28,8 @@
  </lead>
  <date>2010-01-25</date>
  <version>
-  <release>0.7.0-dev</release>
-  <api>0.7.0-dev</api>
+  <release>0.6.1</release>
+  <api>0.6.1</api>
  </version>
  <stability>
   <release>beta</release>
@@ -93,6 +93,7 @@
    <file name="README" role="doc" />
    <file name="config.m4" role="src" />
    <file name="config.w32" role="src" />
+   <file name="detect.c" role="src" />
    <file name="emit.c" role="src" />
    <file name="package.xml" role="src" />
    <file name="parse.c" role="src" />
@@ -122,6 +123,20 @@
  <providesextension>yaml</providesextension>
  <extsrcrelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.6.1</release>
+    <api>0.6.1</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-01-25</date>
+   <notes>
+     Fixed bad pecl package.
+   </notes>
+  </release>
   <release>
    <version>
     <release>0.6.0</release>
