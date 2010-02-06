@@ -20,12 +20,6 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <lead>
-  <name>Ryusuke Sekiyama</name>
-  <user>rsky</user>
-  <email>rsky0711@gmail.com</email>
-  <active>no</active>
- </lead>
  <date>2010-02-06</date>
  <version>
   <release>0.6.2</release>
