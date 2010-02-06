@@ -28,8 +28,8 @@
  </lead>
  <date>2010-02-06</date>
  <version>
-  <release>0.6.2</release>
-  <api>0.6.2</api>
+  <release>0.6.3-dev</release>
+  <api>0.6.3-dev</api>
  </version>
  <stability>
   <release>beta</release>
@@ -37,7 +37,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  First release from new hosting at svn.php.net via pecl.php.net
+  svn trunk
  </notes>
  <contents>
   <dir name="/">
