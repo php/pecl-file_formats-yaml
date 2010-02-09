@@ -22,8 +22,8 @@
  </lead>
  <date>2010-02-09</date>
  <version>
-  <release>0.6.3</release>
-  <api>0.6.3</api>
+  <release>0.6.4-dev</release>
+  <api>0.6.4-dev</api>
  </version>
  <stability>
   <release>beta</release>
@@ -31,7 +31,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Fixed packaging problem that broke install via pecl channel.
+  svn trunk
  </notes>
  <contents>
   <dir name="/">
