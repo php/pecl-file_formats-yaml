@@ -20,10 +20,10 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2010-02-06</date>
+ <date>2010-02-09</date>
  <version>
-  <release>0.6.3-dev</release>
-  <api>0.6.3-dev</api>
+  <release>0.6.3</release>
+  <api>0.6.3</api>
  </version>
  <stability>
   <release>beta</release>
@@ -31,75 +31,74 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  First release from new hosting at svn.php.net via pecl.php.net
+  Fixed packaging problem that broke install via pecl channel.
  </notes>
  <contents>
   <dir name="/">
+   <file role="doc" name="CREDITS" />
+   <file role="doc" name="EXPERIMENTAL" />
+   <file role="doc" name="LICENSE" />
+   <file role="doc" name="README" />
+   <file role="src" name="config.m4" />
+   <file role="src" name="config.w32" />
+   <file role="src" name="detect.c" />
+   <file role="src" name="emit.c" />
+   <file role="src" name="parse.c" />
+   <file role="src" name="php_yaml.h" />
+   <file role="src" name="php_yaml_int.h" />
+   <file role="src" name="yaml.c" />
+   <file role="src" name="yaml.dsp" />
+   <file role="src" name="zval_refcount.h" />
+   <file role="src" name="zval_zval.h" />
    <dir name="tests">
-    <file name="yaml_001.phpt" role="test" />
-    <file name="yaml_002.phpt" role="test" />
-    <file name="yaml_emit_001.phpt" role="test" />
-    <file name="yaml_emit_002.phpt" role="test" />
-    <file name="yaml_emit_003.phpt" role="test" />
-    <file name="yaml_emit_004.phpt" role="test" />
-    <file name="yaml_emit_005.phpt" role="test" />
-    <file name="yaml_emit_006.phpt" role="test" />
-    <file name="yaml_emit_007.phpt" role="test" />
-    <file name="yaml_parse_001.phpt" role="test" />
-    <file name="yaml_parse_002.phpt" role="test" />
-    <file name="yaml_parse_003.phpt" role="test" />
-    <file name="yaml_parse_004.phpt" role="test" />
-    <file name="yaml_parse_005.phpt" role="test" />
-    <file name="yaml_parse_006.phpt" role="test" />
-    <file name="yaml_parse_007.phpt" role="test" />
-    <file name="yaml_parse_spec_binary.phpt" role="test" />
-    <file name="yaml_parse_spec_bool.phpt" role="test" />
-    <file name="yaml_parse_spec_float.phpt" role="test" />
-    <file name="yaml_parse_spec_int.phpt" role="test" />
-    <file name="yaml_parse_spec_map.phpt" role="test" />
-    <file name="yaml_parse_spec_merge.phpt" role="test" />
-    <file name="yaml_parse_spec_null.phpt" role="test" />
-    <file name="yaml_parse_spec_omap.phpt" role="test" />
-    <file name="yaml_parse_spec_pairs.phpt" role="test" />
-    <file name="yaml_parse_spec_seq.phpt" role="test" />
-    <file name="yaml_parse_spec_set.phpt" role="test" />
-    <file name="yaml_parse_spec_str.phpt" role="test" />
-    <file name="yaml_parse_spec_timestamp.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_001.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_002.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_003.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_004.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_005.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_006.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_007.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_008.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBasicTests_009.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBlockMapping_001.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBlockMapping_002.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBlockMapping_003.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsBlockMapping_004.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsMapInSeq_001.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsMapInSeq_002.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsMapInSeq_003.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsStrangeKeys_001.phpt" role="test" />
-    <file name="yaml_parse_wiki_YtsStrangeKeys_002.phpt" role="test" />
+    <file role="test" name="yaml_001.phpt" />
+    <file role="test" name="yaml_002.phpt" />
+    <file role="test" name="yaml_emit_001.phpt" />
+    <file role="test" name="yaml_emit_002.phpt" />
+    <file role="test" name="yaml_emit_003.phpt" />
+    <file role="test" name="yaml_emit_004.phpt" />
+    <file role="test" name="yaml_emit_005.phpt" />
+    <file role="test" name="yaml_emit_006.phpt" />
+    <file role="test" name="yaml_emit_007.phpt" />
+    <file role="test" name="yaml_parse_001.phpt" />
+    <file role="test" name="yaml_parse_002.phpt" />
+    <file role="test" name="yaml_parse_003.phpt" />
+    <file role="test" name="yaml_parse_004.phpt" />
+    <file role="test" name="yaml_parse_005.phpt" />
+    <file role="test" name="yaml_parse_006.phpt" />
+    <file role="test" name="yaml_parse_007.phpt" />
+    <file role="test" name="yaml_parse_spec_binary.phpt" />
+    <file role="test" name="yaml_parse_spec_bool.phpt" />
+    <file role="test" name="yaml_parse_spec_float.phpt" />
+    <file role="test" name="yaml_parse_spec_int.phpt" />
+    <file role="test" name="yaml_parse_spec_map.phpt" />
+    <file role="test" name="yaml_parse_spec_merge.phpt" />
+    <file role="test" name="yaml_parse_spec_null.phpt" />
+    <file role="test" name="yaml_parse_spec_omap.phpt" />
+    <file role="test" name="yaml_parse_spec_pairs.phpt" />
+    <file role="test" name="yaml_parse_spec_seq.phpt" />
+    <file role="test" name="yaml_parse_spec_set.phpt" />
+    <file role="test" name="yaml_parse_spec_str.phpt" />
+    <file role="test" name="yaml_parse_spec_timestamp.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_001.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_002.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_003.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_004.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_005.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_006.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_007.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_008.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBasicTests_009.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBlockMapping_001.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBlockMapping_002.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBlockMapping_003.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsBlockMapping_004.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsMapInSeq_001.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsMapInSeq_002.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsMapInSeq_003.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsStrangeKeys_001.phpt" />
+    <file role="test" name="yaml_parse_wiki_YtsStrangeKeys_002.phpt" />
    </dir> <!-- /tests -->
-   <file name="CREDITS" role="doc" />
-   <file name="EXPERIMENTAL" role="doc" />
-   <file name="LICENSE" role="doc" />
-   <file name="README" role="doc" />
-   <file name="config.m4" role="src" />
-   <file name="config.w32" role="src" />
-   <file name="detect.c" role="src" />
-   <file name="emit.c" role="src" />
-   <file name="package.xml" role="src" />
-   <file name="parse.c" role="src" />
-   <file name="php_yaml.h" role="src" />
-   <file name="php_yaml_int.h" role="src" />
-   <file name="yaml.c" role="src" />
-   <file name="yaml.dsp" role="src" />
-   <file name="zval_refcount.h" role="src" />
-   <file name="zval_zval.h" role="src" />
   </dir> <!-- / -->
  </contents>
  <dependencies>
@@ -120,6 +119,20 @@
  <providesextension>yaml</providesextension>
  <extsrcrelease />
  <changelog>
+  <release>
+   <date>2010-02-09</date>
+   <version>
+    <release>0.6.3</release>
+    <api>0.6.3</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <notes>
+    Fixed packaging problem that broke install via pecl channel.
+   </notes>
+  </release>
   <release>
    <version>
     <release>0.6.2</release>
