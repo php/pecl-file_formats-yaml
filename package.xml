@@ -22,8 +22,8 @@
  </lead>
  <date>2010-02-09</date>
  <version>
-  <release>0.6.4-dev</release>
-  <api>0.6.4-dev</api>
+  <release>0.6.4dev</release>
+  <api>0.6.4dev</api>
  </version>
  <stability>
   <release>beta</release>
@@ -47,7 +47,7 @@
    <file role="src" name="php_yaml.h" />
    <file role="src" name="php_yaml_int.h" />
    <file role="src" name="yaml.c" />
-   <file role="src" name="yaml.dsp" />
+   <!-- <file role="src" name="yaml.dsp" /> -->
    <file role="src" name="zval_refcount.h" />
    <file role="src" name="zval_zval.h" />
    <dir name="tests">
@@ -116,8 +116,12 @@
    </extension>
   </optional>
  </dependencies>
+
  <providesextension>yaml</providesextension>
- <extsrcrelease />
+ <extsrcrelease>
+  <configureoption default="autodetect" name="with-yaml" prompt="Please provide the prefix of libyaml installation" />
+ </extsrcrelease>
+
  <changelog>
   <release>
    <date>2010-02-09</date>
