@@ -474,10 +474,6 @@ PHP_FUNCTION(yaml_parse)
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
-	if (zcallbacks != NULL) {
-		zval_dtor(zcallbacks);
-	}
-
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
@@ -580,10 +576,6 @@ PHP_FUNCTION(yaml_parse_file)
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
 
-	if (zcallbacks != NULL) {
-		zval_dtor(zcallbacks);
-	}
-
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
 		zval_dtor(zndocs);
@@ -677,10 +669,6 @@ PHP_FUNCTION(yaml_parse_url)
 #ifdef IS_UNICODE
 	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
 #endif
-
-	if (zcallbacks != NULL) {
-		zval_dtor(zcallbacks);
-	}
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
