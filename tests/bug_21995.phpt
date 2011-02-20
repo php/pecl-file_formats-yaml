@@ -15,7 +15,7 @@ a: [1,2,3,4]
 d: []
 YAML;
 
-$yaml = yaml_parse($yaml_code, 0, &$ndocs, array(
+$yaml = yaml_parse($yaml_code, 0, $ndocs, array(
     YAML_STR_TAG => "yaml_cbk",
     ));
 ?>
