@@ -22,7 +22,7 @@
  </lead>
  <date>2011-02-20</date>
  <version>
-  <release>1.0.0</release>
+  <release>1.0.1dev</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -31,7 +31,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Marking package as stable after 12 months of daily production usage.
+  svn trunk
  </notes>
  <contents>
   <dir name="/">
