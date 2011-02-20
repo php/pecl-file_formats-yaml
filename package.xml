@@ -20,23 +20,22 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2010-02-09</date>
+ <date>2011-02-20</date>
  <version>
-  <release>0.6.4dev</release>
-  <api>0.6.4dev</api>
+  <release>1.0.0</release>
+  <api>1.0.0</api>
  </version>
  <stability>
-  <release>beta</release>
-  <api>beta</api>
+  <release>stable</release>
+  <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  svn trunk
+  Marking package as stable after 12 months of daily production usage.
  </notes>
  <contents>
   <dir name="/">
    <file role="doc" name="CREDITS" />
-   <file role="doc" name="EXPERIMENTAL" />
    <file role="doc" name="LICENSE" />
    <file role="doc" name="README" />
    <file role="src" name="config.m4" />
@@ -123,6 +122,20 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2011-02-20</date>
+   <version>
+    <release>1.0.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    Marking package as stable after 12 months of daily production usage.
+   </notes>
+  </release>
   <release>
    <date>2010-02-09</date>
    <version>
