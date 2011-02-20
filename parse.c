@@ -619,12 +619,26 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 	/* find and apply the filter function */
 	if (SUCCESS == zend_hash_find(
 			callbacks, tag, strlen(tag) + 1, (void **) &callback)) {
-		zval **argv[] = { zpp };
+		zval **argv[] = { zpp, NULL, NULL };
+		zval *arg2 = { 0 };
+		zval *arg3 = { 0 };
 		zval *retval = { 0 };
 
-		if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-				*callback, &retval, 1, argv, 0, NULL TSRMLS_CC) ||
-				NULL == retval) {
+		MAKE_STD_ZVAL(arg2);
+		ZVAL_STRINGL(arg2, tag, strlen(tag), 1);
+		argv[1] = &arg2;
+
+		MAKE_STD_ZVAL(arg3);
+		ZVAL_LONG(arg3, 0);
+		argv[2] = &arg3;
+
+		// call the user function
+		int callback_result = call_user_function_ex(EG(function_table), NULL,
+				*callback, &retval, 3, argv, 0, NULL TSRMLS_CC);
+		zval_ptr_dtor(&arg2);
+		zval_ptr_dtor(&arg3);
+
+		if (FAILURE == callback_result || NULL == retval) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to apply filter for tag '%s'"
 					" with user defined function", tag);
@@ -635,6 +649,7 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 			ZVAL_ZVAL(*zpp, retval, 1, 1);
 			return Y_FILTER_SUCCESS;
 		}
+
 	} else {
 		return Y_FILTER_NONE;
 	}
@@ -826,7 +841,7 @@ zval *eval_scalar_with_callbacks(yaml_event_t event,
 		argv[0] = &arg1;
 
 		MAKE_STD_ZVAL(arg2);
-		ZVAL_STRINGL(arg2, tag, strlen(tag) + 1, 1);
+		ZVAL_STRINGL(arg2, tag, strlen(tag), 1);
 		argv[1] = &arg2;
 
 		MAKE_STD_ZVAL(arg3);
