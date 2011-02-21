@@ -66,7 +66,7 @@ extern "C" {
 extern "C" {
 #endif
 
-#define PHP_YAML_MODULE_VERSION "1.0.1"
+#define PHP_YAML_MODULE_VERSION "1.0.2-dev"
 
 /* {{{ module globals */
 

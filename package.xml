@@ -22,7 +22,7 @@
  </lead>
  <date>2011-02-20</date>
  <version>
-  <release>1.0.1</release>
+  <release>1.0.2dev</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -31,9 +31,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  - Bug #21995: fixed double free bug when a callback mapping is provided
-  - corrected string length issue with callback "tag" argument
-  - added "tag" and "flags" arguments to sequence and map callbacks
+  svn trunk
  </notes>
  <contents>
   <dir name="/">
@@ -126,6 +124,22 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2011-02-20</date>
+   <version>
+    <release>1.0.1</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    - Bug #21995: fixed double free bug when a callback mapping is provided
+    - corrected string length issue with callback "tag" argument
+    - added "tag" and "flags" arguments to sequence and map callbacks
+   </notes>
+  </release>
   <release>
    <date>2011-02-20</date>
    <version>
