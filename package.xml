@@ -22,7 +22,7 @@
  </lead>
  <date>2011-02-20</date>
  <version>
-  <release>1.0.1dev</release>
+  <release>1.0.1</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -31,7 +31,9 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  svn trunk
+  - Bug #21995: fixed double free bug when a callback mapping is provided
+  - corrected string length issue with callback "tag" argument
+  - added "tag" and "flags" arguments to sequence and map callbacks
  </notes>
  <contents>
   <dir name="/">
@@ -50,6 +52,7 @@
    <file role="src" name="zval_refcount.h" />
    <file role="src" name="zval_zval.h" />
    <dir name="tests">
+    <file role="test" name="bug_21995.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
     <file role="test" name="yaml_emit_001.phpt" />
@@ -66,6 +69,7 @@
     <file role="test" name="yaml_parse_005.phpt" />
     <file role="test" name="yaml_parse_006.phpt" />
     <file role="test" name="yaml_parse_007.phpt" />
+    <file role="test" name="yaml_parse_008.phpt" />
     <file role="test" name="yaml_parse_spec_binary.phpt" />
     <file role="test" name="yaml_parse_spec_bool.phpt" />
     <file role="test" name="yaml_parse_spec_float.phpt" />
