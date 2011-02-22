@@ -4,8 +4,12 @@
 ARG_WITH("yaml", "The YAML parser and emitter PHP extension", "no");
 
 if (PHP_YAML != "no") {
-	if (CHECK_LIB("libyaml_a.lib;libyaml.lib", "yaml", PHP_YAML) && CHECK_HEADER_ADD_INCLUDE("yaml.h", "CFLAGS_YAML")) {
+	if ((lib=CHECK_LIB("libyaml_a.lib;libyaml.lib;yaml.lib", "yaml", PHP_YAML)) && CHECK_HEADER_ADD_INCLUDE("yaml.h", "CFLAGS_YAML")) {
 		AC_DEFINE("HAVE_YAML", 1, "Yaml support");
+
+		if (lib.substr(lib.length - 6, 6) == '_a.lib') {
+			ADD_FLAG("CFLAGS_YAML", "/D YAML_DECLARE_STATIC");
+		}
 		EXTENSION("yaml", "yaml.c parse.c emit.c detect.c");
 	} else {
 		WARNING("yaml not enabled; library or header not found");
