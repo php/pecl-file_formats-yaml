@@ -64,13 +64,11 @@ static PHP_FUNCTION(yaml_emit_file);
 
 /* }}} */
 
-
 /* {{{ globals */
 
-PHPAPI ZEND_DECLARE_MODULE_GLOBALS(yaml);
+ZEND_DECLARE_MODULE_GLOBALS(yaml);
 
 /* }}} */
-
 
 /* {{{ ini entries */
 
