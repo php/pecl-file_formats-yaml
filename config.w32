@@ -1,13 +1,13 @@
 // $Id$
 // vim:ft=javascript
 
-ARG_WITH('yaml', 'The YAML parser and emitter PHP extension', 'no');
+ARG_WITH("yaml", "The YAML parser and emitter PHP extension", "no");
 
-if (PHP_YAML != 'no') {
-	if (CHECK_LIB('yaml.lib', 'yaml', PHP_YAML) && CHECK_HEADER_ADD_INCLUDE('yaml.h', 'CFLAGS_YAML')) {
-		AC_DEFINE('HAVE_YAML', 1, 'Yaml support');
-		EXTENSION('yaml', 'yaml.c parse.c emit.c detect.c');
+if (PHP_YAML != "no") {
+	if (CHECK_LIB("libyaml_a.lib;libyaml.lib", "yaml", PHP_YAML) && CHECK_HEADER_ADD_INCLUDE("yaml.h", "CFLAGS_YAML")) {
+		AC_DEFINE("HAVE_YAML", 1, "Yaml support");
+		EXTENSION("yaml", "yaml.c parse.c emit.c detect.c");
 	} else {
-		WARNING('yaml not enabled; library or header not found');
+		WARNING("yaml not enabled; library or header not found");
 	}
 }

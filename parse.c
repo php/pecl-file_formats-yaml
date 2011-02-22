@@ -619,6 +619,7 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 	/* find and apply the filter function */
 	if (SUCCESS == zend_hash_find(
 			callbacks, tag, strlen(tag) + 1, (void **) &callback)) {
+		int callback_result;
 		zval **argv[] = { zpp, NULL, NULL };
 		zval *arg2 = { 0 };
 		zval *arg3 = { 0 };
@@ -632,8 +633,8 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		ZVAL_LONG(arg3, 0);
 		argv[2] = &arg3;
 
-		// call the user function
-		int callback_result = call_user_function_ex(EG(function_table), NULL,
+		/* call the user function */
+		callback_result = call_user_function_ex(EG(function_table), NULL,
 				*callback, &retval, 3, argv, 0, NULL TSRMLS_CC);
 		zval_ptr_dtor(&arg2);
 		zval_ptr_dtor(&arg3);
