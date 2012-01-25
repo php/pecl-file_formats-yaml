@@ -596,13 +596,17 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 	/* detect event type and get tag */
 	switch (event.type) {
 	case YAML_SEQUENCE_START_EVENT:
-		if (!event.data.sequence_start.implicit) {
+		if (event.data.sequence_start.implicit) {
+			tag = YAML_SEQ_TAG;
+		} else {
 			tag = (char *) event.data.sequence_start.tag;
 		}
 		break;
 
 	case YAML_MAPPING_START_EVENT:
-		if (!event.data.mapping_start.implicit) {
+		if (event.data.sequence_start.implicit) {
+			tag = YAML_MAP_TAG;
+		} else {
 			tag = (char *) event.data.mapping_start.tag;
 		}
 		break;
