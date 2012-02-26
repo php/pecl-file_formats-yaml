@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  * Copyright (c) 2009 Keynetics Inc. All rights reserved.
+ * Copyright (c) 2012 Bryan Davis All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -33,7 +34,6 @@
 
 
 #include "php_yaml.h"
-#include "zval_zval.h"			/* for PHP 4.x */
 #include "zval_refcount.h"		/* for PHP < 5.3 */
 #include "php_yaml_int.h"
 
@@ -624,34 +624,41 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 	if (SUCCESS == zend_hash_find(
 			callbacks, tag, strlen(tag) + 1, (void **) &callback)) {
 		int callback_result;
-		zval **argv[] = { zpp, NULL, NULL };
-		zval *arg2 = { 0 };
-		zval *arg3 = { 0 };
-		zval *retval = { 0 };
+		zval **callback_args[] = { zpp, NULL, NULL };
+		zval *tag_arg = { 0 };
+		zval *mode_arg = { 0 };
+		zval *retval_ptr = { 0 };
 
-		MAKE_STD_ZVAL(arg2);
-		ZVAL_STRINGL(arg2, tag, strlen(tag), 1);
-		argv[1] = &arg2;
+		MAKE_STD_ZVAL(tag_arg);
+		ZVAL_STRINGL(tag_arg, tag, strlen(tag), 1);
+		callback_args[1] = &tag_arg;
 
-		MAKE_STD_ZVAL(arg3);
-		ZVAL_LONG(arg3, 0);
-		argv[2] = &arg3;
+		MAKE_STD_ZVAL(mode_arg);
+		ZVAL_LONG(mode_arg, 0);
+		callback_args[2] = &mode_arg;
 
 		/* call the user function */
 		callback_result = call_user_function_ex(EG(function_table), NULL,
-				*callback, &retval, 3, argv, 0, NULL TSRMLS_CC);
-		zval_ptr_dtor(&arg2);
-		zval_ptr_dtor(&arg3);
+				*callback, &retval_ptr, 3, callback_args, 0, NULL TSRMLS_CC);
 
-		if (FAILURE == callback_result || NULL == retval) {
+		/* cleanup our temp variables */
+		zval_ptr_dtor(&tag_arg);
+		zval_ptr_dtor(&mode_arg);
+
+		if (FAILURE == callback_result || NULL == retval_ptr) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to apply filter for tag '%s'"
 					" with user defined function", tag);
 			return Y_FILTER_FAILURE;
 
 		} else {
-			zval_dtor(*zpp);
-			ZVAL_ZVAL(*zpp, retval, 1, 1);
+			if (retval_ptr == *zpp) {
+				/* throw away duplicate response */
+				zval_ptr_dtor(&retval_ptr);
+			} else {
+				/* copy result into our return var */
+				REPLACE_ZVAL_VALUE(zpp, retval_ptr, 0);
+			}
 			return Y_FILTER_SUCCESS;
 		}
 
@@ -1084,8 +1091,7 @@ eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
 
 		} else {
 			zval_ptr_dtor(&arg);
-			zval_dtor(*zpp);
-			ZVAL_ZVAL(*zpp, retval, 1, 1);
+			REPLACE_ZVAL_VALUE(zpp, retval, 0);
 			return SUCCESS;
 		}
 
@@ -1108,5 +1114,5 @@ eval_timestamp(zval ** zpp, char *ts, int ts_len TSRMLS_DC)
  * c-basic-offset: 4
  * End:
  * vim600: noet sw=4 ts=4 fdm=marker
- * vim<600: noet sw=4 ts=4 
+ * vim<600: noet sw=4 ts=4
  */

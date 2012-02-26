@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  * Copyright (c) 2009 Keynetics Inc. All rights reserved.
+ * Copyright (c) 2012 Bryan Davis All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,7 +33,6 @@
  */
 
 #include "php_yaml.h"
-#include "zval_zval.h"			/* for PHP 4.x */
 #include "zval_refcount.h"		/* for PHP < 5.3 */
 #include "php_yaml_int.h"
 
@@ -364,7 +364,7 @@ static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC)
 		if (key_type == HASH_KEY_IS_STRING) {
 			char *name;
 
-			if (!IS_CALLABLE(*entry, 0, &name)) {
+			if (!ZEND_IS_CALLABLE(*entry, 0, &name)) {
 				if (name != NULL) {
 					php_error_docref(NULL TSRMLS_CC, E_WARNING,
 							"Callback for tag '%s', '%s' is not valid",

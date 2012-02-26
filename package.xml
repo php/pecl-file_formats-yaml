@@ -48,9 +48,10 @@
    <file role="src" name="yaml.c" />
    <!-- <file role="src" name="yaml.dsp" /> -->
    <file role="src" name="zval_refcount.h" />
-   <file role="src" name="zval_zval.h" />
    <dir name="tests">
     <file role="test" name="bug_21995.phpt" />
+    <file role="test" name="bug_59860.phpt" />
+    <file role="test" name="bug_60628.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
     <file role="test" name="yaml_emit_001.phpt" />

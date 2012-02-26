@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  * Copyright (c) 2009 Keynetics Inc. All rights reserved.
+ * Copyright (c) 2012 Bryan Davis All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

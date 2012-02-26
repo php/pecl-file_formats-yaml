@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  * Copyright (c) 2009 Keynetics Inc. All rights reserved.
+ * Copyright (c) 2012 Bryan Davis All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,6 +28,7 @@
  * @author      Bryan Davis <bpd@keynetics.com>
  * @copyright   2007 Ryusuke SEKIYAMA
  * @copyright   2009 Keynetics Inc
+ * @copyright   2012 Bryan Davis
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  * @version     SVN: $Id$
  */
@@ -82,9 +84,9 @@ typedef struct y_emit_state_s {
 
 
 #if (PHP_MAJOR_VERSION > 5) || ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION >= 3))
-#	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
+#	define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
 #else
-#	define IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
+#	define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
 #endif
 
 #define STR_EQ(a, b)\

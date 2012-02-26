@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  * Copyright (c) 2009 Keynetics Inc. All rights reserved.
+ * Copyright (c) 2012 Bryan Davis All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any personobtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,6 +28,7 @@
  * @author      Bryan Davis <bpd@keynetics.com>
  * @copyright   2007 Ryusuke SEKIYAMA
  * @copyright   2009 Keynetics Inc
+ * @copyright   2012 Bryan Davis
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
  * @version     SVN: $Id$
  */
