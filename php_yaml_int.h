@@ -57,6 +57,7 @@ typedef struct parser_state_s {
 typedef struct y_emit_state_s {
 	yaml_emitter_t *emitter;
 	HashTable *recursive;
+	HashTable *callbacks;
 } y_emit_state_t;
 
 /* }}} */
@@ -130,7 +131,7 @@ int scalar_is_numeric(
 int scalar_is_timestamp(const char *value, size_t length);
 
 int php_yaml_write_impl(yaml_emitter_t *emitter, zval *data,
-		yaml_encoding_t encoding TSRMLS_DC);
+		yaml_encoding_t encoding, HashTable *callbacks TSRMLS_DC);
 
 int php_yaml_write_to_buffer(
 		void *data, unsigned char *buffer, size_t size);

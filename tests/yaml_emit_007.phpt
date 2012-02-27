@@ -1,5 +1,5 @@
 --TEST--
-yaml_emit -recursive structures
+yaml_emit - recursive structures
 --SKIPIF--
 <?php
 if(!extension_loaded('yaml')) die('skip yaml n/a');

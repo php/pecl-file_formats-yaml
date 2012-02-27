@@ -48,7 +48,7 @@
 
 /* {{{ local prototypes
  */
-static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC);
+static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC);
 
 static PHP_MINIT_FUNCTION(yaml);
 static PHP_MSHUTDOWN_FUNCTION(yaml);
@@ -123,6 +123,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit, ZEND_SEND_BY_VAL,
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, encoding)
 	ZEND_ARG_INFO(0, linebreak)
+	ZEND_ARG_ARRAY_INFO(0, callbacks, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit_file, ZEND_SEND_BY_VAL,
@@ -131,6 +132,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_yaml_emit_file, ZEND_SEND_BY_VAL,
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, encoding)
 	ZEND_ARG_INFO(0, linebreak)
+	ZEND_ARG_ARRAY_INFO(0, callbacks, 0)
 ZEND_END_ARG_INFO()
 #else
 #define arginfo_yaml_parse third_arg_force_ref
@@ -306,7 +308,7 @@ static PHP_GINIT_FUNCTION(yaml)
 /* {{{ php_yaml_check_callbacks()
  * Validate user supplied callback array contents
  */
-static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC)
+static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 {
 	zval **entry = { 0 };
 #ifdef IS_UNICODE
@@ -319,7 +321,7 @@ static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC)
 
 	zend_hash_internal_pointer_reset(callbacks);
 
-	while (SUCCESS == 
+	while (SUCCESS ==
 			zend_hash_get_current_data(callbacks, (void **) &entry)) {
 		int key_type = zend_hash_get_current_key_ex(
 				callbacks, &key, &key_len, &idx, 0, NULL);
@@ -327,7 +329,7 @@ static int php_yaml_check_callbacks(HashTable * callbacks TSRMLS_DC)
 #ifdef IS_UNICODE
 		if (key_type == HASH_KEY_IS_STRING || key_type == HASH_KEY_IS_UNICODE) {
 			zval name;
-			int type = 
+			int type =
 				(key_type == HASH_KEY_IS_STRING) ? IS_STRING : IS_UNICODE;
 
 			INIT_ZVAL(name);
@@ -683,20 +685,29 @@ PHP_FUNCTION(yaml_parse_url)
 /* }}} yaml_parse_url */
 
 
-/* {{{ proto string yaml_emit(mixed data[, int encoding[, int linebreak]])
+/* {{{ proto string yaml_emit(mixed data[, int encoding[, int linebreak[, array callbacks]]])
    */
 PHP_FUNCTION(yaml_emit)
 {
 	zval *data = { 0 };
 	long encoding = YAML_ANY_ENCODING;
 	long linebreak = YAML_ANY_BREAK;
+	zval *zcallbacks = { 0 };
+	HashTable *callbacks = { 0 };
 
 	yaml_emitter_t emitter = { 0 };
 	smart_str str = { 0 };
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS()TSRMLS_CC, "z/|ll",
-				&data, &encoding, &linebreak)) {
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS()TSRMLS_CC, "z/|lla/",
+				&data, &encoding, &linebreak, &zcallbacks)) {
 		return;
+	}
+
+	if (zcallbacks != NULL) {
+		callbacks = Z_ARRVAL_P(zcallbacks);
+		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+			RETURN_FALSE;
+		}
 	}
 
 	yaml_emitter_initialize(&emitter);
@@ -710,7 +721,8 @@ PHP_FUNCTION(yaml_emit)
 	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
 	if (SUCCESS == php_yaml_write_impl(
-				&emitter, data, (yaml_encoding_t) encoding TSRMLS_CC)) {
+				&emitter, data, (yaml_encoding_t) encoding,
+				callbacks TSRMLS_CC)) {
 #ifdef IS_UNICODE
 		RETVAL_U_STRINGL(UG(utf8_conv), str.c, str.len, ZSTR_DUPLICATE);
 #else
@@ -727,7 +739,7 @@ PHP_FUNCTION(yaml_emit)
 /* }}} yaml_emit */
 
 
-/* {{{ proto bool yaml_emit_file(string filename, mixed data[, string encoding[, string linebreak]])
+/* {{{ proto bool yaml_emit_file(string filename, mixed data[, string encoding[, string linebreak[, array callbacks]]])
    */
 PHP_FUNCTION(yaml_emit_file)
 {
@@ -740,21 +752,23 @@ PHP_FUNCTION(yaml_emit_file)
 	int encoding_len = 0;
 	const char *linebreak = { 0 };
 	int linebreak_len = 0;
+	zval *zcallbacks = { 0 };
+	HashTable *callbacks = { 0 };
 
 	yaml_emitter_t emitter = { 0 };
 
 #ifdef IS_UNICODE
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s&z/|ss",
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s&z/|ssa/",
 			&filename, &filename_len,
 			ZEND_U_CONVERTER(UG(filesystem_encoding_conv)), &data,
-			&encoding, &encoding_len, &linebreak,
+			&encoding, &encoding_len, &linebreak, &zcallbacks,
 			&linebreak_len)) {
 		return;
 	}
 #else
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz/|ss",
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz/|ssa/",
 			&filename, &filename_len, &data, &encoding,
-			&encoding_len, &linebreak,
+			&encoding_len, &linebreak, &zcallbacks,
 			&linebreak_len)) {
 		return;
 	}
@@ -785,7 +799,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
-			&emitter, data, YAML_ANY_ENCODING TSRMLS_CC)));
+			&emitter, data, YAML_ANY_ENCODING, callbacks TSRMLS_CC)));
 
 	yaml_emitter_delete(&emitter);
 	php_stream_close(stream);

@@ -37,6 +37,7 @@ $invoice = array (
     "tax"=> 251.42,
     "total"=> 4443.52,
     "comments"=> "Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.",
+    "tags" => array("a","b","c"),
   );
 $yaml = yaml_emit($invoice);
 $parsed = yaml_parse($yaml);

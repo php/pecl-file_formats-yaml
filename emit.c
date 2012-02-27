@@ -60,16 +60,27 @@ static void y_scan_recursion(y_emit_state_t *state, zval *data TSRMLS_DC);
 static long y_search_recursive(
 		y_emit_state_t *state, const unsigned long addr TSRMLS_DC);
 
-static int y_write_zval(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_null(y_emit_state_t *state TSRMLS_DC);
-static int y_write_bool(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_long(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_double(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_string(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_timestamp(y_emit_state_t *state, zval *data TSRMLS_DC);
-static int y_write_object(y_emit_state_t *state, zval *data TSRMLS_DC);
-
+static int y_write_zval(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_null(
+		y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC);
+static int y_write_bool(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_long(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_double(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_string(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_array(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_timestamp(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_object(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+static int y_write_object_callback (
+		y_emit_state_t *state, zval *callback, zval *data,
+		char *clazz_name TSRMLS_DC);
 /* }}} */
 
 
@@ -223,37 +234,38 @@ static long y_search_recursive(
 /* {{{ y_write_zval()
  * Write a php zval to the emitter
  */
-static int y_write_zval(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_zval(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	int status = FAILURE;
 
 	switch (Z_TYPE_P(data)) {
 	case IS_NULL:
-		status = y_write_null(state TSRMLS_CC);
+		status = y_write_null(state, tag TSRMLS_CC);
 		break;
 
 	case IS_BOOL:
-		status = y_write_bool(state, data TSRMLS_CC);
+		status = y_write_bool(state, data, tag TSRMLS_CC);
 		break;
 
 	case IS_LONG:
-		status = y_write_long(state, data TSRMLS_CC);
+		status = y_write_long(state, data, tag TSRMLS_CC);
 		break;
 
 	case IS_DOUBLE:
-		status = y_write_double(state, data TSRMLS_CC);
+		status = y_write_double(state, data, tag TSRMLS_CC);
 		break;
 
 	case IS_STRING:
-		status = y_write_string(state, data TSRMLS_CC);
+		status = y_write_string(state, data, tag TSRMLS_CC);
 		break;
 
 	case IS_ARRAY:
-		status = y_write_array(state, data TSRMLS_CC);
+		status = y_write_array(state, data, tag TSRMLS_CC);
 		break;
 
 	case IS_OBJECT:
-		status = y_write_object(state, data TSRMLS_CC);
+		status = y_write_object(state, data, tag TSRMLS_CC);
 		break;
 
 	case IS_RESOURCE:		/* unsupported object */
@@ -274,15 +286,20 @@ static int y_write_zval(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* {{{ y_write_null()
  */
-static int y_write_null(y_emit_state_t *state TSRMLS_DC)
+static int y_write_null(y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
+
+	if (NULL == tag) {
+		tag = (yaml_char_t *) YAML_NULL_TAG;
+		omit_tag = 1;
+	}
 	
-	status = yaml_scalar_event_initialize(&event,
-			NULL, (yaml_char_t *) YAML_NULL_TAG,
+	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) "~", strlen("~"),
-			1, 1, YAML_PLAIN_SCALAR_STYLE);
+			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
 	if (!status) {
 		y_event_init_failed(&event);
 		return FAILURE;
@@ -294,16 +311,22 @@ static int y_write_null(y_emit_state_t *state TSRMLS_DC)
 
 /* {{{ y_write_bool()
  */
-static int y_write_bool(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_bool(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	char *res = Z_BVAL_P(data) ? "true" : "false";
 
-	status = yaml_scalar_event_initialize(&event,
-			NULL, (yaml_char_t *) YAML_BOOL_TAG,
+	if (NULL == tag) {
+		tag = (yaml_char_t *) YAML_BOOL_TAG;
+		omit_tag = 1;
+	}
+
+	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) res, strlen(res),
-			1, 1, YAML_PLAIN_SCALAR_STYLE);
+			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
 	if (!status) {
 		y_event_init_failed(&event);
 		return FAILURE;
@@ -315,21 +338,27 @@ static int y_write_bool(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* {{{ y_write_long()
  */
-static int y_write_long(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_long(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	char *res = { 0 };
 	size_t res_size;
+
+	if (NULL == tag) {
+		tag = (yaml_char_t *) YAML_INT_TAG;
+		omit_tag = 1;
+	}
 
 	res_size = snprintf(res, 0, "%ld", Z_LVAL_P(data));
 	res = emalloc(res_size + 1);
 	snprintf(res, res_size + 1, "%ld", Z_LVAL_P(data));
 
-	status = yaml_scalar_event_initialize(&event,
-			NULL, (yaml_char_t *) YAML_INT_TAG,
+	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) res, strlen(res),
-			1, 1, YAML_PLAIN_SCALAR_STYLE);
+			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
 	efree(res);
 	if (!status) {
 		y_event_init_failed(&event);
@@ -342,21 +371,27 @@ static int y_write_long(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* {{{ y_write_double()
  */
-static int y_write_double(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_double(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	char *res = { 0 };
 	size_t res_size;
+
+	if (NULL == tag) {
+		tag = (yaml_char_t *) YAML_FLOAT_TAG;
+		omit_tag = 1;
+	}
 
 	res_size = snprintf(res, 0, "%f", Z_DVAL_P(data));
 	res = emalloc(res_size + 1);
 	snprintf(res, res_size + 1, "%f", Z_DVAL_P(data));
 
-	status = yaml_scalar_event_initialize(&event,
-			NULL, (yaml_char_t *) YAML_FLOAT_TAG,
+	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) res, strlen(res),
-			1, 1, YAML_PLAIN_SCALAR_STYLE);
+			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
 	efree(res);
 	if (!status) {
 		y_event_init_failed(&event);
@@ -369,11 +404,18 @@ static int y_write_double(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* {{{ y_write_string()
  */
-static int y_write_string(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_string(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	yaml_scalar_style_t style = YAML_PLAIN_SCALAR_STYLE;
+
+	if (NULL == tag) {
+		tag = (yaml_char_t *) YAML_STR_TAG;
+		omit_tag = 1;
+	}
 
 	if (NULL != detect_scalar_type(Z_STRVAL_P(data), Z_STRLEN_P(data), NULL)) {
 		/* looks like some other type to us, make sure it's quoted */
@@ -393,10 +435,9 @@ static int y_write_string(y_emit_state_t *state, zval *data TSRMLS_DC)
 		}
 	}
 
-	status = yaml_scalar_event_initialize(&event,
-			NULL, (yaml_char_t *) YAML_STR_TAG,
+	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) Z_STRVAL_P(data), Z_STRLEN_P(data),
-			1, 1, style);
+			omit_tag, omit_tag, style);
 	if (!status) {
 		y_event_init_failed(&event);
 		return FAILURE;
@@ -408,9 +449,11 @@ static int y_write_string(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* {{{ y_write_array()
  */
-static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_array(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	HashTable *ht = Z_ARRVAL_P(data);
 	HashPosition pos;
@@ -426,6 +469,15 @@ static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC)
 	size_t anchor_size;
 
 	array_type = y_array_is_sequence(ht TSRMLS_CC);
+
+	if (NULL == tag) {
+		if (Y_ARRAY_SEQUENCE == array_type) {
+			tag = (yaml_char_t *) YAML_SEQ_TAG;
+		} else {
+			tag = (yaml_char_t *) YAML_MAP_TAG;
+		}
+		omit_tag = 1;
+	}
 
 	/* syck does a check to see if the array is small and all scalars
 	 * if it is then it outputs in inline form
@@ -462,11 +514,11 @@ static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 	if (Y_ARRAY_SEQUENCE == array_type) {
 		status = yaml_sequence_start_event_initialize(&event,
-				(yaml_char_t *) anchor, (yaml_char_t *) YAML_SEQ_TAG, 1,
+				(yaml_char_t *) anchor, tag, omit_tag,
 				YAML_ANY_SEQUENCE_STYLE);
 	} else {
 		status = yaml_mapping_start_event_initialize(&event,
-				(yaml_char_t *) anchor, (yaml_char_t *) YAML_MAP_TAG, 1,
+				(yaml_char_t *) anchor, tag, omit_tag,
 				YAML_ANY_MAPPING_STYLE);
 	}
 
@@ -502,7 +554,7 @@ static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC)
 			}
 
 			/* emit key */
-			status = y_write_zval(state, &key_zval TSRMLS_CC);
+			status = y_write_zval(state, &key_zval, NULL TSRMLS_CC);
 			zval_dtor(&key_zval);
 			if (SUCCESS != status) {
 				return FAILURE;
@@ -518,7 +570,7 @@ static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC)
 				tmp_ht->nApplyCount++;
 			}
 
-			status = y_write_zval(state, (*elm) TSRMLS_CC);
+			status = y_write_zval(state, (*elm), NULL TSRMLS_CC);
 
 			if (tmp_ht) {
 				tmp_ht->nApplyCount--;
@@ -548,13 +600,20 @@ static int y_write_array(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* y_write_timestamp()
  */
-static int y_write_timestamp(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_timestamp(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	zend_class_entry *clazz = Z_OBJCE_P(data);
 	zval *timestamp = { 0 };
 	zval dtfmt;
+
+	if (NULL == tag) {
+		tag = (yaml_char_t *) YAML_TIMESTAMP_TAG;
+		omit_tag = 1;
+	}
 
 	/* get iso-8601 format specifier */
 #if ZEND_MODULE_API_NO >= 20071006
@@ -568,10 +627,9 @@ static int y_write_timestamp(y_emit_state_t *state, zval *data TSRMLS_DC)
 	zval_dtor(&dtfmt);
 
 	/* emit formatted date */
-	status = yaml_scalar_event_initialize(&event,
-			NULL, (yaml_char_t *) YAML_TIMESTAMP_TAG,
+	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) Z_STRVAL_P(timestamp), Z_STRLEN_P(timestamp),
-			1, 1, YAML_PLAIN_SCALAR_STYLE);
+			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
 	zval_dtor(timestamp);
 	efree(timestamp);
 	if (!status) {
@@ -585,19 +643,29 @@ static int y_write_timestamp(y_emit_state_t *state, zval *data TSRMLS_DC)
 
 /* {{{ y_write_object()
  */
-static int y_write_object(y_emit_state_t *state, zval *data TSRMLS_DC)
+static int y_write_object(
+		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
+	int omit_tag = 0;
 	int status;
 	char *clazz_name = { 0 };
 	zend_uint name_len;
 	zend_class_entry *clazz;
+	zval **callback = { 0 };
 
 	clazz = Z_OBJCE_P(data);
 	zend_get_object_classname(data, &clazz_name, &name_len TSRMLS_CC);
 
-	if (0 == strncmp(clazz_name, "DateTime", name_len)) {
-		status = y_write_timestamp(state, data TSRMLS_CC);
+	/* TODO check for a "yamlSerialize()" instance method */
+	if (NULL != state->callbacks && SUCCESS == zend_hash_find(
+			state->callbacks, clazz_name, name_len + 1, (void **) &callback)) {
+		/* found a registered callback for this class */
+		status = y_write_object_callback(
+				state, *callback, data, clazz_name TSRMLS_CC);
+
+	} else if (0 == strncmp(clazz_name, "DateTime", name_len)) {
+		status = y_write_timestamp(state, data, tag TSRMLS_CC);
 
 	} else {
 		/* tag and emit serialized version of object */
@@ -627,6 +695,60 @@ static int y_write_object(y_emit_state_t *state, zval *data TSRMLS_DC)
 }
 /* }}} */
 
+/* {{{ y_write_object_callback()
+ */
+static int
+y_write_object_callback (
+		y_emit_state_t *state, zval *callback, zval *data,
+		char *clazz_name TSRMLS_DC) {
+	int result;
+	zval **argv[] = { &data };
+	zval *zret = { 0 };
+	zval **ztag = { 0 };
+	zval **zdata = { 0 };
+
+	/* call the user function */
+	if (FAILURE == call_user_function_ex(EG(function_table), NULL,
+			callback, &zret, 1, argv, 0, NULL TSRMLS_CC) ||
+			NULL == zret) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				"Failed to apply callback for class '%s'"
+				" with user defined function", clazz_name);
+		return FAILURE;
+	}
+
+	/* return val should be array */
+	if (IS_ARRAY != Z_TYPE_P(zret)) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				"Expected callback for class '%s'"
+				" to return an array", clazz_name);
+		return FAILURE;
+	}
+
+	/* pull out the tag and surrogate object */
+	if (SUCCESS != zend_hash_find(
+			Z_ARRVAL_P(zret), "tag", sizeof("tag"), (void **)&ztag) ||
+			IS_STRING != Z_TYPE_PP(ztag)) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				"Expected callback result for class '%s'"
+				" to contain a key named 'tag' with a string value",
+				clazz_name);
+		return FAILURE;
+	}
+
+	if (SUCCESS != zend_hash_find(
+			Z_ARRVAL_P(zret), "data", sizeof("data"), (void **)&zdata)){
+		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				"Expected callback result for class '%s'"
+				" to contain a key named 'data'",
+				clazz_name);
+		return FAILURE;
+	}
+
+	/* emit surrogate object and tag */
+	return y_write_zval(state, (*zdata), Z_STRVAL_PP(ztag) TSRMLS_CC);
+}
+/* }}} */
 
 /* {{{ php_yaml_write_impl()
  * Common stream writing logic shared by yaml_emit and yaml_emit_file.
@@ -634,7 +756,7 @@ static int y_write_object(y_emit_state_t *state, zval *data TSRMLS_DC)
 int
 php_yaml_write_impl(
 		yaml_emitter_t *emitter, zval *data,
-		yaml_encoding_t encoding TSRMLS_DC)
+		yaml_encoding_t encoding, HashTable *callbacks TSRMLS_DC)
 {
 	y_emit_state_t state;
 	yaml_event_t event;
@@ -645,6 +767,7 @@ php_yaml_write_impl(
 	ALLOC_HASHTABLE(state.recursive);
 	zend_hash_init(state.recursive, 8, NULL, NULL, 0);
 	y_scan_recursion(&state, data TSRMLS_CC);
+	state.callbacks = callbacks;
 
 
 	/* start stream */
@@ -672,7 +795,7 @@ php_yaml_write_impl(
 	}
 
 	/* output data */
-	if (FAILURE == y_write_zval(&state, data TSRMLS_CC)) {
+	if (FAILURE == y_write_zval(&state, data, NULL TSRMLS_CC)) {
 		status = FAILURE;
 		goto cleanup;
 	}
