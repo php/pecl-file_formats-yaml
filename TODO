@@ -1,10 +1,7 @@
 FUTURE FEATURES
 ===============
 
-Document parse callback syntax and usage.
 Document merge support.
-Document emit callback syntax and usage.
-Update call signatures for emit.
 
 More tests for proper string emits
 tests for yaml_parse_file
