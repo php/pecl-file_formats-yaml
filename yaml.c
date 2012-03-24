@@ -416,7 +416,7 @@ PHP_FUNCTION(yaml_parse)
 	zval *yaml = { 0 };
 	long ndocs = 0;
 
-	memset(&state, 0, sizeof(&state));
+	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
 	state.aliases = NULL;
 	state.callbacks = NULL;
@@ -506,7 +506,7 @@ PHP_FUNCTION(yaml_parse_file)
 	zval *yaml = { 0 };
 	long ndocs = 0;
 
-	memset(&state, 0, sizeof(&state));
+	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
 	state.aliases = NULL;
 	state.callbacks = NULL;
@@ -609,7 +609,7 @@ PHP_FUNCTION(yaml_parse_url)
 	zval *yaml = { 0 };
 	long ndocs = 0;
 
-	memset(&state, 0, sizeof(&state));
+	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
 	state.aliases = NULL;
 	state.callbacks = NULL;
