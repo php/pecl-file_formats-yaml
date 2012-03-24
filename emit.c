@@ -647,7 +647,6 @@ static int y_write_object(
 		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
-	int omit_tag = 0;
 	int status;
 	char *clazz_name = { 0 };
 	zend_uint name_len;
@@ -701,7 +700,6 @@ static int
 y_write_object_callback (
 		y_emit_state_t *state, zval *callback, zval *data,
 		char *clazz_name TSRMLS_DC) {
-	int result;
 	zval **argv[] = { &data };
 	zval *zret = { 0 };
 	zval **ztag = { 0 };
@@ -746,7 +744,8 @@ y_write_object_callback (
 	}
 
 	/* emit surrogate object and tag */
-	return y_write_zval(state, (*zdata), Z_STRVAL_PP(ztag) TSRMLS_CC);
+	return y_write_zval(
+			state, (*zdata), (yaml_char_t *) Z_STRVAL_PP(ztag) TSRMLS_CC);
 }
 /* }}} */
 
