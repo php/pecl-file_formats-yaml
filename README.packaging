@@ -20,3 +20,5 @@ To add to pecl channel:
   add new files to svn
   `find . -name '*.xml' | xargs svn propset svn:mime-type application/xml`
 
+Versioning:
+https://wiki.php.net/rfc/peclversioning/solution2

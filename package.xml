@@ -20,9 +20,9 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2011-03-12</date>
+ <date>2011-03-27</date>
  <version>
-  <release>1.1.0-dev</release>
+  <release>1.1.0RC2</release>
   <api>1.1.0</api>
  </version>
  <stability>
@@ -31,6 +31,9 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+    Bugs Fixed:
+      - #61477 memset sizeof(struct) instead of sizeof(pointer)
+      - #61475 config.m4 honors `php-config --prefix`
  </notes>
  <contents>
   <dir name="/">
