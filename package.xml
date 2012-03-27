@@ -22,7 +22,7 @@
  </lead>
  <date>2011-03-27</date>
  <version>
-  <release>1.1.0RC2</release>
+  <release>1.1.0-dev</release>
   <api>1.1.0</api>
  </version>
  <stability>
@@ -31,9 +31,6 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-    Bugs Fixed:
-      - #61477 memset sizeof(struct) instead of sizeof(pointer)
-      - #61475 config.m4 honors `php-config --prefix`
  </notes>
  <contents>
   <dir name="/">
@@ -129,6 +126,22 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+ <date>2011-03-27</date>
+ <version>
+  <release>1.1.0RC2</release>
+  <api>1.1.0</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+ <notes>
+    Bugs Fixed:
+      - #61477 memset sizeof(struct) instead of sizeof(pointer)
+      - #61475 config.m4 honors `php-config --prefix`
+ </notes>
+  </release>
   <release>
    <date>2011-03-12</date>
    <version>
