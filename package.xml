@@ -22,16 +22,15 @@
  </lead>
  <date>2011-04-15</date>
  <version>
-  <release>1.1.0</release>
+  <release>1.1.1-dev</release>
   <api>1.1.0</api>
  </version>
  <stability>
-  <release>stable</release>
-  <api>stable</api>
+  <release>alpha</release>
+  <api>alpha</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Marking 1.1.0 branch as stable. No change from 1.1.0RC2.
  </notes>
  <contents>
   <dir name="/">
@@ -128,20 +127,34 @@
 
  <changelog>
   <release>
- <date>2011-03-27</date>
- <version>
-  <release>1.1.0RC2</release>
-  <api>1.1.0</api>
- </version>
- <stability>
-  <release>beta</release>
-  <api>beta</api>
- </stability>
- <notes>
+   <date>2011-04-15</date>
+   <version>
+    <release>1.1.0</release>
+    <api>1.1.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    Marking 1.1.0 branch as stable. No change from 1.1.0RC2.
+   </notes>
+  </release>
+  <release>
+   <date>2011-03-27</date>
+   <version>
+    <release>1.1.0RC2</release>
+    <api>1.1.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <notes>
     Bugs Fixed:
-      - #61477 memset sizeof(struct) instead of sizeof(pointer)
-      - #61475 config.m4 honors `php-config --prefix`
- </notes>
+    - #61477 memset sizeof(struct) instead of sizeof(pointer)
+    - #61475 config.m4 honors `php-config --prefix`
+   </notes>
   </release>
   <release>
    <date>2011-03-12</date>
