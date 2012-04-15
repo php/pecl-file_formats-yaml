@@ -1,0 +1,24 @@
+To package a new distribution:
+
+  Edit package.xml:
+    - copy current <release/> into <changelog/>
+    - edit <release/> for today's date, version, etc
+  `pear package`
+
+To create a .deb:
+  `pear package`
+  copy package somewhere
+  `dh-make-pecl \
+    --depends libyaml-0-1 \
+    --build-depends libyaml-dev \
+    --only 5 \
+    yaml-<version_number>.tgz`
+
+To add to pecl channel:
+  `cd extras/pear`
+  `php ~/bin/pearscs.phar release ../../yaml-<version_number>.tgz <lead>`
+  add new files to svn
+  `find . -name '*.xml' | xargs svn propset svn:mime-type application/xml`
+
+Versioning:
+https://wiki.php.net/rfc/peclversioning/solution2
