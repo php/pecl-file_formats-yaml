@@ -31,6 +31,8 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+    Bugs Fixed:
+    - #63086 Compiling PHP with YAML as static extension fails
  </notes>
  <contents>
   <dir name="/">
