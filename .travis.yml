@@ -6,10 +6,10 @@ notifications:
 env:
   - REPORT_EXIT_STATUS=1
     CFLAGS="-Wall -fno-strict-aliasing"
-    TEST_PHP_EXECUTABLE=php
 before_script:
   - phpize
   - ./configure --with-yaml
   - make clean all
-script: php -n -d open_basedir= -d output_buffering=0 -d memory_limit=-1
+script: TEST_PHP_EXECUTABLE=$(which php) php
+    -n -d open_basedir= -d output_buffering=0 -d memory_limit=-1
     run-tests.php -n -d extension_dir=modules -d extension=yaml.so tests
