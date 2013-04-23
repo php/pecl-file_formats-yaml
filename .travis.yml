@@ -1,0 +1,14 @@
+language: php
+php:
+  - 5.4
+notifications:
+  email: false
+env:
+  - REPORT_EXIT_STATUS=1 CFLAGS="-Wall -fno-strict-aliasing"
+before_script:
+  - sudo apt-get install libyaml-dev
+  - phpize
+  - ./configure --with-yaml
+  - make clean all
+script: php -n -d open_basedir= -d output_buffering=0 -d memory_limit=-1
+    run-tests.php -n -d extension_dir=modules -d extension=yaml.so tests
