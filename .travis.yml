@@ -4,9 +4,10 @@ php:
 notifications:
   email: false
 env:
-  - REPORT_EXIT_STATUS=1 CFLAGS="-Wall -fno-strict-aliasing"
+  - REPORT_EXIT_STATUS=1
+    CFLAGS="-Wall -fno-strict-aliasing"
+    TEST_PHP_EXECUTABLE=php
 before_script:
-  - sudo apt-get install libyaml-dev
   - phpize
   - ./configure --with-yaml
   - make clean all
