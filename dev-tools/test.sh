@@ -13,7 +13,7 @@ cd "${WORK_DIR}"
 
 TEST=${1:-tests/}
 
-USE_PHP=${TEST_PHP_EXECUTABLE:-/usr/bin/php}
+USE_PHP=${TEST_PHP_EXECUTABLE:-$(which php)}
 
 TEST_PHP_EXECUTABLE=${USE_PHP} \
 REPORT_EXIT_STATUS=1 \
