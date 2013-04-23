@@ -70,6 +70,9 @@ extern "C" {
 
 #define PHP_YAML_MODULE_VERSION "1.1.1-dev"
 
+extern zend_module_entry yaml_module_entry;
+#define phpext_yaml_ptr &yaml_module_entry
+
 /* {{{ module globals */
 
 ZEND_BEGIN_MODULE_GLOBALS(yaml)
