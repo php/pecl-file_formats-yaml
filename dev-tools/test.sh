@@ -5,6 +5,12 @@
 set -e
 set -u
 
+BASENAME=${0}
+TOOLS_DIR=$(dirname ${BASENAME})
+WORK_DIR="${TOOLS_DIR}/.."
+
+cd "${WORK_DIR}"
+
 TEST=${1:-tests/}
 
 USE_PHP=${TEST_PHP_EXECUTABLE:-/usr/bin/php}

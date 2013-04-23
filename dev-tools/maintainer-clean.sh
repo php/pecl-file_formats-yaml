@@ -1,4 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+BASENAME=${0}
+TOOLS_DIR=$(dirname ${BASENAME})
+WORK_DIR="${TOOLS_DIR}/.."
+
+cd "${WORK_DIR}"
 
 ## what `make distclean` does
 find . -name \*.gcno -o -name \*.gcda | xargs rm -f
