@@ -176,7 +176,7 @@ zend_module_entry yaml_module_entry = {	/* {{{ */
 	NULL, /* RINIT */
 	NULL, /* RSHUTDOWN */
 	PHP_MINFO(yaml),
-	PHP_YAML_MODULE_VERSION,
+	PHP_YAML_VERSION,
 #if ZEND_EXTENSION_API_NO >= 220060519
 	PHP_MODULE_GLOBALS(yaml),
 	PHP_GINIT(yaml),
@@ -280,7 +280,7 @@ PHP_MINFO_FUNCTION(yaml)
 {
 	php_info_print_table_start();
 	php_info_print_table_row(2, "LibYAML Support", "enabled");
-	php_info_print_table_row(2, "Module Version", PHP_YAML_MODULE_VERSION);
+	php_info_print_table_row(2, "Module Version", PHP_YAML_VERSION);
 	php_info_print_table_row(2, "LibYAML Version", yaml_get_version_string());
 	php_info_print_table_end();
 
