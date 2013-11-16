@@ -9,7 +9,7 @@ set -e
 set -u
 
 REQ=${1:?PULL-REQUEST-ID required}
-GITHUB_REPO="bd808/pecl-file_formats-yaml"
+GITHUB_REPO="php/pecl-file_formats-yaml"
 MASTER=master
 
 # switch to main branch
