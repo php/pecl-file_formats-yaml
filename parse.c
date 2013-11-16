@@ -418,6 +418,13 @@ static zval *handle_mapping(parser_state_t *state TSRMLS_DC)
 		key_str = convert_to_char(key TSRMLS_CC);
 		zval_ptr_dtor(&key);
 
+		if (NULL == key_str) {
+			zval_ptr_dtor(&retval);
+			yaml_event_delete(&src_event);
+			yaml_event_delete(&key_event);
+			return NULL;
+		}
+
 		value = get_next_element(state TSRMLS_CC);
 
 		if (NULL == value) {
@@ -965,16 +972,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 		break;
 
 	default:
-		{
-			php_serialize_data_t var_hash;
-			smart_str buf = { 0 };
-
-			PHP_VAR_SERIALIZE_INIT(var_hash);
-			php_var_serialize(&buf, &zv, &var_hash TSRMLS_CC);
-			PHP_VAR_SERIALIZE_DESTROY(var_hash);
-
-			str = buf.c;
-		}
+		str = NULL;
 		break;
 	}
 
