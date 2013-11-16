@@ -774,9 +774,6 @@ PHP_FUNCTION(yaml_emit_file)
 	}
 #endif
 
-	php_error_docref(NULL TSRMLS_CC, E_WARNING, "not yet implemented");
-	RETURN_FALSE;
-
 	if (NULL == (stream = php_stream_open_wrapper(filename, "wb",
 			IGNORE_URL | ENFORCE_SAFE_MODE | REPORT_ERRORS | STREAM_WILL_CAST,
 			NULL))) {

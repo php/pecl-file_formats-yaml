@@ -20,7 +20,7 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2011-04-15</date>
+ <date>2013-11-16</date>
  <version>
   <release>1.1.1-dev</release>
   <api>1.1.0</api>
@@ -33,6 +33,9 @@
  <notes>
     Bugs Fixed:
     - #63086 Compiling PHP with YAML as static extension fails
+    Changes:
+    - Removed "not yet implemented" warning and deliberate abort from
+      yaml_emit_file()
  </notes>
  <contents>
   <dir name="/">
