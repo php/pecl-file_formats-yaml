@@ -429,8 +429,9 @@ static zval *handle_mapping(parser_state_t *state TSRMLS_DC)
 		}
 
 		/* check for '<<' and handle merge */
-		if (IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) && 
-				STR_EQ("<<", key_str)) {
+		if (IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
+				STR_EQ("<<", key_str) &&
+				Z_TYPE_P(value) == IS_ARRAY) {
 			/* zend_hash_merge */
 			/*
 			 * value is either a single ref or a simple array of refs

@@ -33,6 +33,7 @@
  <notes>
     Bugs Fixed:
     - #63086 Compiling PHP with YAML as static extension fails
+    - #64019 Segmentation fault if yaml anchor ends with a colon
     Changes:
     - Removed "not yet implemented" warning and deliberate abort from
       yaml_emit_file()
