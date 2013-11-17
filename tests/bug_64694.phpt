@@ -5,21 +5,23 @@ Test PECL bug #64694
 --FILE--
 <?php
 $yaml_code = <<<YAML
-[a]: 1
+"[a]": 1
 YAML;
 
 var_dump(yaml_parse($yaml_code));
 
 $yaml_code = <<<YAML
-"[a]": 1
+[a]: 1
 YAML;
 
 var_dump(yaml_parse($yaml_code));
 ?>
---EXPECTF--
-Warning: yaml_parse(): Failed to convert array to string in %sbug_64694.php on line 6
-bool(false)
+--EXPECT--
 array(1) {
   ["[a]"]=>
+  int(1)
+}
+array(1) {
+  ["a:1:{i:0;s:1:"a";}"]=>
   int(1)
 }
