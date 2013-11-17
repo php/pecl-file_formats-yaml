@@ -429,7 +429,8 @@ static zval *handle_mapping(parser_state_t *state TSRMLS_DC)
 		}
 
 		/* check for '<<' and handle merge */
-		if (IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
+		if (key_event.type == YAML_SCALAR_EVENT &&
+				IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
 				STR_EQ("<<", key_str) &&
 				Z_TYPE_P(value) == IS_ARRAY) {
 			/* zend_hash_merge */
@@ -973,7 +974,11 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			php_var_serialize(&buf, &zv, &var_hash TSRMLS_CC);
 			PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-			str = buf.c;
+			if (buf.c) {
+				str = estrndup(buf.c, buf.len);
+			} else {
+				str = NULL;
+			}
 		}
 		break;
 	}
