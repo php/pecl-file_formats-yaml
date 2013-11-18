@@ -327,6 +327,9 @@ scalar_is_numeric(const char *value, size_t length, long *lval,
 		} else if (*value == '.') {
 			goto check_float;
 
+		} else if (*value == ':') {
+			goto check_sexa;
+
 		} else {
 			goto not_numeric;
 		}
@@ -359,7 +362,7 @@ scalar_is_numeric(const char *value, size_t length, long *lval,
 		/* sexagecimal */
 
 check_sexa:
-		while (value < end - 2) {
+		while (value < end) {
 			if (*value == '.') {
 				type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL;
 				goto check_float;
@@ -370,7 +373,8 @@ check_sexa:
 			}
 
 			*ptr++ = *value++;
-			if (*(value + 1) == ':') {
+			if (*(value + 1) == ':' || *(value + 1) == '.' ||
+					(value + 1) == end) {
 				if (*value >= '0' && *value <= '9') {
 					*ptr++ = *value++;
 

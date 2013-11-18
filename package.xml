@@ -20,7 +20,7 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2013-11-16</date>
+ <date>2013-11-17</date>
  <version>
   <release>1.1.1-dev</release>
   <api>1.1.0</api>
@@ -31,13 +31,14 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+    New Features:
+    - Removed "not yet implemented" warning and deliberate abort from
+      yaml_emit_file()
     Bugs Fixed:
     - #63086 Compiling PHP with YAML as static extension fails
     - #64019 Segmentation fault if yaml anchor ends with a colon
     - #64694 Segfault when array used as mapping key
-    Changes:
-    - Removed "not yet implemented" warning and deliberate abort from
-      yaml_emit_file()
+    - #61923 Detect_scalar_type() is not aware of base 60 representation
  </notes>
  <contents>
   <dir name="/">
