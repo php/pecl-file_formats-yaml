@@ -68,7 +68,7 @@ extern "C" {
 extern "C" {
 #endif
 
-#define PHP_YAML_VERSION "1.1.1"
+#define PHP_YAML_VERSION "1.1.2a1"
 
 extern zend_module_entry yaml_module_entry;
 #define phpext_yaml_ptr &yaml_module_entry

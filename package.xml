@@ -22,24 +22,15 @@
  </lead>
  <date>2013-11-19</date>
  <version>
-  <release>1.1.1</release>
+  <release>1.1.2a1</release>
   <api>1.1.0</api>
  </version>
  <stability>
-  <release>stable</release>
+  <release>alpha</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-    New Features:
-    - Removed "not yet implemented" warning and deliberate abort from
-      yaml_emit_file()
-    Bugs Fixed:
-    - #61770 Crash on nonunicode character
-    - #61923 Detect_scalar_type() is not aware of base 60 representation
-    - #63086 Compiling PHP with YAML as static extension fails
-    - #64019 Segmentation fault if yaml anchor ends with a colon
-    - #64694 Segfault when array used as mapping key
  </notes>
  <contents>
   <dir name="/">
@@ -139,6 +130,28 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2013-11-19</date>
+   <version>
+    <release>1.1.1</release>
+    <api>1.1.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+      New Features:
+      - Removed "not yet implemented" warning and deliberate abort from
+        yaml_emit_file()
+      Bugs Fixed:
+      - #61770 Crash on nonunicode character
+      - #61923 Detect_scalar_type() is not aware of base 60 representation
+      - #63086 Compiling PHP with YAML as static extension fails
+      - #64019 Segmentation fault if yaml anchor ends with a colon
+      - #64694 Segfault when array used as mapping key
+   </notes>
+  </release>
   <release>
    <date>2011-04-15</date>
    <version>
