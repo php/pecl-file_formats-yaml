@@ -29,7 +29,7 @@ autom4te.cache \
 build \
 config.guess \
 config.h \
-config.h.in \
+config.h.in* \
 config.log \
 config.nice \
 config.status \
