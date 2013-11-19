@@ -34,9 +34,8 @@
 
 
 #include "php_yaml.h"
-#include "zval_refcount.h"		/* for PHP < 5.3 */
+#include "zval_refcount.h" /* for PHP < 5.3 */
 #include "php_yaml_int.h"
-
 
 /* {{{ local macros
  */
@@ -81,6 +80,8 @@ static int y_write_object(
 static int y_write_object_callback (
 		y_emit_state_t *state, zval *callback, zval *data,
 		char *clazz_name TSRMLS_DC);
+static inline unsigned int get_next_char(
+		const unsigned char *str, size_t str_len, size_t *cursor, int *status);
 /* }}} */
 
 
@@ -296,7 +297,7 @@ static int y_write_null(y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
 		tag = (yaml_char_t *) YAML_NULL_TAG;
 		omit_tag = 1;
 	}
-	
+
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) "~", strlen("~"),
 			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
@@ -422,15 +423,22 @@ static int y_write_string(
 		style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
 
 	} else {
-		const char *ptr, *end;
-		end = Z_STRVAL_P(data) + Z_STRLEN_P(data);
+		size_t pos = 0, us;
+		int j;
+		const unsigned char *s = (const unsigned char *)Z_STRVAL_P(data);
+		int len = Z_STRLEN_P(data);
 
-		/* TODO: need more test cases for this sniffing */
-		for (ptr = Z_STRVAL_P(data); ptr != end; ptr++) {
-			if ('\n' == *ptr) {
+		for (j = 0; pos < len; j++) {
+			us = get_next_char(s, len, &pos, &status);
+			if (status != SUCCESS) {
+				/* invalid UTF-8 character found */
+				php_error_docref(NULL TSRMLS_CC, E_WARNING,
+						"Invalid UTF-8 sequence in argument");
+				return FAILURE;
+
+			} else if ('\n' == us) {
 				/* has newline(s), make sure they are preserved */
 				style = YAML_LITERAL_SCALAR_STYLE;
-				break;
 			}
 		}
 	}
@@ -487,7 +495,7 @@ static int y_write_array(
 	 * if it exists:
 	 *     anchor = "id%04d" % index
 	 *   if ht->nApplyCount > 0:
-	 *     emit a ref 
+	 *     emit a ref
 	 */
 	recursive_idx = y_search_recursive(state, (unsigned long) ht TSRMLS_CC);
 	if (-1 != recursive_idx) {
@@ -545,7 +553,7 @@ static int y_write_array(
 					0, &pos);
 
 			/* create zval for key */
-			if (HASH_KEY_IS_LONG == 
+			if (HASH_KEY_IS_LONG ==
 					zend_hash_get_current_key_type_ex(ht, &pos)) {
 				ZVAL_LONG(&key_zval, kidx);
 
@@ -561,7 +569,7 @@ static int y_write_array(
 			}
 		}
 
-		if (SUCCESS == 
+		if (SUCCESS ==
 				zend_hash_get_current_data_ex(ht, (void **) &elm, &pos)) {
 
 			tmp_ht = HASH_OF(*elm);
@@ -650,10 +658,8 @@ static int y_write_object(
 	int status;
 	char *clazz_name = { 0 };
 	zend_uint name_len;
-	zend_class_entry *clazz;
 	zval **callback = { 0 };
 
-	clazz = Z_OBJCE_P(data);
 	zend_get_object_classname(data, &clazz_name, &name_len TSRMLS_CC);
 
 	/* TODO check for a "yamlSerialize()" instance method */
@@ -847,11 +853,120 @@ php_yaml_write_to_buffer(void *data, unsigned char *buffer, size_t size)
 /* }}} */
 
 
+/* {{{ get_next_char
+ * Copied from ext/standard/html.c @ a37ff1fa4bb149dc81fc812d03cdf7685c499403
+ * and trimmed to include only utf8 code branch. I would have liked to use
+ * php_next_utf8_char() but it isn't available until php 5.4.
+ *
+ * Thank you cataphract@php.net!
+ */
+#define CHECK_LEN(pos, chars_need) ((str_len - (pos)) >= (chars_need))
+#define MB_FAILURE(pos, advance) do { \
+	*cursor = pos + (advance); \
+	*status = FAILURE; \
+	return 0; \
+} while (0)
+#define utf8_lead(c)  ((c) < 0x80 || ((c) >= 0xC2 && (c) <= 0xF4))
+#define utf8_trail(c) ((c) >= 0x80 && (c) <= 0xBF)
+
+static inline unsigned int get_next_char(
+		const unsigned char *str,
+		size_t str_len,
+		size_t *cursor,
+		int *status)
+{
+	size_t pos = *cursor;
+	unsigned int this_char = 0;
+	unsigned char c;
+
+	*status = SUCCESS;
+	assert(pos <= str_len);
+
+	if (!CHECK_LEN(pos, 1))
+		MB_FAILURE(pos, 1);
+
+	/* We'll follow strategy 2. from section 3.6.1 of UTR #36:
+		* "In a reported illegal byte sequence, do not include any
+		*  non-initial byte that encodes a valid character or is a leading
+		*  byte for a valid sequence." */
+	c = str[pos];
+	if (c < 0x80) {
+		this_char = c;
+		pos++;
+	} else if (c < 0xc2) {
+		MB_FAILURE(pos, 1);
+	} else if (c < 0xe0) {
+		if (!CHECK_LEN(pos, 2))
+			MB_FAILURE(pos, 1);
+
+		if (!utf8_trail(str[pos + 1])) {
+			MB_FAILURE(pos, utf8_lead(str[pos + 1]) ? 1 : 2);
+		}
+		this_char = ((c & 0x1f) << 6) | (str[pos + 1] & 0x3f);
+		if (this_char < 0x80) { /* non-shortest form */
+			MB_FAILURE(pos, 2);
+		}
+		pos += 2;
+	} else if (c < 0xf0) {
+		size_t avail = str_len - pos;
+
+		if (avail < 3 ||
+				!utf8_trail(str[pos + 1]) || !utf8_trail(str[pos + 2])) {
+			if (avail < 2 || utf8_lead(str[pos + 1]))
+				MB_FAILURE(pos, 1);
+			else if (avail < 3 || utf8_lead(str[pos + 2]))
+				MB_FAILURE(pos, 2);
+			else
+				MB_FAILURE(pos, 3);
+		}
+
+		this_char = ((c & 0x0f) << 12) | ((str[pos + 1] & 0x3f) << 6) |
+				(str[pos + 2] & 0x3f);
+		if (this_char < 0x800) {
+			/* non-shortest form */
+			MB_FAILURE(pos, 3);
+		} else if (this_char >= 0xd800 && this_char <= 0xdfff) {
+			/* surrogate */
+			MB_FAILURE(pos, 3);
+		}
+		pos += 3;
+	} else if (c < 0xf5) {
+		size_t avail = str_len - pos;
+
+		if (avail < 4 ||
+				!utf8_trail(str[pos + 1]) || !utf8_trail(str[pos + 2]) ||
+				!utf8_trail(str[pos + 3])) {
+			if (avail < 2 || utf8_lead(str[pos + 1]))
+				MB_FAILURE(pos, 1);
+			else if (avail < 3 || utf8_lead(str[pos + 2]))
+				MB_FAILURE(pos, 2);
+			else if (avail < 4 || utf8_lead(str[pos + 3]))
+				MB_FAILURE(pos, 3);
+			else
+				MB_FAILURE(pos, 4);
+		}
+
+		this_char = ((c & 0x07) << 18) | ((str[pos + 1] & 0x3f) << 12) |
+				((str[pos + 2] & 0x3f) << 6) | (str[pos + 3] & 0x3f);
+		if (this_char < 0x10000 || this_char > 0x10FFFF) {
+			/* non-shortest form or outside range */
+			MB_FAILURE(pos, 4);
+		}
+		pos += 4;
+	} else {
+		MB_FAILURE(pos, 1);
+	}
+
+	*cursor = pos;
+	return this_char;
+}
+/* }}} */
+
 /*
  * Local variables:
  * tab-width: 4
  * c-basic-offset: 4
  * End:
  * vim600: noet sw=4 ts=4 fdm=marker
- * vim<600: noet sw=4 ts=4 
+ * vim<600: noet sw=4 ts=4
  */
