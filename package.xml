@@ -20,14 +20,14 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2013-11-18</date>
+ <date>2013-11-19</date>
  <version>
-  <release>1.1.1-dev</release>
+  <release>1.1.1</release>
   <api>1.1.0</api>
  </version>
  <stability>
-  <release>alpha</release>
-  <api>alpha</api>
+  <release>stable</release>
+  <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
