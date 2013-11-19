@@ -20,14 +20,14 @@
   <email>bd808@php.net</email>
   <active>yes</active>
  </lead>
- <date>2013-11-18</date>
+ <date>2013-11-19</date>
  <version>
-  <release>1.1.1-dev</release>
+  <release>1.1.1</release>
   <api>1.1.0</api>
  </version>
  <stability>
-  <release>alpha</release>
-  <api>alpha</api>
+  <release>stable</release>
+  <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
@@ -54,12 +54,15 @@
    <file role="src" name="php_yaml.h" />
    <file role="src" name="php_yaml_int.h" />
    <file role="src" name="yaml.c" />
-   <!-- <file role="src" name="yaml.dsp" /> -->
    <file role="src" name="zval_refcount.h" />
    <dir name="tests">
     <file role="test" name="bug_21995.phpt" />
     <file role="test" name="bug_59860.phpt" />
     <file role="test" name="bug_60628.phpt" />
+    <file role="test" name="bug_61770.phpt" />
+    <file role="test" name="bug_61923.phpt" />
+    <file role="test" name="bug_64019.phpt" />
+    <file role="test" name="bug_64694.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
     <file role="test" name="yaml_emit_001.phpt" />
@@ -71,6 +74,7 @@
     <file role="test" name="yaml_emit_007.phpt" />
     <file role="test" name="yaml_emit_008.phpt" />
     <file role="test" name="yaml_emit_009.phpt" />
+    <file role="test" name="yaml_emit_file_basic.phpt" />
     <file role="test" name="yaml_parse_001.phpt" />
     <file role="test" name="yaml_parse_002.phpt" />
     <file role="test" name="yaml_parse_003.phpt" />
