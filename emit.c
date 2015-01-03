@@ -52,34 +52,34 @@
 /* {{{ local prototypes
  */
 static int y_event_emit(
-		y_emit_state_t *state, yaml_event_t *event TSRMLS_DC);
+		const y_emit_state_t *state, yaml_event_t *event TSRMLS_DC);
 static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC);
 static int y_array_is_sequence(HashTable *ht TSRMLS_DC);
-static void y_scan_recursion(y_emit_state_t *state, zval *data TSRMLS_DC);
+static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC);
 static long y_search_recursive(
-		y_emit_state_t *state, const unsigned long addr TSRMLS_DC);
+		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC);
 
 static int y_write_zval(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_null(
-		y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC);
 static int y_write_bool(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_long(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_double(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_string(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_array(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_timestamp(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_object(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
 static int y_write_object_callback (
-		y_emit_state_t *state, zval *callback, zval *data,
-		char *clazz_name TSRMLS_DC);
+		const y_emit_state_t *state, zval *callback, zval *data,
+		const char *clazz_name TSRMLS_DC);
 static inline unsigned int get_next_char(
 		const unsigned char *str, size_t str_len, size_t *cursor, int *status);
 /* }}} */
@@ -89,7 +89,7 @@ static inline unsigned int get_next_char(
  * send an event to the emitter
  */
 static int
-y_event_emit(y_emit_state_t *state, yaml_event_t *event TSRMLS_DC)
+y_event_emit(const y_emit_state_t *state, yaml_event_t *event TSRMLS_DC)
 {
 	if (!yaml_emitter_emit(state->emitter, event)) {
 		yaml_event_delete(event);
@@ -139,7 +139,7 @@ static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 {
 	HashPosition pos;
 	ulong kidx, idx;
-	char *kstr;
+	const char *kstr;
 	int key_type;
 
 	zend_hash_internal_pointer_reset_ex(ht, &pos);
@@ -167,7 +167,7 @@ static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 /* {{{ y_scan_recursion()
  * walk an object graph looking for recursive references
  */
-static void y_scan_recursion(y_emit_state_t *state, zval *data TSRMLS_DC)
+static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 {
 	HashTable *ht;
 	HashPosition pos;
@@ -209,7 +209,7 @@ static void y_scan_recursion(y_emit_state_t *state, zval *data TSRMLS_DC)
  * Search the recursive state hash for an address
  */
 static long y_search_recursive(
-		y_emit_state_t *state, const unsigned long addr TSRMLS_DC)
+		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC)
 {
  	zval **entry;
 	HashPosition pos;
@@ -236,7 +236,7 @@ static long y_search_recursive(
  * Write a php zval to the emitter
  */
 static int y_write_zval(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	int status = FAILURE;
 
@@ -287,7 +287,7 @@ static int y_write_zval(
 
 /* {{{ y_write_null()
  */
-static int y_write_null(y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
+static int y_write_null(const y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -313,12 +313,12 @@ static int y_write_null(y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
 /* {{{ y_write_bool()
  */
 static int y_write_bool(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
 	int status;
-	char *res = Z_BVAL_P(data) ? "true" : "false";
+	const char *res = Z_BVAL_P(data) ? "true" : "false";
 
 	if (NULL == tag) {
 		tag = (yaml_char_t *) YAML_BOOL_TAG;
@@ -340,7 +340,7 @@ static int y_write_bool(
 /* {{{ y_write_long()
  */
 static int y_write_long(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -354,7 +354,7 @@ static int y_write_long(
 	}
 
 	res_size = snprintf(res, 0, "%ld", Z_LVAL_P(data));
-	res = emalloc(res_size + 1);
+	res = (char*) emalloc(res_size + 1);
 	snprintf(res, res_size + 1, "%ld", Z_LVAL_P(data));
 
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
@@ -373,7 +373,7 @@ static int y_write_long(
 /* {{{ y_write_double()
  */
 static int y_write_double(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -387,7 +387,7 @@ static int y_write_double(
 	}
 
 	res_size = snprintf(res, 0, "%f", Z_DVAL_P(data));
-	res = emalloc(res_size + 1);
+	res = (char*) emalloc(res_size + 1);
 	snprintf(res, res_size + 1, "%f", Z_DVAL_P(data));
 
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
@@ -406,7 +406,7 @@ static int y_write_double(
 /* {{{ y_write_string()
  */
 static int y_write_string(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -458,7 +458,7 @@ static int y_write_string(
 /* {{{ y_write_array()
  */
 static int y_write_array(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -501,7 +501,7 @@ static int y_write_array(
 	if (-1 != recursive_idx) {
 		/* create anchor to refer to this structure */
 		anchor_size = snprintf(anchor, 0, "refid%ld", recursive_idx + 1);
-		anchor = emalloc(anchor_size + 1);
+		anchor = (char*) emalloc(anchor_size + 1);
 		snprintf(anchor, anchor_size + 1, "refid%ld", recursive_idx + 1);
 
 		if (ht->nApplyCount > 1) {
@@ -574,7 +574,7 @@ static int y_write_array(
 
 			tmp_ht = HASH_OF(*elm);
 			if (tmp_ht) {
-				/* increment access counted for hash */
+				/* increment access count for hash */
 				tmp_ht->nApplyCount++;
 			}
 
@@ -609,7 +609,7 @@ static int y_write_array(
 /* y_write_timestamp()
  */
 static int y_write_timestamp(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -652,11 +652,11 @@ static int y_write_timestamp(
 /* {{{ y_write_object()
  */
 static int y_write_object(
-		y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
 {
 	yaml_event_t event;
 	int status;
-	char *clazz_name = { 0 };
+	const char *clazz_name = { 0 };
 	zend_uint name_len;
 	zval **callback = { 0 };
 
@@ -695,7 +695,6 @@ static int y_write_object(
 		}
 	}
 
-	efree(clazz_name);
 	return status;
 }
 /* }}} */
@@ -704,8 +703,8 @@ static int y_write_object(
  */
 static int
 y_write_object_callback (
-		y_emit_state_t *state, zval *callback, zval *data,
-		char *clazz_name TSRMLS_DC) {
+		const y_emit_state_t *state, zval *callback, zval *data,
+		const char *clazz_name TSRMLS_DC) {
 	zval **argv[] = { &data };
 	zval *zret = { 0 };
 	zval **ztag = { 0 };
@@ -741,7 +740,7 @@ y_write_object_callback (
 	}
 
 	if (SUCCESS != zend_hash_find(
-			Z_ARRVAL_P(zret), "data", sizeof("data"), (void **)&zdata)){
+			Z_ARRVAL_P(zret), "data", sizeof("data"), (void **)&zdata)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'data'",
