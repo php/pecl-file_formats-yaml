@@ -17,12 +17,12 @@
  <lead>
   <name>Bryan Davis</name>
   <user>bd808</user>
-  <email>bd808@php.net</email>
+  <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2013-11-19</date>
+ <date>2015-01-03</date>
  <version>
-  <release>1.1.2a1</release>
+  <release>1.1.2a2</release>
   <api>1.1.0</api>
  </version>
  <stability>
@@ -31,6 +31,11 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+    Bugs Fixed:
+    - Honour --with-libdir
+    - Fix package.xml schema validation
+    - Add const for pointers where possible
+    - Explicitly cast emalloc returns
  </notes>
  <contents>
   <dir name="/">
