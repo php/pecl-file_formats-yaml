@@ -45,3 +45,5 @@ mkinstalldirs \
 modules \
 run-tests.php \
 
+## coverage stuff
+rm -rf coverage.info reports

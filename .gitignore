@@ -63,3 +63,7 @@ tests/*/*.php
 tests/*/*.exp
 tests/*/*.log
 tests/*/*.sh
+
+# coverage
+/coverage.info
+/reports
