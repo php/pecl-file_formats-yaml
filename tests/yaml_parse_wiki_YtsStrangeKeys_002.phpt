@@ -6,7 +6,7 @@ This requires the line noise be tame enough
 to pass as an implicit plain key.
 
 --CREDITS--
-Bryan Davis bpd@keynetics.com
+Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>

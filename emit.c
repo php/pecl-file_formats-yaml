@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007 Ryusuke SEKIYAMA. All rights reserved.
  * Copyright (c) 2009 Keynetics Inc. All rights reserved.
- * Copyright (c) 2012 Bryan Davis All rights reserved.
+ * Copyright (c) 2015 Bryan Davis and contributors. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -25,11 +25,11 @@
  *
  * @package     php_yaml
  * @author      Ryusuke SEKIYAMA <rsky0711@gmail.com>
- * @author      Bryan Davis <bpd@keynetics.com>
+ * @author      Bryan Davis <bd808@bd808.com>
  * @copyright   2007 Ryusuke SEKIYAMA
  * @copyright   2009 Keynetics Inc
+ * @copyright   2015 Bryan Davis and contributors
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
- * @version     SVN: $Id$
  */
 
 
