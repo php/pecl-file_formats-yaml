@@ -54,9 +54,9 @@
 
 /* {{{ local prototypes
  */
-static long eval_sexagesimal_l(long lval, char *sg, char *eos);
+static long eval_sexagesimal_l(long lval, const char *sg, const char *eos);
 
-static double eval_sexagesimal_d(double dval, char *sg, char *eos);
+static double eval_sexagesimal_d(double dval, const char *sg, const char *eos);
 
 /* }}} */
 
@@ -64,7 +64,7 @@ static double eval_sexagesimal_d(double dval, char *sg, char *eos);
 /* {{{ detect_scalar_type(const char *, size_t, yaml_event_t)
  * Guess what datatype the scalar encodes
  */
-char *detect_scalar_type(const char *value, size_t length,
+const char *detect_scalar_type(const char *value, size_t length,
 		const yaml_event_t *event)
 {
 	int flags = 0;
@@ -105,8 +105,7 @@ char *detect_scalar_type(const char *value, size_t length,
  * specification is found at http://yaml.org/type/null.html.
  */
 int
-scalar_is_null(const char *value, size_t length,
-		const yaml_event_t *event)
+scalar_is_null(const char *value, size_t length, const yaml_event_t *event)
 {
 	if (NULL != event && event->data.scalar.quoted_implicit) {
 		return 0;
@@ -134,8 +133,7 @@ scalar_is_null(const char *value, size_t length,
  * specification is found at http://yaml.org/type/bool.html.
  */
 int
-scalar_is_bool(const char *value, size_t length,
-		const yaml_event_t *event)
+scalar_is_bool(const char *value, size_t length, const yaml_event_t *event)
 {
 	/* TODO: add ini setting to turn 'y'/'n' checks on/off */
 	if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), YAML_BOOL_TAG)) {
@@ -730,9 +728,9 @@ int scalar_is_timestamp(const char *value, size_t length)
 /* {{{ eval_sexagesimal_l()
  * Convert a base 60 number to a long
  */
-static long eval_sexagesimal_l(long lval, char *sg, char *eos)
+static long eval_sexagesimal_l(long lval, const char *sg, const char *eos)
 {
-	char *ep;
+	const char *ep;
 
 	while (sg < eos && (*sg < '0' || *sg > '9')) {
 		sg++;
@@ -756,9 +754,9 @@ static long eval_sexagesimal_l(long lval, char *sg, char *eos)
 /* {{{ eval_sexagesimal_d()
  * Convert a base 60 number to a double
  */
-static double eval_sexagesimal_d(double dval, char *sg, char *eos)
+static double eval_sexagesimal_d(double dval, const char *sg, const char *eos)
 {
-	char *ep;
+	const char *ep;
 
 	while (sg < eos && *sg != '.' && (*sg < '0' || *sg > '9')) {
 		sg++;
