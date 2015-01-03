@@ -254,6 +254,7 @@
     <release>beta</release>
     <api>beta</api>
    </stability>
+   <date>2010-02-06</date>
    <notes>
     First release from new hosting at svn.php.net via pecl.php.net
    </notes>
