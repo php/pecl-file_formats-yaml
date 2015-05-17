@@ -797,7 +797,6 @@ zval *eval_scalar(yaml_event_t event,
 
 		if (!php_var_unserialize(
 				&retval, &p, p + (int) length, &var_hash TSRMLS_CC)) {
-			PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 			php_error_docref(NULL TSRMLS_CC, E_NOTICE,
 					"Failed to unserialize class");
 			/* return the serialized string directly */
