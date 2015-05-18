@@ -22,30 +22,15 @@
  </lead>
  <date>2015-05-18</date>
  <version>
-  <release>1.2.0</release>
+  <release>1.2.1a1</release>
   <api>1.1.0</api>
  </version>
  <stability>
-  <release>stable</release>
+  <release>alpha</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-    New Features:
-    - #69617 Allow unserialize for !php/object to be disabled
-
-      New yaml.decode_php ini setting to enable/disable serialized php object
-      processing. Deployments relying on !php/object are encouraged to
-      explicitly set yaml.decode_php=1 as default will change to disabled in
-      a future release.
-
-    Bugs Fixed:
-    - Honour --with-libdir
-    - Fix package.xml schema validation
-    - Add const for pointers where possible
-    - Explicitly cast emalloc returns
-    - #69465 Resolve quoted and non-specific scalars as strings
-    - #69616 Fix double free when unserialize fails
  </notes>
  <contents>
   <dir name="/">
@@ -147,6 +132,34 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2015-05-18</date>
+   <version>
+    <release>1.2.0</release>
+    <api>1.1.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+      New Features:
+      - #69617 Allow unserialize for !php/object to be disabled
+
+        New yaml.decode_php ini setting to enable/disable serialized php object
+        processing. Deployments relying on !php/object are encouraged to
+        explicitly set yaml.decode_php=1 as default will change to disabled in
+        a future release.
+
+      Bugs Fixed:
+      - Honour --with-libdir
+      - Fix package.xml schema validation
+      - Add const for pointers where possible
+      - Explicitly cast emalloc returns
+      - #69465 Resolve quoted and non-specific scalars as strings
+      - #69616 Fix double free when unserialize fails
+   </notes>
+  </release>
   <release>
    <date>2013-11-19</date>
    <version>
