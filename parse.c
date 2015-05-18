@@ -821,7 +821,7 @@ zval *eval_scalar(yaml_event_t event,
 
 
 /* {{{ eval_scalar_with_callbacks()
- * Convert a scalar node to the proper PHP data type using user supplied input 
+ * Convert a scalar node to the proper PHP data type using user supplied input
  * filters if available.
  */
 zval *eval_scalar_with_callbacks(yaml_event_t event,
@@ -1041,14 +1041,14 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 
 			while (src < end && *src != '.') {
 				if (src + 1 < end &&
-						(*(src - 1) >= '0' && *(src - 1) <= '9') && 
-						(*src == 'T' || *src == 't') && 
+						(*(src - 1) >= '0' && *(src - 1) <= '9') &&
+						(*src == 'T' || *src == 't') &&
 						(*(src + 1) >= '0' && *(src + 1) <= '9')) {
 					src++;
 					*dst++ = ' ';
 
 				} else if (*src == ':' && src > ts + 2 && (
-						((*(src - 2) == '+' || *(src - 2) == '-') && 
+						((*(src - 2) == '+' || *(src - 2) == '-') &&
 						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
 						((*(src - 3) == '+' || *(src - 3) == '-') &&
 						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
