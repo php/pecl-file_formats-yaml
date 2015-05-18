@@ -64,9 +64,10 @@ typedef struct y_emit_state_s {
 
 /* {{{ ext/yaml macros
 */
-#define YAML_BINARY_TAG     "tag:yaml.org,2002:binary"
-#define YAML_MERGE_TAG      "tag:yaml.org,2002:merge"
-#define YAML_PHP_TAG        "!php/object"
+#define YAML_BINARY_TAG      "tag:yaml.org,2002:binary"
+#define YAML_MERGE_TAG       "tag:yaml.org,2002:merge"
+#define YAML_PHP_TAG         "!php/object"
+#define YAML_NONSPECIFIC_TAG "!"
 
 #define Y_SCALAR_IS_NOT_NUMERIC 0x00
 #define Y_SCALAR_IS_INT         0x10
@@ -90,16 +91,25 @@ typedef struct y_emit_state_s {
 #endif
 
 #define STR_EQ(a, b)\
-	(0 == strcmp(a, b))
+	(a != NULL && b != NULL && 0 == strcmp(a, b))
 
 #define SCALAR_TAG_IS(event, name) \
-	STR_EQ((const char *)event.data.scalar.tag, name)
+	STR_EQ(name, (const char *)event.data.scalar.tag)
+
+#define IS_NOT_IMPLICIT(event) \
+	(!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit)
 
 #define IS_NOT_IMPLICIT_AND_TAG_IS(event, name) \
-	(!event.data.scalar.quoted_implicit && !event.data.scalar.plain_implicit && SCALAR_TAG_IS(event, name))
+	(IS_NOT_IMPLICIT(event) && SCALAR_TAG_IS(event, name))
+
+#define IS_NOT_QUOTED(event) \
+	(YAML_PLAIN_SCALAR_STYLE == event.data.scalar.style || YAML_ANY_SCALAR_STYLE == event.data.scalar.style)
 
 #define IS_NOT_QUOTED_OR_TAG_IS(event, name) \
-	((YAML_PLAIN_SCALAR_STYLE == event.data.scalar.style || YAML_ANY_SCALAR_STYLE == event.data.scalar.style) && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
+	(IS_NOT_QUOTED(event) && (event.data.scalar.plain_implicit || SCALAR_TAG_IS(event, name)))
+
+#define SCALAR_IS_QUOTED(event) \
+	(YAML_SINGLE_QUOTED_SCALAR_STYLE == event.data.scalar.style || YAML_DOUBLE_QUOTED_SCALAR_STYLE == event.data.scalar.style)
 
 /* }}} */
 
