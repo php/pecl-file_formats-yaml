@@ -764,31 +764,28 @@ zval *eval_scalar(yaml_event_t event,
 	}
 
 	/* check for binary */
-	if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_BINARY_TAG)) {
-		if (YAML_G(decode_binary)) {
-			unsigned char *data = { 0 };
-			int data_len = 0;
+	if (YAML_G(decode_binary) &&
+			IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_BINARY_TAG)) {
+		unsigned char *data = { 0 };
+		int data_len = 0;
 
-			data = php_base64_decode(
-					(const unsigned char *) value, (int) length, &data_len);
-			if (NULL == data) {
-				php_error_docref(NULL TSRMLS_CC, E_WARNING,
-						"Failed to decode binary");
-				ZVAL_NULL(retval);
-
-			} else {
-				ZVAL_STRINGL(retval, (char *) data, data_len, 0);
-			}
+		data = php_base64_decode(
+				(const unsigned char *) value, (int) length, &data_len);
+		if (NULL == data) {
+			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+					"Failed to decode binary");
+			ZVAL_NULL(retval);
 
 		} else {
-			ZVAL_STRINGL(retval, value, length, 1);
+			ZVAL_STRINGL(retval, (char *) data, data_len, 0);
 		}
 
 		return retval;
 	}
 
 	/* check for php object */
-	if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_PHP_TAG)) {
+	if (YAML_G(decode_php) &&
+			IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_PHP_TAG)) {
 		const unsigned char *p;
 		php_unserialize_data_t var_hash;
 
@@ -797,7 +794,6 @@ zval *eval_scalar(yaml_event_t event,
 
 		if (!php_var_unserialize(
 				&retval, &p, p + (int) length, &var_hash TSRMLS_CC)) {
-			PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 			php_error_docref(NULL TSRMLS_CC, E_NOTICE,
 					"Failed to unserialize class");
 			/* return the serialized string directly */
