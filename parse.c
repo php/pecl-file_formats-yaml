@@ -687,6 +687,17 @@ zval *eval_scalar(yaml_event_t event,
 	MAKE_STD_ZVAL(retval);
 	ZVAL_NULL(retval);
 
+	/* check for non-specific tag (treat as a string) */
+	if (SCALAR_TAG_IS(event, YAML_NONSPECIFIC_TAG) ||
+			event.data.scalar.quoted_implicit) {
+#ifdef IS_UNICODE
+		ZVAL_U_STRINGL(UG(utf8_conv), retval, value, length, ZSTR_DUPLICATE);
+#else
+		ZVAL_STRINGL(retval, value, length, 1);
+#endif
+		return retval;
+	}
+
 	/* check for null */
 	if (scalar_is_null(value, length, &event)) {
 		return retval;
@@ -743,21 +754,11 @@ zval *eval_scalar(yaml_event_t event,
 	}
 
 	/* check for timestamp */
-	if (event.data.scalar.plain_implicit || event.data.scalar.quoted_implicit) {
-		if (scalar_is_timestamp(value, length)) {
-			if (FAILURE == eval_timestamp(
-					&retval, value, (int) length TSRMLS_CC)) {
-				zval_ptr_dtor(&retval);
-				return NULL;
-			}
-			return retval;
-		}
-
-	} else if (SCALAR_TAG_IS(event, YAML_TIMESTAMP_TAG)) {
+	if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_TIMESTAMP_TAG) ||
+			 scalar_is_timestamp(value, length)) {
 		if (FAILURE == eval_timestamp(
 				&retval, value, (int) length TSRMLS_CC)) {
-			zval_ptr_dtor(&retval);
-			return NULL;
+			ZVAL_NULL(retval);
 		}
 		return retval;
 	}
@@ -820,7 +821,7 @@ zval *eval_scalar(yaml_event_t event,
 
 
 /* {{{ eval_scalar_with_callbacks()
- * Convert a scalar node to the proper PHP data type using user supplied input 
+ * Convert a scalar node to the proper PHP data type using user supplied input
  * filters if available.
  */
 zval *eval_scalar_with_callbacks(yaml_event_t event,
@@ -1040,14 +1041,14 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 
 			while (src < end && *src != '.') {
 				if (src + 1 < end &&
-						(*(src - 1) >= '0' && *(src - 1) <= '9') && 
-						(*src == 'T' || *src == 't') && 
+						(*(src - 1) >= '0' && *(src - 1) <= '9') &&
+						(*src == 'T' || *src == 't') &&
 						(*(src + 1) >= '0' && *(src + 1) <= '9')) {
 					src++;
 					*dst++ = ' ';
 
 				} else if (*src == ':' && src > ts + 2 && (
-						((*(src - 2) == '+' || *(src - 2) == '-') && 
+						((*(src - 2) == '+' || *(src - 2) == '-') &&
 						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
 						((*(src - 3) == '+' || *(src - 3) == '-') &&
 						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&

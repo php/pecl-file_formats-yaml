@@ -22,7 +22,7 @@
  </lead>
  <date>2015-01-03</date>
  <version>
-  <release>1.1.2a2</release>
+  <release>1.1.2a3</release>
   <api>1.1.0</api>
  </version>
  <stability>
@@ -36,6 +36,7 @@
     - Fix package.xml schema validation
     - Add const for pointers where possible
     - Explicitly cast emalloc returns
+    - #69465 Resolve quoted and non-specific scalars as strings
  </notes>
  <contents>
   <dir name="/">
