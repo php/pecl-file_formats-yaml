@@ -77,6 +77,7 @@ extern zend_module_entry yaml_module_entry;
 ZEND_BEGIN_MODULE_GLOBALS(yaml)
 	zend_bool decode_binary;
 	long decode_timestamp;
+	zend_bool decode_php;
 	zval *timestamp_decoder;
 	zend_bool output_canonical;
 	long output_indent;
