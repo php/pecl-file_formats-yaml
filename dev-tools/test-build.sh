@@ -21,6 +21,7 @@ hash phpenv &>/dev/null || {
 make distclean &>/dev/null || true
 phpenv local $1 &&
 phpize &&
-CC=colorgcc CFLAGS="-Wall -fno-strict-aliasing" ./configure --with-yaml &&
+CC=colorgcc CFLAGS="-Wall -fno-strict-aliasing -g3" \
+  ./configure --with-yaml --enable-debug &&
 make clean all &&
 TEST_PHP_EXECUTABLE=$(command -v php) ${SCRIPT_DIR}/test.sh || exit $?
