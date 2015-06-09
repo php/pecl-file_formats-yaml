@@ -675,7 +675,7 @@ static int y_write_object(
 	} else {
 		/* tag and emit serialized version of object */
 		php_serialize_data_t var_hash;
-		smart_str buf = { 0 };
+		smart_string buf = { 0 };
 
 		PHP_VAR_SERIALIZE_INIT(var_hash);
 		php_var_serialize(&buf, &data, &var_hash TSRMLS_CC);
@@ -686,7 +686,7 @@ static int y_write_object(
 				(yaml_char_t *) buf.c, buf.len,
 				0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
 
-		smart_str_free(&buf);
+		smart_string_free(&buf);
 		if (!status) {
 			y_event_init_failed(&event);
 			status = FAILURE;
@@ -846,7 +846,7 @@ cleanup:
 int
 php_yaml_write_to_buffer(void *data, unsigned char *buffer, size_t size)
 {
-	smart_str_appendl((smart_str *) data, (char *) buffer, size);
+	smart_string_appendl((smart_string *) data, (char *) buffer, size);
 	return 1;
 }
 /* }}} */

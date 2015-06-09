@@ -72,10 +72,6 @@ ZEND_DECLARE_MODULE_GLOBALS(yaml);
 
 /* {{{ ini entries */
 
-#ifndef ZEND_ENGINE_2
-#define OnUpdateLong OnUpdateInt
-#endif
-
 PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("yaml.decode_binary", "0", PHP_INI_ALL, OnUpdateBool,
 			decode_binary, zend_yaml_globals, yaml_globals)
@@ -317,17 +313,14 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 #ifdef IS_UNICODE
 	zstr key;
 #else
-	char *key = { 0 };
+	zend_string *key;
 #endif
-	uint key_len = 0;
 	ulong idx = 0L;
 
 	zend_hash_internal_pointer_reset(callbacks);
 
-	while (SUCCESS ==
-			zend_hash_get_current_data(callbacks, (void **) &entry)) {
-		int key_type = zend_hash_get_current_key_ex(
-				callbacks, &key, &key_len, &idx, 0, NULL);
+	while (*entry = (zend_hash_get_current_data(callbacks))) {
+		int key_type = zend_hash_get_current_key_ex(callbacks, &key, &idx, 0);
 
 #ifdef IS_UNICODE
 		if (key_type == HASH_KEY_IS_STRING || key_type == HASH_KEY_IS_UNICODE) {
@@ -383,7 +376,7 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 				return FAILURE;
 			}
 
-			if (!strcmp(key, YAML_TIMESTAMP_TAG)) {
+			if (!memcmp(key->val, YAML_TIMESTAMP_TAG, sizeof(YAML_TIMESTAMP_TAG))) {
 				YAML_G(timestamp_decoder) = *entry;
 			}
 
@@ -547,7 +540,7 @@ PHP_FUNCTION(yaml_parse_file)
 	}
 
 	if (NULL == (stream = php_stream_open_wrapper(filename, "rb",
-			IGNORE_URL | ENFORCE_SAFE_MODE | REPORT_ERRORS | STREAM_WILL_CAST,
+			IGNORE_URL | REPORT_ERRORS | STREAM_WILL_CAST,
 			NULL))) {
 		RETURN_FALSE;
 	}
@@ -605,7 +598,7 @@ PHP_FUNCTION(yaml_parse_url)
 	zval *zcallbacks = { 0 };
 
 	php_stream *stream = { 0 };
-	char *input = { 0 };
+	zend_string *input;
 	size_t size = 0;
 
 	parser_state_t state;
@@ -639,8 +632,7 @@ PHP_FUNCTION(yaml_parse_url)
 		state.eval_func = eval_scalar;
 	}
 
-	if (NULL == (stream = php_stream_open_wrapper(url, "rb",
-					ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL))) {
+	if (NULL == (stream = php_stream_open_wrapper(url, "rb", REPORT_ERRORS, NULL))) {
 		RETURN_FALSE;
 	}
 
@@ -648,7 +640,7 @@ PHP_FUNCTION(yaml_parse_url)
 	size = php_stream_copy_to_mem(
 			stream, (void **) &input, PHP_STREAM_COPY_ALL, 0);
 #else
-	size = php_stream_copy_to_mem(stream, &input, PHP_STREAM_COPY_ALL, 0);
+	input = php_stream_copy_to_mem(stream, PHP_STREAM_COPY_ALL, 0);
 #endif
 
 #ifdef IS_UNICODE
@@ -699,7 +691,7 @@ PHP_FUNCTION(yaml_emit)
 	HashTable *callbacks = { 0 };
 
 	yaml_emitter_t emitter = { 0 };
-	smart_str str = { 0 };
+	smart_string str = { 0 };
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS()TSRMLS_CC, "z/|lla/",
 				&data, &encoding, &linebreak, &zcallbacks)) {
@@ -729,7 +721,7 @@ PHP_FUNCTION(yaml_emit)
 #ifdef IS_UNICODE
 		RETVAL_U_STRINGL(UG(utf8_conv), str.c, str.len, ZSTR_DUPLICATE);
 #else
-		RETVAL_STRINGL(str.c, str.len, 1);
+		RETVAL_STRINGL(str.c, str.len);
 #endif
 
 	} else {
@@ -737,7 +729,7 @@ PHP_FUNCTION(yaml_emit)
 	}
 
 	yaml_emitter_delete(&emitter);
-	smart_str_free(&str);
+	smart_string_free(&str);
 }
 /* }}} yaml_emit */
 
@@ -778,7 +770,7 @@ PHP_FUNCTION(yaml_emit_file)
 #endif
 
 	if (NULL == (stream = php_stream_open_wrapper(filename, "wb",
-			IGNORE_URL | ENFORCE_SAFE_MODE | REPORT_ERRORS | STREAM_WILL_CAST,
+			IGNORE_URL | REPORT_ERRORS | STREAM_WILL_CAST,
 			NULL))) {
 		RETURN_FALSE;
 	}

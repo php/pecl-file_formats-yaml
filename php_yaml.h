@@ -53,7 +53,7 @@ extern "C" {
 #include <ext/standard/base64.h>
 #include <ext/standard/basic_functions.h>
 #include <ext/standard/php_var.h>
-#include <ext/standard/php_smart_str.h>
+#include <ext/standard/php_smart_string.h>
 #include <Zend/zend_extensions.h>
 #include <Zend/zend_hash.h>
 #include <Zend/zend_interfaces.h>
