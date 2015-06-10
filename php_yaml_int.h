@@ -115,10 +115,10 @@ typedef struct y_emit_state_s {
 
 /* {{{ ext/yaml prototypes
 */
-zval *php_yaml_read_all(parser_state_t *state, long *ndocs TSRMLS_DC);
+void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_DC);
 
-zval *php_yaml_read_partial(
-		parser_state_t *state, long pos, long *ndocs TSRMLS_DC);
+void php_yaml_read_partial(
+		parser_state_t *state, long pos, long *ndocs, zval *retval TSRMLS_DC);
 
 zval *eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC);
 
