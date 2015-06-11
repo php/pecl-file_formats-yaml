@@ -137,28 +137,21 @@ static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC)
  */
 static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 {
-	HashPosition pos;
 	ulong kidx, idx;
-	const char *kstr;
-	int key_type;
+	zend_string *str_key;
 
-	zend_hash_internal_pointer_reset_ex(ht, &pos);
 	idx = 0;
-	while (SUCCESS == zend_hash_has_more_elements_ex(ht, &pos)) {
-		key_type = zend_hash_get_current_key_ex(
-				ht, (char **) &kstr, NULL, &kidx, 0, &pos);
-		if (HASH_KEY_IS_LONG != key_type) {
+	ZEND_HASH_FOREACH_KEY(ht, kidx, str_key) {
+		if (str_key) {
 			/* non-numeric key found */
 			return Y_ARRAY_MAP;
-
 		} else if (kidx != idx) {
 			/* gap in sequence found */
 			return Y_ARRAY_MAP;
 		}
 
 		idx++;
-		zend_hash_move_forward_ex(ht, &pos);
-	};
+	} ZEND_HASH_FOREACH_END();
 	return Y_ARRAY_SEQUENCE;
 }
 /* }}} */
@@ -171,7 +164,7 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 {
 	HashTable *ht;
 	HashPosition pos;
-	zval **elm;
+	zval *elm;
 
 	ht = HASH_OF(data);
 
@@ -180,25 +173,23 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 		return;
 	}
 
-	if (ht->nApplyCount > 0) {
-		zval *tmp;
-		MAKE_STD_ZVAL(tmp);
-		ZVAL_LONG(tmp, (unsigned long) ht);
+	if (ht->u.v.nApplyCount > 0) {
+		zval tmp;
+		ZVAL_LONG(&tmp, (unsigned long) ht);
 
 		/* we've seen this before, so record address */
-		zend_hash_next_index_insert(
-				state->recursive, &tmp, sizeof(zval *), NULL);
+		zend_hash_next_index_insert(state->recursive, &tmp);
 		return;
 	}
 
-	ht->nApplyCount++;
+	ht->u.v.nApplyCount++;
 	zend_hash_internal_pointer_reset_ex(ht, &pos);
 	while (SUCCESS == zend_hash_has_more_elements_ex(ht, &pos)) {
-		zend_hash_get_current_data_ex(ht, (void **) &elm, &pos);
-		y_scan_recursion(state, (*elm) TSRMLS_CC);
+		elm = zend_hash_get_current_data_ex(ht, &pos);
+		y_scan_recursion(state, elm TSRMLS_CC);
 		zend_hash_move_forward_ex(ht, &pos);
 	};
-	ht->nApplyCount--;
+	ht->u.v.nApplyCount--;
 
 	return;
 }
@@ -211,18 +202,17 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 static long y_search_recursive(
 		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC)
 {
- 	zval **entry;
+ 	zval *entry;
 	HashPosition pos;
    	ulong num_key;
 	unsigned long found;
 
 	zend_hash_internal_pointer_reset_ex(state->recursive, &pos);
 	while (SUCCESS == zend_hash_has_more_elements_ex(state->recursive, &pos)) {
-		zend_hash_get_current_data_ex(state->recursive, (void **)&entry, &pos);
-		found = (unsigned long) Z_LVAL_PP(entry);
+		entry = zend_hash_get_current_data_ex(state->recursive, &pos);
+		found = Z_LVAL_P(entry);
 		if (addr == found) {
-			zend_hash_get_current_key_ex(
-					state->recursive, NULL, NULL, &num_key, 0, &pos);
+			zend_hash_get_current_key_ex(state->recursive, NULL, &num_key, &pos);
 			return num_key;
 		}
 		zend_hash_move_forward_ex(state->recursive, &pos);
@@ -245,7 +235,8 @@ static int y_write_zval(
 		status = y_write_null(state, tag TSRMLS_CC);
 		break;
 
-	case IS_BOOL:
+	case IS_TRUE:
+	case IS_FALSE:
 		status = y_write_bool(state, data, tag TSRMLS_CC);
 		break;
 
@@ -318,7 +309,7 @@ static int y_write_bool(
 	yaml_event_t event;
 	int omit_tag = 0;
 	int status;
-	const char *res = Z_BVAL_P(data) ? "true" : "false";
+	const char *res = Z_TYPE_P(data) == IS_TRUE ? "true" : "false";
 
 	if (NULL == tag) {
 		tag = (yaml_char_t *) YAML_BOOL_TAG;
@@ -465,12 +456,12 @@ static int y_write_array(
 	int status;
 	HashTable *ht = Z_ARRVAL_P(data);
 	HashPosition pos;
-	zval **elm;
+	zval *elm;
 	int array_type;
 	zval key_zval;
 	ulong kidx;
 	uint key_len;
-	char *kstr = { 0 };
+	zend_string *kstr;
 	HashTable *tmp_ht;
 	long recursive_idx = -1;
 	char *anchor = { 0 };
@@ -504,7 +495,7 @@ static int y_write_array(
 		anchor = (char*) emalloc(anchor_size + 1);
 		snprintf(anchor, anchor_size + 1, "refid%ld", recursive_idx + 1);
 
-		if (ht->nApplyCount > 1) {
+		if (ht->u.v.nApplyCount > 1) {
 			/* node has been visited before */
 			status = yaml_alias_event_initialize(
 					&event, (yaml_char_t *) anchor);
@@ -549,8 +540,7 @@ static int y_write_array(
 	zend_hash_internal_pointer_reset_ex(ht, &pos);
 	while (SUCCESS == zend_hash_has_more_elements_ex(ht, &pos)) {
 		if (Y_ARRAY_MAP == array_type) {
-			zend_hash_get_current_key_ex(ht, (char **) &kstr, &key_len, &kidx,
-					0, &pos);
+			zend_hash_get_current_key_ex(ht, &kstr, &kidx, &pos);
 
 			/* create zval for key */
 			if (HASH_KEY_IS_LONG ==
@@ -558,7 +548,7 @@ static int y_write_array(
 				ZVAL_LONG(&key_zval, kidx);
 
 			} else {
-				ZVAL_STRINGL(&key_zval, kstr, strlen(kstr), 1);
+				ZVAL_STR(&key_zval, kstr);
 			}
 
 			/* emit key */
@@ -569,19 +559,18 @@ static int y_write_array(
 			}
 		}
 
-		if (SUCCESS ==
-				zend_hash_get_current_data_ex(ht, (void **) &elm, &pos)) {
+		if ((elm = zend_hash_get_current_data_ex(ht, &pos)) != NULL) {
 
-			tmp_ht = HASH_OF(*elm);
+			tmp_ht = HASH_OF(elm);
 			if (tmp_ht) {
 				/* increment access count for hash */
-				tmp_ht->nApplyCount++;
+				tmp_ht->u.v.nApplyCount++;
 			}
 
-			status = y_write_zval(state, (*elm), NULL TSRMLS_CC);
+			status = y_write_zval(state, elm, NULL TSRMLS_CC);
 
 			if (tmp_ht) {
-				tmp_ht->nApplyCount--;
+				tmp_ht->u.v.nApplyCount--;
 			}
 
 			if (SUCCESS != status) {
@@ -616,7 +605,8 @@ static int y_write_timestamp(
 	int status;
 	zend_class_entry *clazz = Z_OBJCE_P(data);
 	zval *timestamp = { 0 };
-	zval dtfmt;
+	zval *dtfmt;
+	zend_string *dtfmt_constant;
 
 	if (NULL == tag) {
 		tag = (yaml_char_t *) YAML_TIMESTAMP_TAG;
@@ -624,15 +614,18 @@ static int y_write_timestamp(
 	}
 
 	/* get iso-8601 format specifier */
+
 #if ZEND_MODULE_API_NO >= 20071006
-	zend_get_constant_ex("DateTime::ISO8601", 17, &dtfmt, clazz, 0 TSRMLS_CC);
+	dtfmt_constant = zend_string_init("DateTime::ISO8601", 17, 0);
+	dtfmt = zend_get_constant_ex(dtfmt_constant, clazz, 0 TSRMLS_CC);
+	zend_string_release(dtfmt_constant);
 #else
 	zend_get_constant_ex("DateTime::ISO8601", 17, &dtfmt, clazz TSRMLS_CC);
 #endif
 	/* format date as iso-8601 string */
-	zend_call_method_with_1_params(&data, clazz, NULL,
-			"format", &timestamp, &dtfmt);
-	zval_dtor(&dtfmt);
+	zend_call_method_with_1_params(data, clazz, NULL,
+			"format", timestamp, dtfmt);
+	zval_dtor(dtfmt);
 
 	/* emit formatted date */
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
@@ -656,35 +649,34 @@ static int y_write_object(
 {
 	yaml_event_t event;
 	int status;
-	const char *clazz_name = { 0 };
-	zend_uint name_len;
-	zval **callback = { 0 };
+	zend_string *clazz_name;
+	zval *callback;
 
-	zend_get_object_classname(data, &clazz_name, &name_len TSRMLS_CC);
+	clazz_name = Z_OBJCE_P(data)->name;
 
 	/* TODO check for a "yamlSerialize()" instance method */
-	if (NULL != state->callbacks && SUCCESS == zend_hash_find(
-			state->callbacks, clazz_name, name_len + 1, (void **) &callback)) {
+	if (NULL != state->callbacks && (callback = zend_hash_find(
+			state->callbacks, clazz_name)) != NULL) {
 		/* found a registered callback for this class */
 		status = y_write_object_callback(
-				state, *callback, data, clazz_name TSRMLS_CC);
+				state, callback, data, clazz_name->val TSRMLS_CC);
 
-	} else if (0 == strncmp(clazz_name, "DateTime", name_len)) {
+	} else if (0 == strncmp(clazz_name->val, "DateTime", clazz_name->len)) {
 		status = y_write_timestamp(state, data, tag TSRMLS_CC);
-
 	} else {
 		/* tag and emit serialized version of object */
 		php_serialize_data_t var_hash;
-		smart_string buf = { 0 };
+		smart_str buf = { 0 };
 
 		PHP_VAR_SERIALIZE_INIT(var_hash);
-		php_var_serialize(&buf, &data, &var_hash TSRMLS_CC);
+		php_var_serialize(&buf, data, &var_hash TSRMLS_CC);
 		PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-		status = yaml_scalar_event_initialize(&event,
-				NULL, (yaml_char_t *) YAML_PHP_TAG,
-				(yaml_char_t *) buf.c, buf.len,
-				0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+		// TODO Sean-Der
+		//status = yaml_scalar_event_initialize(&event,
+		//		NULL, (yaml_char_t *) YAML_PHP_TAG,
+		//		(yaml_char_t *) buf.c, buf.len,
+		//		0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
 
 		smart_string_free(&buf);
 		if (!status) {
@@ -705,14 +697,16 @@ static int
 y_write_object_callback (
 		const y_emit_state_t *state, zval *callback, zval *data,
 		const char *clazz_name TSRMLS_DC) {
-	zval **argv[] = { &data };
+	zval argv[1];
+	argv[0] = *data;
 	zval *zret = { 0 };
-	zval **ztag = { 0 };
-	zval **zdata = { 0 };
+	zval *ztag;
+	zval *zdata;
+	zend_string *str_key;
 
 	/* call the user function */
 	if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-			callback, &zret, 1, argv, 0, NULL TSRMLS_CC) ||
+			callback, zret, 1, argv, 0, NULL TSRMLS_CC) ||
 			NULL == zret) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Failed to apply callback for class '%s'"
@@ -729,9 +723,9 @@ y_write_object_callback (
 	}
 
 	/* pull out the tag and surrogate object */
-	if (SUCCESS != zend_hash_find(
-			Z_ARRVAL_P(zret), "tag", sizeof("tag"), (void **)&ztag) ||
-			IS_STRING != Z_TYPE_PP(ztag)) {
+	str_key = zend_string_init("tag", sizeof("tag"), 0);
+	if ((ztag = zend_hash_find(Z_ARRVAL_P(zret), str_key)) != NULL ||
+			IS_STRING != Z_TYPE_P(ztag)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'tag' with a string value",
@@ -739,18 +733,21 @@ y_write_object_callback (
 		return FAILURE;
 	}
 
-	if (SUCCESS != zend_hash_find(
-			Z_ARRVAL_P(zret), "data", sizeof("data"), (void **)&zdata)) {
+	str_key = zend_string_init("data", sizeof("data"), 0);
+	if ((zdata = zend_hash_find(Z_ARRVAL_P(zret), str_key)) != NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'data'",
 				clazz_name);
+		zend_string_release(str_key);
 		return FAILURE;
 	}
+	zend_string_release(str_key);
+
 
 	/* emit surrogate object and tag */
 	return y_write_zval(
-			state, (*zdata), (yaml_char_t *) Z_STRVAL_PP(ztag) TSRMLS_CC);
+			state, zdata, (yaml_char_t *) Z_STRVAL_P(ztag) TSRMLS_CC);
 }
 /* }}} */
 
