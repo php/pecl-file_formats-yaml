@@ -402,11 +402,11 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
  Takes a YAML encoded string and converts it to a PHP variable. */
 PHP_FUNCTION(yaml_parse)
 {
-	char *input = { 0 };
-	int input_len = 0;
+	zend_string *input;
 	long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
+	zval aliases;
 
 	parser_state_t state;
 	zval yaml;
@@ -414,7 +414,7 @@ PHP_FUNCTION(yaml_parse)
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
-	state.aliases = NULL;
+	state.aliases = &aliases;
 	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
@@ -430,7 +430,7 @@ PHP_FUNCTION(yaml_parse)
 	}
 #else
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-					"s|lza/", &input, &input_len, &pos, &zndocs,
+					"S|lza/", &input, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
 	}
@@ -453,13 +453,11 @@ PHP_FUNCTION(yaml_parse)
 #endif
 
 	yaml_parser_initialize(&state.parser);
-	yaml_parser_set_input_string(
-			&state.parser, (unsigned char *) input, (size_t) input_len);
+	yaml_parser_set_input_string(&state.parser, input->val, input->len);
 
 
 	if (pos < 0) {
 		php_yaml_read_all(&state, &ndocs, &yaml TSRMLS_CC);
-
 	} else {
 		php_yaml_read_partial(&state, pos, &ndocs, &yaml TSRMLS_CC);
 	}
@@ -476,7 +474,7 @@ PHP_FUNCTION(yaml_parse)
 		ZVAL_LONG(zndocs, ndocs);
 	}
 
-	if (ZVAL_TYPE_P(yaml) == IS_UNDEF) {
+	if (Z_TYPE_P(&yaml) == IS_UNDEF) {
 		RETURN_FALSE;
 	}
 

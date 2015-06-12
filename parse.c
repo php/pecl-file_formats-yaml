@@ -81,9 +81,9 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC);
 
 void handle_sequence(parser_state_t *state, zval *retval TSRMLS_DC);
 
-static zval *handle_scalar(parser_state_t *state TSRMLS_DC);
+void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC);
 
-static zval *handle_alias(parser_state_t *state TSRMLS_DC);
+void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC);
 
 static int apply_filter(
 		zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
@@ -184,7 +184,7 @@ void php_yaml_read_partial(
 		} else if (YAML_DOCUMENT_START_EVENT == state->event.type) {
 			if (*ndocs == pos) {
 				handle_document(state, retval TSRMLS_CC);
-				if (NULL == retval) {
+				if (Z_TYPE_P(retval) == IS_UNDEF) {
 					code = Y_PARSER_FAILURE;
 					break;
 				}
@@ -327,11 +327,11 @@ void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
 		break;
 
 	case YAML_SCALAR_EVENT:
-		retval = handle_scalar(state TSRMLS_CC);
+		handle_scalar(state, retval TSRMLS_CC);
 		break;
 
 	case YAML_ALIAS_EVENT:
-		retval = handle_alias(state TSRMLS_CC);
+		handle_alias(state, retval TSRMLS_CC);
 		break;
 
 	default:
@@ -356,15 +356,14 @@ void handle_document(parser_state_t *state, zval *retval TSRMLS_DC)
 	zval aliases;
 
 	/* make a new array to hold aliases */
-	MAKE_ARRAY(&aliases);
-	ZVAL_DUP(state->aliases, &aliases);
+	MAKE_ARRAY(state->aliases);
 
 	/* document consists of next element */
 	get_next_element(state, retval TSRMLS_CC);
 
 	/* clean up aliases */
+	zval_ptr_dtor(state->aliases);
 	state->aliases = NULL;
-	zval_ptr_dtor(&aliases);
 
 	/* assert that end event is next in stream */
 	if (NULL != retval && NEXT_EVENT() &&
@@ -383,9 +382,9 @@ void handle_document(parser_state_t *state, zval *retval TSRMLS_DC)
 void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 {
 	yaml_event_t src_event = { YAML_NO_EVENT }, key_event = { YAML_NO_EVENT };
-	zval *key = { 0 };
 	char *key_str;
-	zval value;
+	zval key = { 0 };
+	zval value = { 0 };
 
 	/* save copy of mapping start event */
 	COPY_EVENT(src_event, state);
@@ -396,17 +395,15 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	if (NULL != src_event.data.mapping_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
-		add_assoc_zval(state->aliases,
-				(char *) src_event.data.mapping_start.anchor,
-				retval);
+		add_assoc_zval(state->aliases, src_event.data.mapping_start.anchor, retval);
 	}
 
-	for (get_next_element(state, key); ZVAL_TYPE_P(key) != IS_UNDEF; get_next_element(state, key)) {
+	for (get_next_element(state, &key); Z_TYPE_P(&key) != IS_UNDEF; get_next_element(state, &key)) {
 		COPY_EVENT(key_event, state);
-		key_str = convert_to_char(key TSRMLS_CC);
+		key_str = convert_to_char(&key TSRMLS_CC);
 		get_next_element(state, &value TSRMLS_CC);
 
-		if (ZVAL_TYPE_P(value) == IS_UNDEF) {
+		if (Z_TYPE_P(&value) == IS_UNDEF) {
 			//TODO Sean-Der
 			zval_ptr_dtor(retval);
 			yaml_event_delete(&src_event);
@@ -440,15 +437,14 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			}
 
 			zval_ptr_dtor(&value);
-
 		} else {
-
 			/* add key => value to retval */
 			add_assoc_zval(retval, key_str, &value);
 		}
-
 		efree(key_str);
 		yaml_event_delete(&key_event);
+		zval_ptr_dtor(&key);
+		ZVAL_UNDEF(&key);
 	}
 
 	if (YAML_MAPPING_END_EVENT != state->event.type) {
@@ -475,7 +471,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
  */
 void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	yaml_event_t src_event = { YAML_NO_EVENT };
-	zval value;
+	zval value = { 0 };
 
 	/* save copy of sequence start event */
 	COPY_EVENT(src_event, state);
@@ -486,13 +482,12 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	if (NULL != src_event.data.sequence_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
-		add_assoc_zval(state->aliases,
-				(char *) src_event.data.sequence_start.anchor,
-				retval);
+		add_assoc_zval(state->aliases, src_event.data.sequence_start.anchor, retval);
 	}
 
-	for (get_next_element(state, &value); ZVAL_TYPE_P(&value) != IS_UNDEF; get_next_element(state, &value)) {
+	for (get_next_element(state, &value); Z_TYPE_P(&value) != IS_UNDEF; get_next_element(state, &value)) {
 		add_next_index_zval(retval, &value);
+		ZVAL_UNDEF(&value);
 	}
 
 	if (YAML_SEQUENCE_END_EVENT != state->event.type) {
@@ -521,18 +516,13 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 /* {{{ handle_scalar()
  * Handle a scalar event
  */
-static zval *handle_scalar(parser_state_t *state TSRMLS_DC) {
-	zval *retval = { 0 };
-
-	retval = state->eval_func(state->event, state->callbacks TSRMLS_CC);
-
+void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
+	state->eval_func(state->event, state->callbacks, retval TSRMLS_CC);
 	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
-		add_assoc_zval(state->aliases,
-				(char *) state->event.data.scalar.anchor, retval);
+		add_assoc_zval(state->aliases, state->event.data.scalar.anchor, retval);
 	}
-	return retval;
 }
 /* }}} */
 
@@ -540,8 +530,7 @@ static zval *handle_scalar(parser_state_t *state TSRMLS_DC) {
 /* {{{ handle_alias()
  * Handle an alias event
  */
-static zval *handle_alias(parser_state_t *state TSRMLS_DC) {
-	zval *retval;
+void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
 	char *anchor = (char *) state->event.data.alias.anchor;
 	zend_string *anchor_zstring = zend_string_init(anchor, strlen(anchor), 0);
 
@@ -553,16 +542,14 @@ static zval *handle_alias(parser_state_t *state TSRMLS_DC) {
 				anchor,
 				state->parser.mark.line + 1,
 				state->parser.mark.column + 1);
-
-		return NULL;
 	}
 	zend_string_release(anchor_zstring);
 
 	/* add a reference to retval's internal counter */
-	Z_ADDREF_PP(retval);
-	Z_SET_ISREF_PP(retval);
+	ZVAL_MAKE_REF(retval);
+	Z_TRY_ADDREF_P(retval);
 
-	return retval;
+	return;
 }
 /* }}} */
 
@@ -593,7 +580,7 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		if (event.data.sequence_start.implicit) {
 			tag = YAML_MAP_TAG;
 		} else {
-			tag = (char *) event.data.mapping_start.tag;
+			tag = event.data.mapping_start.tag;
 		}
 		break;
 
@@ -611,41 +598,39 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 	if ((callback = zend_hash_find(callbacks, tag_zstring)) != NULL) {
 		int callback_result;
 		zval callback_args[3];
-		zval *tag_arg = { 0 };
-		zval *mode_arg = { 0 };
-		zval *retval_ptr = { 0 };
+		zval tag_arg;
+		zval mode_arg;
+		zval retval;
 
 		// TODO Sean-Der
 		//callback_args[0] = *zpp;
 
-		MAKE_STD_ZVAL(tag_arg);
-		ZVAL_STRINGL(tag_arg, tag, strlen(tag));
-		callback_args[1] = *tag_arg;
+		ZVAL_STRINGL(&tag_arg, tag, strlen(tag));
+		callback_args[1] = tag_arg;
 
-		MAKE_STD_ZVAL(mode_arg);
-		ZVAL_LONG(mode_arg, 0);
-		callback_args[2] = *mode_arg;
+		ZVAL_LONG(&mode_arg, 0);
+		callback_args[2] = mode_arg;
 
 		/* call the user function */
-		callback_result = call_user_function_ex(EG(function_table), NULL, callback, retval_ptr, 3, callback_args, 0, NULL TSRMLS_CC);
+		callback_result = call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, callback_args, 0, NULL TSRMLS_CC);
 
 		/* cleanup our temp variables */
-		zval_ptr_dtor(tag_arg);
-		zval_ptr_dtor(mode_arg);
+		zval_ptr_dtor(&tag_arg);
+		zval_ptr_dtor(&mode_arg);
 
-		if (FAILURE == callback_result || NULL == retval_ptr) {
+		if (FAILURE == callback_result || Z_TYPE_P(&retval) != IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to apply filter for tag '%s'"
 					" with user defined function", tag);
 			return Y_FILTER_FAILURE;
 
 		} else {
-			if (retval_ptr == *zpp) {
+			if (&retval == *zpp) {
 				/* throw away duplicate response */
-				zval_ptr_dtor(retval_ptr);
+				zval_ptr_dtor(&retval);
 			} else {
 				/* copy result into our return var */
-				REPLACE_ZVAL_VALUE(zpp, retval_ptr, 0);
+				ZVAL_COPY_VALUE(*zpp, &retval);
 			}
 			return Y_FILTER_SUCCESS;
 		}
@@ -662,15 +647,13 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
  *
  * All YAML scalar types found at http://yaml.org/type/index.html.
  */
-zval *eval_scalar(yaml_event_t event,
-		HashTable * callbacks TSRMLS_DC)
+void eval_scalar(yaml_event_t event,
+		HashTable * callbacks, zval *retval TSRMLS_DC)
 {
-	zval *retval = { 0 };
-	char *value = (char *) event.data.scalar.value;
+	char *value = event.data.scalar.value;
 	size_t length = event.data.scalar.length;
 	int flags = 0;
 
-	MAKE_STD_ZVAL(retval);
 	ZVAL_NULL(retval);
 
 	/* check for non-specific tag (treat as a string) */
@@ -681,18 +664,18 @@ zval *eval_scalar(yaml_event_t event,
 #else
 		ZVAL_STRINGL(retval, value, length);
 #endif
-		return retval;
+		return;
 	}
 
 	/* check for null */
 	if (scalar_is_null(value, length, &event)) {
-		return retval;
+		return;
 	}
 
 	/* check for bool */
 	if (-1 != (flags = scalar_is_bool(value, length, &event))) {
 		ZVAL_BOOL(retval, (zend_bool) flags);
-		return retval;
+		return;
 	}
 
 	/* check for numeric (int or float) */
@@ -725,17 +708,17 @@ zval *eval_scalar(yaml_event_t event,
 				convert_to_long(retval);
 			}
 
-			return retval;
+			return;
 
 		} else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_FLOAT_TAG)) {
 			ZVAL_STRINGL(retval, value, length);
 			convert_to_double(retval);
-			return retval;
+			return;
 
 		} else if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_INT_TAG)) {
 			ZVAL_STRINGL(retval, value, length);
 			convert_to_long(retval);
-			return retval;
+			return;
 		}
 	}
 
@@ -746,7 +729,7 @@ zval *eval_scalar(yaml_event_t event,
 				&retval, value, (int) length TSRMLS_CC)) {
 			ZVAL_NULL(retval);
 		}
-		return retval;
+		return;
 	}
 
 	/* check for binary */
@@ -764,7 +747,7 @@ zval *eval_scalar(yaml_event_t event,
 			ZVAL_STR(retval, data);
 		}
 
-		return retval;
+		return;
 	}
 
 	/* check for php object */
@@ -785,7 +768,7 @@ zval *eval_scalar(yaml_event_t event,
 		}
 
 		PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
-		return retval;
+		return;
 	}
 
 	/* others (treat as a string) */
@@ -795,7 +778,7 @@ zval *eval_scalar(yaml_event_t event,
 	ZVAL_STRINGL(retval, value, length);
 #endif
 
-	return retval;
+	return;
 }
 /* }}} */
 
@@ -804,8 +787,8 @@ zval *eval_scalar(yaml_event_t event,
  * Convert a scalar node to the proper PHP data type using user supplied input
  * filters if available.
  */
-zval *eval_scalar_with_callbacks(yaml_event_t event,
-		HashTable *callbacks TSRMLS_DC)
+void eval_scalar_with_callbacks(yaml_event_t event,
+		HashTable *callbacks, zval *retval TSRMLS_DC)
 {
 	const char *tag = (char *) event.data.scalar.tag;
 	zend_string *tag_zstring;
@@ -826,41 +809,38 @@ zval *eval_scalar_with_callbacks(yaml_event_t event,
 	/* find and apply the evaluation function */
 	if ((callback = zend_hash_find(callbacks, tag_zstring)) != NULL) {
 		zval argv[3];
-		zval *arg1 = { 0 };
-		zval *arg2 = { 0 };
-		zval *arg3 = { 0 };
-		zval *retval = { 0 };
+		zval arg1;
+		zval arg2;
+		zval arg3;
+		zval retval;
 
-		MAKE_STD_ZVAL(arg1);
-		ZVAL_STRINGL(arg1, (char *) event.data.scalar.value,
+		ZVAL_STRINGL(&arg1, (char *) event.data.scalar.value,
 				event.data.scalar.length);
-		argv[0] = *arg1;
+		argv[0] = arg1;
 
-		MAKE_STD_ZVAL(arg2);
-		ZVAL_STRINGL(arg2, tag, strlen(tag));
-		argv[1] = *arg2;
+		ZVAL_STRINGL(&arg2, tag, strlen(tag));
+		argv[1] = arg2;
 
-		MAKE_STD_ZVAL(arg3);
-		ZVAL_LONG(arg3, event.data.scalar.style);
-		argv[2] = *arg3;
+		ZVAL_LONG(&arg3, event.data.scalar.style);
+		argv[2] = arg3;
 
 		if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-				callback, retval, 3, argv, 0, NULL TSRMLS_CC) ||
-				NULL == retval) {
+				callback, &retval, 3, argv, 0, NULL TSRMLS_CC) ||
+				Z_TYPE_P(&retval) == IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to evaluate value for tag '%s'"
 					" with user defined function", tag);
 		}
 
-		zval_ptr_dtor(arg1);
-		zval_ptr_dtor(arg2);
-		zval_ptr_dtor(arg3);
+		zval_ptr_dtor(&arg1);
+		zval_ptr_dtor(&arg2);
+		zval_ptr_dtor(&arg3);
 
-		return retval;
+		return;
 	}
 
 	/* no mapping, so handle raw */
-	return eval_scalar(event, NULL TSRMLS_CC);
+	return eval_scalar(event, NULL, retval TSRMLS_CC);
 }
 /* }}} */
 
@@ -954,6 +934,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			php_var_serialize(&buf, zv, &var_hash TSRMLS_CC);
 			PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
+			// TODO sdubois
 			//if (buf.c) {
 			//	str = estrndup(buf.c, buf.len);
 			//} else {
@@ -988,10 +969,9 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 			1L == YAML_G(decode_timestamp) ||
 			2L == YAML_G(decode_timestamp)) {
 		zval argv[1];
-		zval *arg, *retval, *func, afunc;
+		zval arg, *retval, *func, afunc;
 		const char *funcs[] = { "strtotime", "date_create" };
 
-		INIT_ZVAL(afunc);
 		if (NULL == YAML_G(timestamp_decoder)) {
 			if (2L == YAML_G(decode_timestamp)) {
 				ZVAL_STRING(&afunc, funcs[1]);
@@ -1005,9 +985,8 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 			func = YAML_G(timestamp_decoder);
 		}
 
-		MAKE_STD_ZVAL(arg);
 #if 1
-		ZVAL_STRINGL(arg, ts, ts_len);
+		ZVAL_STRINGL(&arg, ts, ts_len);
 #else
 		{
 			/* fix timestamp format for PHP4 */
@@ -1066,18 +1045,18 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 		}
 #endif
 
-		argv[0] = *arg;
+		argv[0] = arg;
 
 		if (FAILURE == call_user_function_ex(EG(function_table), NULL, func,
 				retval, 1, argv, 0, NULL TSRMLS_CC) || NULL == retval) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to evaluate string '%s' as timestamp", ts);
-			zval_ptr_dtor(arg);
+			zval_ptr_dtor(&arg);
 			return FAILURE;
 
 		} else {
-			zval_ptr_dtor(arg);
-			REPLACE_ZVAL_VALUE(zpp, retval, 0);
+			zval_ptr_dtor(&arg);
+			ZVAL_COPY_VALUE(*zpp, retval);
 			return SUCCESS;
 		}
 
