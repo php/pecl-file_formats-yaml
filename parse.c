@@ -86,7 +86,7 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC);
 void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC);
 
 static int apply_filter(
-		zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+		zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
 
 static char *convert_to_char(zval *zv TSRMLS_DC);
 
@@ -405,9 +405,8 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 
 		if (Z_TYPE_P(&value) == IS_UNDEF) {
 			//TODO Sean-Der
-			zval_ptr_dtor(retval);
+			//zval_ptr_dtor(retval);
 			yaml_event_delete(&src_event);
-			efree(key_str);
 			yaml_event_delete(&key_event);
 		}
 
@@ -455,7 +454,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	if (NULL != retval && NULL != state->callbacks) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
-				&retval, src_event, state->callbacks TSRMLS_CC)) {
+				retval, src_event, state->callbacks TSRMLS_CC)) {
 			//TODO Sean-Der
 			ZVAL_UNDEF(retval);
 		}
@@ -500,7 +499,7 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	if (NULL != retval && NULL != state->callbacks) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
-				&retval, src_event, state->callbacks TSRMLS_CC)) {
+				retval, src_event, state->callbacks TSRMLS_CC)) {
 			//TODO Sean-Der
 			ZVAL_UNDEF(retval);
 			//zval_ptr_dtor(&retval);
@@ -560,7 +559,7 @@ void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
  * Apply user supplied hander to node
  */
 static int
-apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
+apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 {
 	char *tag = { 0 };
 	zend_string *tag_zstring;
@@ -598,25 +597,18 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 	if ((callback = zend_hash_find(callbacks, tag_zstring)) != NULL) {
 		int callback_result;
 		zval callback_args[3];
-		zval tag_arg;
-		zval mode_arg;
 		zval retval;
 
-		// TODO Sean-Der
-		//callback_args[0] = *zpp;
-
-		ZVAL_STRINGL(&tag_arg, tag, strlen(tag));
-		callback_args[1] = tag_arg;
-
-		ZVAL_LONG(&mode_arg, 0);
-		callback_args[2] = mode_arg;
+		callback_args[0] = *zp;
+		ZVAL_STRINGL(&callback_args[1], tag, strlen(tag));
+		ZVAL_LONG(&callback_args[2], 0);
 
 		/* call the user function */
 		callback_result = call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, callback_args, 0, NULL TSRMLS_CC);
 
 		/* cleanup our temp variables */
-		zval_ptr_dtor(&tag_arg);
-		zval_ptr_dtor(&mode_arg);
+		zval_ptr_dtor(&callback_args[1]);
+		zval_ptr_dtor(&callback_args[2]);
 
 		if (FAILURE == callback_result || Z_TYPE_P(&retval) != IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
@@ -625,12 +617,12 @@ apply_filter(zval **zpp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 			return Y_FILTER_FAILURE;
 
 		} else {
-			if (&retval == *zpp) {
+			if (&retval == zp) {
 				/* throw away duplicate response */
 				zval_ptr_dtor(&retval);
 			} else {
 				/* copy result into our return var */
-				ZVAL_COPY_VALUE(*zpp, &retval);
+				ZVAL_COPY_VALUE(zp, &retval);
 			}
 			return Y_FILTER_SUCCESS;
 		}
@@ -790,7 +782,7 @@ void eval_scalar(yaml_event_t event,
 void eval_scalar_with_callbacks(yaml_event_t event,
 		HashTable *callbacks, zval *retval TSRMLS_DC)
 {
-	const char *tag = (char *) event.data.scalar.tag;
+	const char *tag = event.data.scalar.tag;
 	zend_string *tag_zstring;
 	zval *callback;
 
@@ -808,38 +800,28 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 	tag_zstring = zend_string_init(tag, strlen(tag), 0);
 	/* find and apply the evaluation function */
 	if ((callback = zend_hash_find(callbacks, tag_zstring)) != NULL) {
-		zval argv[3];
-		zval arg1;
-		zval arg2;
-		zval arg3;
-		zval retval;
+		zval argv[3] = { 0 };
+		zval retval = { 0 };
 
-		ZVAL_STRINGL(&arg1, (char *) event.data.scalar.value,
-				event.data.scalar.length);
-		argv[0] = arg1;
+		ZVAL_STRINGL(&argv[0], event.data.scalar.value, event.data.scalar.length);
+		ZVAL_STRINGL(&argv[1], tag, strlen(tag));
+		ZVAL_LONG(&argv[2], event.data.scalar.style);
 
-		ZVAL_STRINGL(&arg2, tag, strlen(tag));
-		argv[1] = arg2;
-
-		ZVAL_LONG(&arg3, event.data.scalar.style);
-		argv[2] = arg3;
-
-		if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-				callback, &retval, 3, argv, 0, NULL TSRMLS_CC) ||
-				Z_TYPE_P(&retval) == IS_UNDEF) {
+		if (FAILURE == call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, argv, 0, NULL TSRMLS_CC) || Z_TYPE_P(&retval) == IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to evaluate value for tag '%s'"
 					" with user defined function", tag);
 		}
 
-		zval_ptr_dtor(&arg1);
-		zval_ptr_dtor(&arg2);
-		zval_ptr_dtor(&arg3);
-
+		zval_ptr_dtor(&argv[0]);
+		zval_ptr_dtor(&argv[1]);
+		zval_ptr_dtor(&argv[2]);
+		zend_string_release(tag_zstring);
 		return;
 	}
 
 	/* no mapping, so handle raw */
+	zend_string_release(tag_zstring);
 	return eval_scalar(event, NULL, retval TSRMLS_CC);
 }
 /* }}} */
