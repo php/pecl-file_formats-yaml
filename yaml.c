@@ -309,89 +309,37 @@ static PHP_GINIT_FUNCTION(yaml)
  */
 static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 {
-	zval **entry = { 0 };
-#ifdef IS_UNICODE
-	zstr key;
-#else
+	zval *entry;
 	zend_string *key;
-#endif
-	ulong idx = 0L;
+	ulong idx;
 
-	zend_hash_internal_pointer_reset(callbacks);
-
-	while (*entry = (zend_hash_get_current_data(callbacks))) {
-		int key_type = zend_hash_get_current_key_ex(callbacks, &key, &idx, 0);
-
-#ifdef IS_UNICODE
-		if (key_type == HASH_KEY_IS_STRING || key_type == HASH_KEY_IS_UNICODE) {
-			zval name;
-			int type =
-				(key_type == HASH_KEY_IS_STRING) ? IS_STRING : IS_UNICODE;
-
-			INIT_ZVAL(name);
-
-			if (!zend_is_callable(*entry, 0, &name)) {
-				if (Z_TYPE(name) == IS_UNICODE ||
-					Z_TYPE(name) == IS_STRING) {
-					php_error_docref(NULL TSRMLS_CC, E_WARNING,
-							"Callback for tag '%R', '%R' is not valid",
-							type, key, Z_TYPE(name), Z_UNIVAL(name));
-
-				} else {
-					php_error_docref(NULL TSRMLS_CC, E_WARNING,
-							"Callback for tag '%R' is not valid",
-							type, key);
-				}
-
-				zval_dtor(&name);
-				return FAILURE;
-			}
-
-			if (ZEND_U_EQUAL(type, key, key_len - 1,
-						YAML_TIMESTAMP_TAG, sizeof(YAML_TIMESTAMP_TAG) - 1)) {
-				YAML_G(timestamp_decoder) = *entry;
-			}
-
-			zval_dtor(&name);
-
-		} else {
-			php_error_docref(NULL TSRMLS_CC, E_NOTICE,
-					"Callback key should be a string");
-		}
-#else
-		if (key_type == HASH_KEY_IS_STRING) {
+	ZEND_HASH_FOREACH_KEY_VAL(callbacks, idx, key, entry) {
+		if (key) {
 			zend_string *name;
 
-			if (!ZEND_IS_CALLABLE(*entry, 0, &name)) {
+			if (!ZEND_IS_CALLABLE(entry, 0, &name)) {
 				if (name != NULL) {
 					php_error_docref(NULL TSRMLS_CC, E_WARNING,
 							"Callback for tag '%s', '%s' is not valid",
-							key, name);
+							key->val, name->val);
 					efree(name);
 
 				} else {
 					php_error_docref(NULL TSRMLS_CC, E_WARNING,
-							"Callback for tag '%s' is not valid", key);
+							"Callback for tag '%s' is not valid", key->val);
 				}
 				return FAILURE;
 			}
 
 			if (!memcmp(key->val, YAML_TIMESTAMP_TAG, sizeof(YAML_TIMESTAMP_TAG))) {
-				YAML_G(timestamp_decoder) = *entry;
-			}
-
-			if (name != NULL) {
-				efree(name);
+				YAML_G(timestamp_decoder) = entry;
 			}
 
 		} else {
 			php_error_docref(NULL TSRMLS_CC, E_NOTICE,
 					"Callback key should be a string");
 		}
-#endif
-
-		zend_hash_move_forward(callbacks);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	return SUCCESS;
 }

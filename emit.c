@@ -553,7 +553,6 @@ static int y_write_array(
 
 			/* emit key */
 			status = y_write_zval(state, &key_zval, NULL TSRMLS_CC);
-			zval_dtor(&key_zval);
 			if (SUCCESS != status) {
 				return FAILURE;
 			}
@@ -604,12 +603,12 @@ static int y_write_timestamp(
 	int omit_tag = 0;
 	int status;
 	zend_class_entry *clazz = Z_OBJCE_P(data);
-	zval *timestamp = { 0 };
+	zval timestamp = { 0 };
 	zval *dtfmt;
 	zend_string *dtfmt_constant;
 
 	if (NULL == tag) {
-		tag = (yaml_char_t *) YAML_TIMESTAMP_TAG;
+		tag = YAML_TIMESTAMP_TAG;
 		omit_tag = 1;
 	}
 
@@ -622,17 +621,15 @@ static int y_write_timestamp(
 #else
 	zend_get_constant_ex("DateTime::ISO8601", 17, &dtfmt, clazz TSRMLS_CC);
 #endif
+
 	/* format date as iso-8601 string */
-	zend_call_method_with_1_params(data, clazz, NULL,
-			"format", timestamp, dtfmt);
-	zval_dtor(dtfmt);
+	zend_call_method_with_1_params(data, clazz, NULL, "format", &timestamp, dtfmt);
 
 	/* emit formatted date */
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
-			(yaml_char_t *) Z_STRVAL_P(timestamp), Z_STRLEN_P(timestamp),
+			Z_STRVAL_P(&timestamp), Z_STRLEN_P(&timestamp),
 			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
-	zval_dtor(timestamp);
-	efree(timestamp);
+	zval_ptr_dtor(&timestamp);
 	if (!status) {
 		y_event_init_failed(&event);
 		return FAILURE;
@@ -672,11 +669,9 @@ static int y_write_object(
 		php_var_serialize(&buf, data, &var_hash TSRMLS_CC);
 		PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-		// TODO Sean-Der
-		//status = yaml_scalar_event_initialize(&event,
-		//		NULL, (yaml_char_t *) YAML_PHP_TAG,
-		//		(yaml_char_t *) buf.c, buf.len,
-		//		0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
+		status = yaml_scalar_event_initialize(&event,
+				NULL, YAML_PHP_TAG, buf.s->val, buf.s->len,
+				0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
 
 		smart_string_free(&buf);
 		if (!status) {
@@ -730,8 +725,10 @@ y_write_object_callback (
 				"Expected callback result for class '%s'"
 				" to contain a key named 'tag' with a string value",
 				clazz_name);
+		zend_string_release(str_key);
 		return FAILURE;
 	}
+	zend_string_release(str_key);
 
 	str_key = zend_string_init("data", sizeof("data"), 0);
 	if ((zdata = zend_hash_find(Z_ARRVAL_P(zret), str_key)) != NULL) {
