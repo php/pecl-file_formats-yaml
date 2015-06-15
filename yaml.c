@@ -354,7 +354,7 @@ PHP_FUNCTION(yaml_parse)
 	long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
-	zval aliases;
+	zval aliases = { 0 };
 
 	parser_state_t state;
 	zval yaml;
@@ -362,7 +362,6 @@ PHP_FUNCTION(yaml_parse)
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
-	state.aliases = &aliases;
 	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
@@ -450,7 +449,6 @@ PHP_FUNCTION(yaml_parse_file)
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
-	state.aliases = NULL;
 	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
@@ -553,7 +551,6 @@ PHP_FUNCTION(yaml_parse_url)
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
-	state.aliases = NULL;
 	state.callbacks = NULL;
 
 #ifdef IS_UNICODE
