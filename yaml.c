@@ -680,15 +680,12 @@ PHP_FUNCTION(yaml_emit)
    */
 PHP_FUNCTION(yaml_emit_file)
 {
-	char *filename = { 0 };
-	int filename_len = 0;
+	zend_string *filename = { 0 };
 	php_stream *stream = { 0 };
 	FILE *fp = { 0 };
 	zval *data = { 0 };
-	const char *encoding = { 0 };
-	int encoding_len = 0;
-	const char *linebreak = { 0 };
-	int linebreak_len = 0;
+	zend_string *encoding = { 0 };
+	zend_string *linebreak = { 0 };
 	zval *zcallbacks = { 0 };
 	HashTable *callbacks = { 0 };
 
@@ -703,15 +700,13 @@ PHP_FUNCTION(yaml_emit_file)
 		return;
 	}
 #else
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz/|ssa/",
-			&filename, &filename_len, &data, &encoding,
-			&encoding_len, &linebreak, &zcallbacks,
-			&linebreak_len)) {
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Sz/|SSa/",
+			&filename, &data, &encoding, &linebreak, &zcallbacks)) {
 		return;
 	}
 #endif
 
-	if (NULL == (stream = php_stream_open_wrapper(filename, "wb",
+	if (NULL == (stream = php_stream_open_wrapper(filename->val, "wb",
 			IGNORE_URL | REPORT_ERRORS | STREAM_WILL_CAST,
 			NULL))) {
 		RETURN_FALSE;

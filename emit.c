@@ -231,6 +231,11 @@ static int y_write_zval(
 	int status = FAILURE;
 
 	switch (Z_TYPE_P(data)) {
+	// TODO Sean-Der
+	//case IS_REFERENCE:
+	//	status = y_write_zval(state, Z_REFVAL_P(data), tag);
+	//	break;
+
 	case IS_NULL:
 		status = y_write_null(state, tag TSRMLS_CC);
 		break;
