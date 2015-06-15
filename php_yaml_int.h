@@ -48,7 +48,7 @@ typedef struct parser_state_s {
 	yaml_parser_t parser;
 	yaml_event_t event;
 	int have_event;
-	zval *aliases;
+	zval aliases;
 	eval_scalar_func_t eval_func;
 	HashTable *callbacks;
 } parser_state_t;

@@ -356,14 +356,13 @@ void handle_document(parser_state_t *state, zval *retval TSRMLS_DC)
 	zval aliases;
 
 	/* make a new array to hold aliases */
-	MAKE_ARRAY(state->aliases);
+	MAKE_ARRAY(&state->aliases);
 
 	/* document consists of next element */
 	get_next_element(state, retval TSRMLS_CC);
 
 	/* clean up aliases */
-	zval_ptr_dtor(state->aliases);
-	state->aliases = NULL;
+	zval_ptr_dtor(&state->aliases);
 
 	/* assert that end event is next in stream */
 	if (NULL != retval && NEXT_EVENT() &&
@@ -395,7 +394,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	if (NULL != src_event.data.mapping_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
-		add_assoc_zval(state->aliases, src_event.data.mapping_start.anchor, retval);
+		add_assoc_zval(&state->aliases, src_event.data.mapping_start.anchor, retval);
 	}
 
 	for (get_next_element(state, &key); Z_TYPE_P(&key) != IS_UNDEF; get_next_element(state, &key)) {
@@ -481,7 +480,7 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	if (NULL != src_event.data.sequence_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
-		add_assoc_zval(state->aliases, src_event.data.sequence_start.anchor, retval);
+		add_assoc_zval(&state->aliases, src_event.data.sequence_start.anchor, retval);
 	}
 
 	for (get_next_element(state, &value); Z_TYPE_P(&value) != IS_UNDEF; get_next_element(state, &value)) {
@@ -520,7 +519,7 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
-		add_assoc_zval(state->aliases, state->event.data.scalar.anchor, retval);
+		add_assoc_zval(&state->aliases, state->event.data.scalar.anchor, retval);
 	}
 }
 /* }}} */
@@ -533,7 +532,7 @@ void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
 	char *anchor = (char *) state->event.data.alias.anchor;
 	zend_string *anchor_zstring = zend_string_init(anchor, strlen(anchor), 0);
 
-	if ((retval = zend_hash_find(Z_ARRVAL_P(state->aliases), anchor_zstring)) == NULL) {
+	if ((retval = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
 		zend_string_release(anchor_zstring);
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"alias %s is not registered "
