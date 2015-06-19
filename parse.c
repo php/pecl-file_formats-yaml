@@ -407,6 +407,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			//zval_ptr_dtor(retval);
 			yaml_event_delete(&src_event);
 			yaml_event_delete(&key_event);
+			return;
 		}
 
 		/* check for '<<' and handle merge */
@@ -609,7 +610,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		zval_ptr_dtor(&callback_args[1]);
 		zval_ptr_dtor(&callback_args[2]);
 
-		if (FAILURE == callback_result || Z_TYPE_P(&retval) != IS_UNDEF) {
+		if (FAILURE == callback_result || Z_TYPE_P(&retval) == IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to apply filter for tag '%s'"
 					" with user defined function", tag);
@@ -800,13 +801,12 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 	/* find and apply the evaluation function */
 	if ((callback = zend_hash_find(callbacks, tag_zstring)) != NULL) {
 		zval argv[3] = { 0 };
-		zval retval = { 0 };
 
 		ZVAL_STRINGL(&argv[0], event.data.scalar.value, event.data.scalar.length);
 		ZVAL_STRINGL(&argv[1], tag, strlen(tag));
 		ZVAL_LONG(&argv[2], event.data.scalar.style);
 
-		if (FAILURE == call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, argv, 0, NULL TSRMLS_CC) || Z_TYPE_P(&retval) == IS_UNDEF) {
+		if (FAILURE == call_user_function_ex(EG(function_table), NULL, callback, retval, 3, argv, 0, NULL TSRMLS_CC) || Z_TYPE_P(retval) == IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to evaluate value for tag '%s'"
 					" with user defined function", tag);
@@ -866,44 +866,16 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 		str = estrndup(Z_STRVAL_P(zv), Z_STRLEN_P(zv));
 		break;
 
-#ifdef IS_UNICODE
-	case IS_UNICODE:
-		{
-			int len;
-			UErrorCode status = U_ZERO_ERROR;
-
-			zend_unicode_to_string_ex(UG(utf8_conv), &str, &len,
-					Z_USTRVAL_P(zv), Z_USTRLEN_P(zv), &status);
-			if (U_FAILURE(status)) {
-				if (str != NULL) {
-					efree(str);
-					str = NULL;
-				}
-			}
-		}
-		break;
-#endif
-
-#ifdef ZEND_ENGINE_2
 	case IS_OBJECT:
 		{
 			zval tmp;
 
-			if (SUCCESS == zend_std_cast_object_tostring(
-#if PHP_MAJOR_VERSION >= 6
-					zv, &tmp, IS_STRING, UG(utf8_conv) TSRMLS_CC
-#elif PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION >= 2
-					zv, &tmp, IS_STRING TSRMLS_CC
-#else
-					zv, &tmp, IS_STRING, 0 TSRMLS_CC
-#endif
-					)) {
+			if (SUCCESS == zend_std_cast_object_tostring(zv, &tmp, IS_STRING TSRMLS_CC)) {
 				str = estrndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
 				zval_dtor(&tmp);
 				return str;
 			}
 		}
-#endif
 		break;
 
 	default:
@@ -915,12 +887,11 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			php_var_serialize(&buf, zv, &var_hash TSRMLS_CC);
 			PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-			// TODO sdubois
-			//if (buf.c) {
-			//	str = estrndup(buf.c, buf.len);
-			//} else {
-			//	str = NULL;
-			//}
+			if (buf.s) {
+				str = estrndup(buf.s->val, buf.s->len);
+			} else {
+				str = NULL;
+			}
 		}
 		break;
 	}
