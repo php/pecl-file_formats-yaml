@@ -83,7 +83,7 @@ void handle_sequence(parser_state_t *state, zval *retval TSRMLS_DC);
 
 void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC);
 
-void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC);
+void handle_alias(parser_state_t *state, zval **retval TSRMLS_DC);
 
 static int apply_filter(
 		zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
@@ -331,7 +331,7 @@ void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
 		break;
 
 	case YAML_ALIAS_EVENT:
-		handle_alias(state, retval TSRMLS_CC);
+		handle_alias(state, &retval TSRMLS_CC);
 		break;
 
 	default:
@@ -529,24 +529,27 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 /* {{{ handle_alias()
  * Handle an alias event
  */
-void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
-	char *anchor = (char *) state->event.data.alias.anchor;
+void handle_alias(parser_state_t *state, zval **retval TSRMLS_DC) {
+	char *anchor = state->event.data.alias.anchor;
 	zend_string *anchor_zstring = zend_string_init(anchor, strlen(anchor), 0);
+	zval *retval_orig = *retval;
 
-	if ((retval = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
-		zend_string_release(anchor_zstring);
+	if ((*retval = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"alias %s is not registered "
 				"(line %zd, column %zd)",
 				anchor,
 				state->parser.mark.line + 1,
 				state->parser.mark.column + 1);
+		zend_string_release(anchor_zstring);
+		ZVAL_UNDEF(retval_orig);
+		return;
 	}
 	zend_string_release(anchor_zstring);
 
 	/* add a reference to retval's internal counter */
-	ZVAL_MAKE_REF(retval);
-	Z_TRY_ADDREF_P(retval);
+	ZVAL_MAKE_REF(*retval);
+	Z_TRY_ADDREF_P(*retval);
 
 	return;
 }
