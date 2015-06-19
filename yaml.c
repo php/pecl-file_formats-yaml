@@ -377,7 +377,7 @@ PHP_FUNCTION(yaml_parse)
 	}
 #else
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-					"S|lza/", &input, &pos, &zndocs,
+					"S|lz/a/", &input, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
 	}
@@ -417,7 +417,7 @@ PHP_FUNCTION(yaml_parse)
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
-		zval_dtor(zndocs);
+		zval_ptr_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
 
