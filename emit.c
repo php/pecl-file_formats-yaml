@@ -699,15 +699,15 @@ y_write_object_callback (
 		const char *clazz_name TSRMLS_DC) {
 	zval argv[1];
 	argv[0] = *data;
-	zval *zret = { 0 };
+	zval zret;
 	zval *ztag;
 	zval *zdata;
 	zend_string *str_key;
 
 	/* call the user function */
 	if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-			callback, zret, 1, argv, 0, NULL TSRMLS_CC) ||
-			NULL == zret) {
+			callback, &zret, 1, argv, 0, NULL TSRMLS_CC) ||
+			Z_TYPE_P(&zret) == IS_UNDEF) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Failed to apply callback for class '%s'"
 				" with user defined function", clazz_name);
@@ -715,7 +715,7 @@ y_write_object_callback (
 	}
 
 	/* return val should be array */
-	if (IS_ARRAY != Z_TYPE_P(zret)) {
+	if (IS_ARRAY != Z_TYPE_P(&zret)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Expected callback for class '%s'"
 				" to return an array", clazz_name);
@@ -723,9 +723,8 @@ y_write_object_callback (
 	}
 
 	/* pull out the tag and surrogate object */
-	str_key = zend_string_init("tag", sizeof("tag"), 0);
-	if ((ztag = zend_hash_find(Z_ARRVAL_P(zret), str_key)) != NULL ||
-			IS_STRING != Z_TYPE_P(ztag)) {
+	str_key = zend_string_init("tag", sizeof("tag") - 1, 0);
+	if ((ztag = zend_hash_find(Z_ARRVAL_P(&zret), str_key)) == NULL ||  Z_TYPE_P(ztag) != IS_STRING) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'tag' with a string value",
@@ -735,8 +734,8 @@ y_write_object_callback (
 	}
 	zend_string_release(str_key);
 
-	str_key = zend_string_init("data", sizeof("data"), 0);
-	if ((zdata = zend_hash_find(Z_ARRVAL_P(zret), str_key)) != NULL) {
+	str_key = zend_string_init("data", sizeof("data") - 1, 0);
+	if ((zdata = zend_hash_find(Z_ARRVAL_P(&zret), str_key)) == NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'data'",
