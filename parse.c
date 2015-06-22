@@ -83,7 +83,7 @@ void handle_sequence(parser_state_t *state, zval *retval TSRMLS_DC);
 
 void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC);
 
-void handle_alias(parser_state_t *state, zval **retval TSRMLS_DC);
+void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC);
 
 static int apply_filter(
 		zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
@@ -331,7 +331,7 @@ void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
 		break;
 
 	case YAML_ALIAS_EVENT:
-		handle_alias(state, &retval TSRMLS_CC);
+		handle_alias(state, retval TSRMLS_CC);
 		break;
 
 	default:
@@ -393,7 +393,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 
 	if (NULL != src_event.data.mapping_start.anchor) {
 		/* record anchors in current alias table */
-		Z_ADDREF_P(retval);
+		Z_TRY_ADDREF_P(retval);
 		add_assoc_zval(&state->aliases, src_event.data.mapping_start.anchor, retval);
 	}
 
@@ -410,6 +410,10 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			return;
 		}
 
+		if (Z_ISREF_P(&value)) {
+			value = *Z_REFVAL_P(&value);
+		}
+
 		/* check for '<<' and handle merge */
 		if (key_event.type == YAML_SCALAR_EVENT &&
 				IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
@@ -423,16 +427,11 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 				/* single ref */
 				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(&value), zval_add_ref, 0);
 			} else {
-				/* array of refs */
-				HashTable *ht = Z_ARRVAL_P(&value);
 				zval *zvalp;
-
-				zend_hash_internal_pointer_reset(ht);
-				while (SUCCESS == zend_hash_has_more_elements(ht)) {
-					zvalp = zend_hash_get_current_data(ht);
+				ZEND_HASH_FOREACH_VAL(HASH_OF(&value), zvalp) {
+					ZVAL_DEREF(zvalp);
 					zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(zvalp), zval_add_ref, 0);
-					zend_hash_move_forward(ht);
-				};
+				} ZEND_HASH_FOREACH_END();
 			}
 
 			zval_ptr_dtor(&value);
@@ -480,7 +479,7 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 
 	if (NULL != src_event.data.sequence_start.anchor) {
 		/* record anchors in current alias table */
-		Z_ADDREF_P(retval);
+		Z_TRY_ADDREF_P(retval);
 		add_assoc_zval(&state->aliases, src_event.data.sequence_start.anchor, retval);
 	}
 
@@ -519,7 +518,7 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 	state->eval_func(state->event, state->callbacks, retval TSRMLS_CC);
 	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
 		/* record anchors in current alias table */
-		Z_ADDREF_P(retval);
+		Z_TRY_ADDREF_P(retval);
 		add_assoc_zval(&state->aliases, state->event.data.scalar.anchor, retval);
 	}
 }
@@ -529,12 +528,12 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 /* {{{ handle_alias()
  * Handle an alias event
  */
-void handle_alias(parser_state_t *state, zval **retval TSRMLS_DC) {
+void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
 	char *anchor = state->event.data.alias.anchor;
 	zend_string *anchor_zstring = zend_string_init(anchor, strlen(anchor), 0);
-	zval *retval_orig = *retval;
+	zval *retval_orig = retval;
 
-	if ((*retval = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
+	if ((retval = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"alias %s is not registered "
 				"(line %zd, column %zd)",
@@ -548,10 +547,9 @@ void handle_alias(parser_state_t *state, zval **retval TSRMLS_DC) {
 	zend_string_release(anchor_zstring);
 
 	/* add a reference to retval's internal counter */
-	ZVAL_MAKE_REF(*retval);
-	Z_TRY_ADDREF_P(*retval);
-
-	return;
+	ZVAL_MAKE_REF(retval);
+	Z_TRY_ADDREF_P(retval);
+	ZVAL_COPY_VALUE(retval_orig, retval);
 }
 /* }}} */
 
@@ -940,66 +938,7 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 			func = YAML_G(timestamp_decoder);
 		}
 
-#if 1
 		ZVAL_STRINGL(&arg, ts, ts_len);
-#else
-		{
-			/* fix timestamp format for PHP4 */
-			char *buf, *dst, *end, *src;
-
-			buf = (char *) emalloc((size_t) ts_len + 1);
-			dst = buf;
-			end = ts + ts_len;
-			src = ts;
-
-			while (src < end && *src != '.') {
-				if (src + 1 < end &&
-						(*(src - 1) >= '0' && *(src - 1) <= '9') &&
-						(*src == 'T' || *src == 't') &&
-						(*(src + 1) >= '0' && *(src + 1) <= '9')) {
-					src++;
-					*dst++ = ' ';
-
-				} else if (*src == ':' && src > ts + 2 && (
-						((*(src - 2) == '+' || *(src - 2) == '-') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
-						((*(src - 3) == '+' || *(src - 3) == '-') &&
-						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '9')))) {
-					src++;
-
-				} else {
-					*dst++ = *src++;
-				}
-			}
-
-			if (src < end && *src == '.') {
-				src++;
-				while (src < end && *src >= '0' && *src <= '9') {
-					src++;
-				}
-			}
-
-			while (src < end) {
-				if (*src == ':' && src > ts + 2 && (
-						((*(src - 2) == '+' || *(src - 2) == '-') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
-						((*(src - 3) == '+' || *(src - 3) == '-') &&
-						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '9')))) {
-					src++;
-
-				} else {
-					*dst++ = *src++;
-				}
-			}
-
-			*dst = '\0';
-
-			ZVAL_STRINGL(arg, buf, dst - buf, 0);
-		}
-#endif
-
 		argv[0] = arg;
 
 		if (FAILURE == call_user_function_ex(EG(function_table), NULL, func,
@@ -1017,11 +956,7 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 
 	} else {
 		zval_dtor(*zpp);
-#ifdef IS_UNICODE
-		ZVAL_U_STRINGL(UG(utf8_conv), *zpp, ts, ts_len, 1);
-#else
 		ZVAL_STRINGL(*zpp, ts, ts_len);
-#endif
 		return SUCCESS;
 	}
 }
