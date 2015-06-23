@@ -166,6 +166,8 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 	HashPosition pos;
 	zval *elm;
 
+	ZVAL_DEREF(data);
+
 	ht = HASH_OF(data);
 
 	if (!ht) {
@@ -173,7 +175,7 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 		return;
 	}
 
-	if (ht->u.v.nApplyCount > 0) {
+	if (ZEND_HASH_APPLY_PROTECTION(ht) && ht->u.v.nApplyCount > 0) {
 		zval tmp;
 		ZVAL_LONG(&tmp, (unsigned long) ht);
 
@@ -182,14 +184,17 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 		return;
 	}
 
-	ht->u.v.nApplyCount++;
-	zend_hash_internal_pointer_reset_ex(ht, &pos);
-	while (SUCCESS == zend_hash_has_more_elements_ex(ht, &pos)) {
-		elm = zend_hash_get_current_data_ex(ht, &pos);
+	if (ZEND_HASH_APPLY_PROTECTION(ht)) {
+		ht->u.v.nApplyCount++;
+	}
+
+	ZEND_HASH_FOREACH_VAL(ht, elm) {
 		y_scan_recursion(state, elm TSRMLS_CC);
-		zend_hash_move_forward_ex(ht, &pos);
-	};
-	ht->u.v.nApplyCount--;
+	} ZEND_HASH_FOREACH_END();
+
+	if (ZEND_HASH_APPLY_PROTECTION(ht)) {
+		ht->u.v.nApplyCount--;
+	}
 
 	return;
 }
@@ -203,20 +208,15 @@ static long y_search_recursive(
 		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC)
 {
  	zval *entry;
-	HashPosition pos;
    	ulong num_key;
 	unsigned long found;
 
-	zend_hash_internal_pointer_reset_ex(state->recursive, &pos);
-	while (SUCCESS == zend_hash_has_more_elements_ex(state->recursive, &pos)) {
-		entry = zend_hash_get_current_data_ex(state->recursive, &pos);
+	ZEND_HASH_FOREACH_NUM_KEY_VAL(state->recursive, num_key, entry) {
 		found = Z_LVAL_P(entry);
 		if (addr == found) {
-			zend_hash_get_current_key_ex(state->recursive, NULL, &num_key, &pos);
 			return num_key;
 		}
-		zend_hash_move_forward_ex(state->recursive, &pos);
-	}
+	} ZEND_HASH_FOREACH_END();
 	return -1;
 }
 /* }}} */
@@ -231,10 +231,9 @@ static int y_write_zval(
 	int status = FAILURE;
 
 	switch (Z_TYPE_P(data)) {
-	// TODO Sean-Der
-	//case IS_REFERENCE:
-	//	status = y_write_zval(state, Z_REFVAL_P(data), tag);
-	//	break;
+	case IS_REFERENCE:
+		status = y_write_zval(state, Z_REFVAL_P(data), tag);
+		break;
 
 	case IS_NULL:
 		status = y_write_null(state, tag TSRMLS_CC);
@@ -500,7 +499,7 @@ static int y_write_array(
 		anchor = (char*) emalloc(anchor_size + 1);
 		snprintf(anchor, anchor_size + 1, "refid%ld", recursive_idx + 1);
 
-		if (ht->u.v.nApplyCount > 1) {
+		if (ZEND_HASH_APPLY_PROTECTION(ht) && ht->u.v.nApplyCount > 1) {
 			/* node has been visited before */
 			status = yaml_alias_event_initialize(
 					&event, (yaml_char_t *) anchor);
@@ -542,18 +541,15 @@ static int y_write_array(
 	}
 
 	/* emit array elements */
-	zend_hash_internal_pointer_reset_ex(ht, &pos);
-	while (SUCCESS == zend_hash_has_more_elements_ex(ht, &pos)) {
+	ZEND_HASH_FOREACH_KEY_VAL(ht, kidx, kstr, elm) {
+		ZVAL_DEREF(elm);
+
 		if (Y_ARRAY_MAP == array_type) {
-			zend_hash_get_current_key_ex(ht, &kstr, &kidx, &pos);
-
 			/* create zval for key */
-			if (HASH_KEY_IS_LONG ==
-					zend_hash_get_current_key_type_ex(ht, &pos)) {
-				ZVAL_LONG(&key_zval, kidx);
-
-			} else {
+			if (kstr) {
 				ZVAL_STR(&key_zval, kstr);
+			} else {
+				ZVAL_LONG(&key_zval, kidx);
 			}
 
 			/* emit key */
@@ -563,26 +559,23 @@ static int y_write_array(
 			}
 		}
 
-		if ((elm = zend_hash_get_current_data_ex(ht, &pos)) != NULL) {
-
-			tmp_ht = HASH_OF(elm);
-			if (tmp_ht) {
-				/* increment access count for hash */
-				tmp_ht->u.v.nApplyCount++;
-			}
-
-			status = y_write_zval(state, elm, NULL TSRMLS_CC);
-
-			if (tmp_ht) {
-				tmp_ht->u.v.nApplyCount--;
-			}
-
-			if (SUCCESS != status) {
-				return FAILURE;
-			}
+		tmp_ht = HASH_OF(elm);
+		if (tmp_ht && ZEND_HASH_APPLY_PROTECTION(tmp_ht)) {
+			/* increment access count for hash */
+			tmp_ht->u.v.nApplyCount++;
 		}
-		zend_hash_move_forward_ex(ht, &pos);
-	};
+
+		status = y_write_zval(state, elm, NULL TSRMLS_CC);
+
+		if (tmp_ht && ZEND_HASH_APPLY_PROTECTION(tmp_ht)) {
+			tmp_ht->u.v.nApplyCount--;
+		}
+
+		if (SUCCESS != status) {
+			return FAILURE;
+		}
+	} ZEND_HASH_FOREACH_END();
+
 
 	if (Y_ARRAY_SEQUENCE == array_type) {
 		status = yaml_sequence_end_event_initialize(&event);
