@@ -30,6 +30,7 @@ mkinstalldirs
 modules
 run-tests.php
 tmp-php.ini
+yaml.loT
 
 # General Ignores
 *~
@@ -57,12 +58,12 @@ tmp-php.ini
 core
 
 # Test specific Ignores
-tests/*/*.diff
-tests/*/*.out
-tests/*/*.php
-tests/*/*.exp
-tests/*/*.log
-tests/*/*.sh
+tests/*.diff
+tests/*.exp
+tests/*.log
+tests/*.out
+tests/*.php
+tests/*.sh
 
 # coverage
 /coverage.info
