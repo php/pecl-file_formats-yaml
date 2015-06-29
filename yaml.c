@@ -311,9 +311,8 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 {
 	zval *entry;
 	zend_string *key;
-	ulong idx;
 
-	ZEND_HASH_FOREACH_KEY_VAL(callbacks, idx, key, entry) {
+	ZEND_HASH_FOREACH_STR_KEY_VAL(callbacks, key, entry) {
 		if (key) {
 			zend_string *name;
 
@@ -354,7 +353,6 @@ PHP_FUNCTION(yaml_parse)
 	long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
-	zval aliases = { 0 };
 
 	parser_state_t state;
 	zval yaml;
@@ -400,7 +398,7 @@ PHP_FUNCTION(yaml_parse)
 #endif
 
 	yaml_parser_initialize(&state.parser);
-	yaml_parser_set_input_string(&state.parser, input->val, input->len);
+	yaml_parser_set_input_string(&state.parser, (unsigned char *)input->val, input->len);
 
 
 	if (pos < 0) {

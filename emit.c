@@ -163,7 +163,6 @@ static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 {
 	HashTable *ht;
-	HashPosition pos;
 	zval *elm;
 
 	ZVAL_DEREF(data);
@@ -459,12 +458,10 @@ static int y_write_array(
 	int omit_tag = 0;
 	int status;
 	HashTable *ht = Z_ARRVAL_P(data);
-	HashPosition pos;
 	zval *elm;
 	int array_type;
 	zval key_zval;
 	ulong kidx;
-	uint key_len;
 	zend_string *kstr;
 	HashTable *tmp_ht;
 	long recursive_idx = -1;
@@ -601,12 +598,12 @@ static int y_write_timestamp(
 	int omit_tag = 0;
 	int status;
 	zend_class_entry *clazz = Z_OBJCE_P(data);
-	zval timestamp = { 0 };
+	zval timestamp = {{0} };
 	zval *dtfmt;
 	zend_string *dtfmt_constant;
 
 	if (NULL == tag) {
-		tag = YAML_TIMESTAMP_TAG;
+		tag = (yaml_char_t *) YAML_TIMESTAMP_TAG;
 		omit_tag = 1;
 	}
 
@@ -625,7 +622,7 @@ static int y_write_timestamp(
 
 	/* emit formatted date */
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
-			Z_STRVAL_P(&timestamp), Z_STRLEN_P(&timestamp),
+			(yaml_char_t *) Z_STRVAL_P(&timestamp), Z_STRLEN_P(&timestamp),
 			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
 	zval_ptr_dtor(&timestamp);
 	if (!status) {
@@ -668,7 +665,7 @@ static int y_write_object(
 		PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 		status = yaml_scalar_event_initialize(&event,
-				NULL, YAML_PHP_TAG, buf.s->val, buf.s->len,
+				NULL, (yaml_char_t *) YAML_PHP_TAG, (yaml_char_t *) buf.s->val, buf.s->len,
 				0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
 
 		smart_string_free(&buf);
