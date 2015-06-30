@@ -42,13 +42,13 @@ extern "C" {
 
 /* {{{ ext/yaml types
 */
-typedef zval *(*eval_scalar_func_t)(yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+typedef void (*eval_scalar_func_t)(yaml_event_t event, HashTable *callbacks, zval *retval TSRMLS_DC);
 
 typedef struct parser_state_s {
 	yaml_parser_t parser;
 	yaml_event_t event;
 	int have_event;
-	zval *aliases;
+	zval aliases;
 	eval_scalar_func_t eval_func;
 	HashTable *callbacks;
 } parser_state_t;
@@ -115,15 +115,16 @@ typedef struct y_emit_state_s {
 
 /* {{{ ext/yaml prototypes
 */
-zval *php_yaml_read_all(parser_state_t *state, long *ndocs TSRMLS_DC);
+void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_DC);
 
-zval *php_yaml_read_partial(
-		parser_state_t *state, long pos, long *ndocs TSRMLS_DC);
+void php_yaml_read_partial(
+		parser_state_t *state, long pos, long *ndocs, zval *retval TSRMLS_DC);
 
-zval *eval_scalar(yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+void eval_scalar(yaml_event_t event,
+		HashTable * callbacks, zval *retval TSRMLS_DC);
 
-zval *eval_scalar_with_callbacks(
-		yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+void eval_scalar_with_callbacks(
+		yaml_event_t event, HashTable *callbacks, zval *retval TSRMLS_DC);
 
 const char *detect_scalar_type(
 		const char *value, size_t length, const yaml_event_t *event);
