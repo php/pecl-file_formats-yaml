@@ -47,3 +47,6 @@ run-tests.php \
 
 ## coverage stuff
 rm -rf coverage.info reports
+
+## failed tests
+rm tests/*.{diff,exp,log,out,php,sh}
