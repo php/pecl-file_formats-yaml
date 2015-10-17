@@ -297,9 +297,6 @@ static PHP_GINIT_FUNCTION(yaml)
 	yaml_globals->output_canonical = 0;
 	yaml_globals->output_indent = 2;
 	yaml_globals->output_width = 80;
-#ifdef IS_UNICODE
-	yaml_globals->orig_runtime_encoding_conv = NULL;
-#endif
 }
 /* }}} */
 
@@ -362,24 +359,13 @@ PHP_FUNCTION(yaml_parse)
 	state.have_event = 0;
 	state.callbacks = NULL;
 
-#ifdef IS_UNICODE
-	YAML_G(orig_runtime_encoding_conv) = UG(runtime_encoding_conv);
-#endif
 	YAML_G(timestamp_decoder) = NULL;
 
-#ifdef IS_UNICODE
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-					"s&|lza/", &input, &input_len, UG(utf8_conv), &pos,
-					&zndocs, &zcallbacks)) {
-		return;
-	}
-#else
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
 					"S|lz/a/", &input, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
 	}
-#endif
 
 	if (zcallbacks != NULL) {
 		state.callbacks = Z_ARRVAL_P(zcallbacks);
@@ -393,10 +379,6 @@ PHP_FUNCTION(yaml_parse)
 		state.eval_func = eval_scalar;
 	}
 
-#ifdef IS_UNICODE
-	UG(runtime_encoding_conv) = UG(utf8_conv);
-#endif
-
 	yaml_parser_initialize(&state.parser);
 	yaml_parser_set_input_string(&state.parser, (unsigned char *)input->val, input->len);
 
@@ -408,10 +390,6 @@ PHP_FUNCTION(yaml_parse)
 	}
 
 	yaml_parser_delete(&state.parser);
-
-#ifdef IS_UNICODE
-	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
-#endif
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
@@ -449,25 +427,13 @@ PHP_FUNCTION(yaml_parse_file)
 	state.have_event = 0;
 	state.callbacks = NULL;
 
-#ifdef IS_UNICODE
-	YAML_G(orig_runtime_encoding_conv) = UG(runtime_encoding_conv);
-#endif
 	YAML_G(timestamp_decoder) = NULL;
 
-#ifdef IS_UNICODE
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
-					"s&|lza/", &filename, &filename_len,
-					ZEND_U_CONVERTER(UG(filesystem_encoding_conv)), &pos,
-					&zndocs, &zcallbacks)) {
-		return;
-	}
-#else
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
 					"s|lza/", &filename, &filename_len, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
 	}
-#endif
 
 	if (zcallbacks != NULL) {
 		state.callbacks = Z_ARRVAL_P(zcallbacks);
@@ -493,10 +459,6 @@ PHP_FUNCTION(yaml_parse_file)
 		RETURN_FALSE;
 	}
 
-#ifdef IS_UNICODE
-	UG(runtime_encoding_conv) = UG(utf8_conv);
-#endif
-
 	yaml_parser_initialize(&state.parser);
 	yaml_parser_set_input_file(&state.parser, fp);
 
@@ -509,10 +471,6 @@ PHP_FUNCTION(yaml_parse_file)
 
 	yaml_parser_delete(&state.parser);
 	php_stream_close(stream);
-
-#ifdef IS_UNICODE
-	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
-#endif
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
@@ -551,9 +509,6 @@ PHP_FUNCTION(yaml_parse_url)
 	state.have_event = 0;
 	state.callbacks = NULL;
 
-#ifdef IS_UNICODE
-	YAML_G(orig_runtime_encoding_conv) = UG(runtime_encoding_conv);
-#endif
 	YAML_G(timestamp_decoder) = NULL;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
@@ -577,16 +532,7 @@ PHP_FUNCTION(yaml_parse_url)
 		RETURN_FALSE;
 	}
 
-#ifdef IS_UNICODE
-	size = php_stream_copy_to_mem(
-			stream, (void **) &input, PHP_STREAM_COPY_ALL, 0);
-#else
 	input = php_stream_copy_to_mem(stream, PHP_STREAM_COPY_ALL, 0);
-#endif
-
-#ifdef IS_UNICODE
-	UG(runtime_encoding_conv) = UG(utf8_conv);
-#endif
 
 	yaml_parser_initialize(&state.parser);
 	yaml_parser_set_input_string(&state.parser, (unsigned char *)input, size);
@@ -600,10 +546,6 @@ PHP_FUNCTION(yaml_parse_url)
 	yaml_parser_delete(&state.parser);
 	php_stream_close(stream);
 	efree(input);
-
-#ifdef IS_UNICODE
-	UG(runtime_encoding_conv) = YAML_G(orig_runtime_encoding_conv);
-#endif
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
@@ -658,11 +600,7 @@ PHP_FUNCTION(yaml_emit)
 	if (SUCCESS == php_yaml_write_impl(
 				&emitter, data, (yaml_encoding_t) encoding,
 				callbacks TSRMLS_CC)) {
-#ifdef IS_UNICODE
-		RETVAL_U_STRINGL(UG(utf8_conv), str.c, str.len, ZSTR_DUPLICATE);
-#else
 		RETVAL_STRINGL(str.c, str.len);
-#endif
 
 	} else {
 		RETVAL_FALSE;
@@ -689,19 +627,10 @@ PHP_FUNCTION(yaml_emit_file)
 
 	yaml_emitter_t emitter = { 0 };
 
-#ifdef IS_UNICODE
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "S&z/|SSa/",
-			&filename
-			ZEND_U_CONVERTER(UG(filesystem_encoding_conv)), &data,
-			&encoding, &linebreak, &zcallbacks)) {
-		return;
-	}
-#else
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Sz/|SSa/",
 			&filename, &data, &encoding, &linebreak, &zcallbacks)) {
 		return;
 	}
-#endif
 
 	if (NULL == (stream = php_stream_open_wrapper(filename->val, "wb",
 			IGNORE_URL | REPORT_ERRORS | STREAM_WILL_CAST,

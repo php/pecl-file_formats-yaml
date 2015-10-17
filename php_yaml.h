@@ -82,9 +82,6 @@ ZEND_BEGIN_MODULE_GLOBALS(yaml)
 	zend_bool output_canonical;
 	zend_long output_indent;
 	zend_long output_width;
-#ifdef IS_UNICODE
-	UConverter *orig_runtime_encoding_conv;
-#endif
 ZEND_END_MODULE_GLOBALS(yaml)
 
 ZEND_EXTERN_MODULE_GLOBALS(yaml)
