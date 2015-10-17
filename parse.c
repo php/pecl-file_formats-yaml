@@ -888,6 +888,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 
 			if (buf.s) {
 				str = estrndup(buf.s->val, buf.s->len);
+				smart_string_free(&buf);
 			} else {
 				str = NULL;
 			}
