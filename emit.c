@@ -56,8 +56,8 @@ static int y_event_emit(
 static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC);
 static int y_array_is_sequence(HashTable *ht TSRMLS_DC);
 static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC);
-static long y_search_recursive(
-		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC);
+static zend_long y_search_recursive(
+		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC);
 
 static int y_write_zval(
 		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
@@ -137,7 +137,7 @@ static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC)
  */
 static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 {
-	ulong kidx, idx;
+	zend_ulong kidx, idx;
 	zend_string *str_key;
 
 	idx = 0;
@@ -176,7 +176,7 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 
 	if (ZEND_HASH_APPLY_PROTECTION(ht) && ht->u.v.nApplyCount > 0) {
 		zval tmp;
-		ZVAL_LONG(&tmp, (unsigned long) ht);
+		ZVAL_LONG(&tmp, (zend_ulong) ht);
 
 		/* we've seen this before, so record address */
 		zend_hash_next_index_insert(state->recursive, &tmp);
@@ -203,12 +203,12 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 /* {{{ y_search_recursive()
  * Search the recursive state hash for an address
  */
-static long y_search_recursive(
-		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC)
+static zend_long y_search_recursive(
+		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC)
 {
  	zval *entry;
-   	ulong num_key;
-	unsigned long found;
+   	zend_ulong num_key;
+	zend_ulong found;
 
 	ZEND_HASH_FOREACH_NUM_KEY_VAL(state->recursive, num_key, entry) {
 		found = Z_LVAL_P(entry);
@@ -461,10 +461,10 @@ static int y_write_array(
 	zval *elm;
 	int array_type;
 	zval key_zval;
-	ulong kidx;
+	zend_ulong kidx;
 	zend_string *kstr;
 	HashTable *tmp_ht;
-	long recursive_idx = -1;
+	zend_long recursive_idx = -1;
 	char *anchor = { 0 };
 	size_t anchor_size;
 
@@ -489,7 +489,7 @@ static int y_write_array(
 	 *   if ht->nApplyCount > 0:
 	 *     emit a ref
 	 */
-	recursive_idx = y_search_recursive(state, (unsigned long) ht TSRMLS_CC);
+	recursive_idx = y_search_recursive(state, (zend_ulong) ht TSRMLS_CC);
 	if (-1 != recursive_idx) {
 		/* create anchor to refer to this structure */
 		anchor_size = snprintf(anchor, 0, "refid%ld", recursive_idx + 1);

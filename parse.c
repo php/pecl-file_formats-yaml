@@ -98,7 +98,7 @@ static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC);
 /* {{{ php_yaml_read_all()
  * Process events from yaml parser
  */
-void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_DC)
+void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSRMLS_DC)
 {
 	zval doc;
 	int code = Y_PARSER_CONTINUE;
@@ -165,7 +165,7 @@ void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_D
  * Read a particular document from the parser's document stream.
  */
 void php_yaml_read_partial(
-		parser_state_t *state, long pos, long *ndocs, zval *retval TSRMLS_DC)
+		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval TSRMLS_DC)
 {
 	int code = Y_PARSER_CONTINUE;
 
@@ -674,7 +674,7 @@ void eval_scalar(yaml_event_t event,
 			(event.data.scalar.plain_implicit ||
 			 SCALAR_TAG_IS(event, YAML_INT_TAG) ||
 			 SCALAR_TAG_IS(event, YAML_FLOAT_TAG))) {
-		long lval = 0;
+		zend_long lval = 0;
 		double dval = 0.0;
 
 		flags = scalar_is_numeric(

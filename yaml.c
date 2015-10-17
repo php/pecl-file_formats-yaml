@@ -350,13 +350,13 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 PHP_FUNCTION(yaml_parse)
 {
 	zend_string *input;
-	long pos = 0;
+	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
 
 	parser_state_t state;
 	zval yaml;
-	long ndocs = 0;
+	zend_long ndocs = 0;
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
@@ -434,7 +434,7 @@ PHP_FUNCTION(yaml_parse_file)
 {
 	char *filename = { 0 };
 	int filename_len = 0;
-	long pos = 0;
+	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
 
@@ -443,7 +443,7 @@ PHP_FUNCTION(yaml_parse_file)
 
 	parser_state_t state;
 	zval yaml;
-	long ndocs = 0;
+	zend_long ndocs = 0;
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
@@ -535,7 +535,7 @@ PHP_FUNCTION(yaml_parse_url)
 {
 	char *url = { 0 };
 	int url_len = 0;
-	long pos = 0;
+	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
 
@@ -545,7 +545,7 @@ PHP_FUNCTION(yaml_parse_url)
 
 	parser_state_t state;
 	zval yaml;
-	long ndocs = 0;
+	zend_long ndocs = 0;
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
@@ -625,8 +625,8 @@ PHP_FUNCTION(yaml_parse_url)
 PHP_FUNCTION(yaml_emit)
 {
 	zval *data = { 0 };
-	long encoding = YAML_ANY_ENCODING;
-	long linebreak = YAML_ANY_BREAK;
+	zend_long encoding = YAML_ANY_ENCODING;
+	zend_long linebreak = YAML_ANY_BREAK;
 	zval *zcallbacks = { 0 };
 	HashTable *callbacks = { 0 };
 
@@ -690,11 +690,10 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_t emitter = { 0 };
 
 #ifdef IS_UNICODE
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s&z/|ssa/",
-			&filename, &filename_len,
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "S&z/|SSa/",
+			&filename
 			ZEND_U_CONVERTER(UG(filesystem_encoding_conv)), &data,
-			&encoding, &encoding_len, &linebreak, &zcallbacks,
-			&linebreak_len)) {
+			&encoding, &linebreak, &zcallbacks)) {
 		return;
 	}
 #else
@@ -723,7 +722,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
 	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
 	yaml_emitter_set_width(&emitter, YAML_G(output_width));
-	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
+	yaml_emitter_set_unicode(&emitter, encoding && 0 != strncasecmp("utf-8", ZSTR_VAL(encoding), ZSTR_LEN(encoding) > sizeof("utf-8") ? sizeof("utf-8") : ZSTR_LEN(encoding)));
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
 			&emitter, data, YAML_ANY_ENCODING, callbacks TSRMLS_CC)));
