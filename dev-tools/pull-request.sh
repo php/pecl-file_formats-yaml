@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Apply a github pull request.
 #
-#/ usage: pull-request.sh PULL-REQUEST-ID
+#/ usage: pull-request.sh PULL-REQUEST-ID [BRANCH]
 #/   - PULL-REQUEST-ID : Pull request number
+#/   - BRANCH          : Branch to land to (default: "master")
 #
 
 set -e
@@ -10,17 +11,17 @@ set -u
 
 REQ=${1:?PULL-REQUEST-ID required}
 GITHUB_REPO="php/pecl-file_formats-yaml"
-MASTER=master
+BRANCH=${2:-master}
 
 # switch to main branch
-git checkout ${MASTER}
+git checkout ${BRANCH}
 
 # fetch the pull request into a local branch
 git fetch git://github.com/${GITHUB_REPO}.git \
   pull/${REQ}/head:pull-request/${REQ}
 
 # review changes
-git log --patch-with-stat ${MASTER}..pull-request/${REQ}
+git log --patch-with-stat ${BRANCH}..pull-request/${REQ}
 
 printf "Accept changes? (y/N) "
 read -e APPLY
