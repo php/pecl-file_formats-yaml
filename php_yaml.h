@@ -57,6 +57,7 @@ extern "C" {
 #include <Zend/zend_extensions.h>
 #include <Zend/zend_hash.h>
 #include <Zend/zend_interfaces.h>
+#include <Zend/zend_smart_str.h>
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -674,7 +674,7 @@ static int y_write_object(
 		} else {
 			status = y_event_emit(state, &event TSRMLS_CC);
 		}
-		smart_string_free(&buf);
+		smart_str_free(&buf);
 	}
 
 	return status;

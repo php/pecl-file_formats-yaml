@@ -872,7 +872,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			} else {
 				str = NULL;
 			}
-			smart_string_free(&buf);
+			smart_str_free(&buf);
 		}
 		break;
 	}
