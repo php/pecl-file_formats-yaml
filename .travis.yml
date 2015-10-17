@@ -1,6 +1,6 @@
 language: php
 php:
-  - nightly
+  - 7.0
 sudo: false
 env:
   - REPORT_EXIT_STATUS=1 NO_INTERACTION=1
