@@ -67,7 +67,7 @@ extern "C" {
 extern "C" {
 #endif
 
-#define PHP_YAML_VERSION "2.0.0RC2"
+#define PHP_YAML_VERSION "2.0.0RC4"
 
 extern zend_module_entry yaml_module_entry;
 #define phpext_yaml_ptr &yaml_module_entry
@@ -76,15 +76,12 @@ extern zend_module_entry yaml_module_entry;
 
 ZEND_BEGIN_MODULE_GLOBALS(yaml)
 	zend_bool decode_binary;
-	long decode_timestamp;
+	zend_long decode_timestamp;
 	zend_bool decode_php;
 	zval *timestamp_decoder;
 	zend_bool output_canonical;
-	long output_indent;
-	long output_width;
-#ifdef IS_UNICODE
-	UConverter *orig_runtime_encoding_conv;
-#endif
+	zend_long output_indent;
+	zend_long output_width;
 ZEND_END_MODULE_GLOBALS(yaml)
 
 ZEND_EXTERN_MODULE_GLOBALS(yaml)

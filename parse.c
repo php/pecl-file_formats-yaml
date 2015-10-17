@@ -53,17 +53,6 @@
 	memcpy(&dest, &state->event, sizeof(yaml_event_t)); \
 	state->have_event = 0; \
 	memset(&state->event, 0, sizeof(yaml_event_t))
-
-
-#ifdef IS_UNICODE
-#define MAKE_ARRAY(var) \
-	MAKE_STD_ZVAL(var); \
-	array_init(var); \
-	Z_ARRVAL_P(var)->unicode = UG(unicode)
-#else
-#define MAKE_ARRAY(var) \
-	array_init(var)
-#endif
 /* }}} */
 
 
@@ -98,13 +87,13 @@ static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC);
 /* {{{ php_yaml_read_all()
  * Process events from yaml parser
  */
-void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_DC)
+void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSRMLS_DC)
 {
 	zval doc;
 	int code = Y_PARSER_CONTINUE;
 
 	/* create an empty array to hold results */
-	MAKE_ARRAY(retval);
+	array_init(retval);
 
 	while (Y_PARSER_CONTINUE == code) {
 
@@ -165,7 +154,7 @@ void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_D
  * Read a particular document from the parser's document stream.
  */
 void php_yaml_read_partial(
-		parser_state_t *state, long pos, long *ndocs, zval *retval TSRMLS_DC)
+		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval TSRMLS_DC)
 {
 	int code = Y_PARSER_CONTINUE;
 
@@ -354,7 +343,7 @@ void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
 void handle_document(parser_state_t *state, zval *retval TSRMLS_DC)
 {
 	/* make a new array to hold aliases */
-	MAKE_ARRAY(&state->aliases);
+	array_init(&state->aliases);
 
 	/* document consists of next element */
 	get_next_element(state, retval TSRMLS_CC);
@@ -387,7 +376,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	COPY_EVENT(src_event, state);
 
 	/* make a new array to hold mapping */
-	MAKE_ARRAY(retval);
+	array_init(retval);
 
 	if (NULL != src_event.data.mapping_start.anchor) {
 		/* record anchors in current alias table */
@@ -473,7 +462,7 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	COPY_EVENT(src_event, state);
 
 	/* make a new array to hold mapping */
-	MAKE_ARRAY(retval);
+	array_init(retval);
 
 	if (NULL != src_event.data.sequence_start.anchor) {
 		/* record anchors in current alias table */
@@ -650,11 +639,7 @@ void eval_scalar(yaml_event_t event,
 	/* check for non-specific tag (treat as a string) */
 	if (SCALAR_TAG_IS(event, YAML_NONSPECIFIC_TAG) ||
 			event.data.scalar.quoted_implicit) {
-#ifdef IS_UNICODE
-		ZVAL_U_STRINGL(UG(utf8_conv), retval, value, length, ZSTR_DUPLICATE);
-#else
 		ZVAL_STRINGL(retval, value, length);
-#endif
 		return;
 	}
 
@@ -674,7 +659,7 @@ void eval_scalar(yaml_event_t event,
 			(event.data.scalar.plain_implicit ||
 			 SCALAR_TAG_IS(event, YAML_INT_TAG) ||
 			 SCALAR_TAG_IS(event, YAML_FLOAT_TAG))) {
-		long lval = 0;
+		zend_long lval = 0;
 		double dval = 0.0;
 
 		flags = scalar_is_numeric(
@@ -763,11 +748,7 @@ void eval_scalar(yaml_event_t event,
 	}
 
 	/* others (treat as a string) */
-#ifdef IS_UNICODE
-	ZVAL_U_STRINGL(UG(utf8_conv), retval, value, length, ZSTR_DUPLICATE);
-#else
 	ZVAL_STRINGL(retval, value, length);
-#endif
 
 	return;
 }
@@ -888,10 +869,10 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 
 			if (buf.s) {
 				str = estrndup(buf.s->val, buf.s->len);
-				smart_string_free(&buf);
 			} else {
 				str = NULL;
 			}
+			smart_string_free(&buf);
 		}
 		break;
 	}
