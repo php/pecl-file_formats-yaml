@@ -612,7 +612,7 @@ PHP_FUNCTION(yaml_emit)
 /* }}} yaml_emit */
 
 
-/* {{{ proto bool yaml_emit_file(string filename, mixed data[, string encoding[, string linebreak[, array callbacks]]])
+/* {{{ proto bool yaml_emit_file(string filename, mixed data[, int encoding[, int linebreak[, array callbacks]]])
    */
 PHP_FUNCTION(yaml_emit_file)
 {
@@ -620,16 +620,23 @@ PHP_FUNCTION(yaml_emit_file)
 	php_stream *stream = { 0 };
 	FILE *fp = { 0 };
 	zval *data = { 0 };
-	zend_string *encoding = { 0 };
-	zend_string *linebreak = { 0 };
+	zend_long encoding = YAML_ANY_ENCODING;
+	zend_long linebreak = YAML_ANY_BREAK;
 	zval *zcallbacks = { 0 };
 	HashTable *callbacks = { 0 };
 
 	yaml_emitter_t emitter = { 0 };
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Sz/|SSa/",
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Sz/|lla/",
 			&filename, &data, &encoding, &linebreak, &zcallbacks)) {
 		return;
+	}
+
+	if (zcallbacks != NULL) {
+		callbacks = Z_ARRVAL_P(zcallbacks);
+		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+			RETURN_FALSE;
+		}
 	}
 
 	if (NULL == (stream = php_stream_open_wrapper(filename->val, "wb",
@@ -651,7 +658,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
 	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
 	yaml_emitter_set_width(&emitter, YAML_G(output_width));
-	yaml_emitter_set_unicode(&emitter, encoding && 0 != strncasecmp("utf-8", ZSTR_VAL(encoding), ZSTR_LEN(encoding) > sizeof("utf-8") ? sizeof("utf-8") : ZSTR_LEN(encoding)));
+	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
 			&emitter, data, YAML_ANY_ENCODING, callbacks TSRMLS_CC)));
