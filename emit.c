@@ -668,13 +668,13 @@ static int y_write_object(
 				NULL, (yaml_char_t *) YAML_PHP_TAG, (yaml_char_t *) buf.s->val, buf.s->len,
 				0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
 
-		smart_string_free(&buf);
 		if (!status) {
 			y_event_init_failed(&event);
 			status = FAILURE;
 		} else {
 			status = y_event_emit(state, &event TSRMLS_CC);
 		}
+		smart_string_free(&buf);
 	}
 
 	return status;
