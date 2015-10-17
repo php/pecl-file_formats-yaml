@@ -4,6 +4,8 @@ yaml_parse - serializable
 <?php
 if(!extension_loaded('yaml')) die('skip yaml n/a');
 ?>
+--INI--
+yaml.decode_php=1
 --FILE--
 <?php
 class A {

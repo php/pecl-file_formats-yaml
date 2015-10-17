@@ -77,7 +77,7 @@ PHP_INI_BEGIN()
 			decode_binary, zend_yaml_globals, yaml_globals)
 	STD_PHP_INI_ENTRY("yaml.decode_timestamp", "0", PHP_INI_ALL, OnUpdateLong,
 			decode_timestamp, zend_yaml_globals, yaml_globals)
-	STD_PHP_INI_ENTRY("yaml.decode_php", "1", PHP_INI_ALL, OnUpdateBool,
+	STD_PHP_INI_ENTRY("yaml.decode_php", "0", PHP_INI_ALL, OnUpdateBool,
 			decode_php, zend_yaml_globals, yaml_globals)
 	STD_PHP_INI_ENTRY("yaml.output_canonical", "0", PHP_INI_ALL, OnUpdateBool,
 			output_canonical, zend_yaml_globals, yaml_globals)
@@ -292,7 +292,7 @@ static PHP_GINIT_FUNCTION(yaml)
 {
 	yaml_globals->decode_binary = 0;
 	yaml_globals->decode_timestamp = 0;
-	yaml_globals->decode_php = 1;
+	yaml_globals->decode_php = 0;
 	yaml_globals->timestamp_decoder = NULL;
 	yaml_globals->output_canonical = 0;
 	yaml_globals->output_indent = 2;

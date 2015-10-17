@@ -2,6 +2,8 @@
 Test PECL bug #69616
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+yaml.decode_php=1
 --FILE--
 <?php
 $yaml_code = <<<YAML
