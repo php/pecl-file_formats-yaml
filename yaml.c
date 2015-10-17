@@ -722,7 +722,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
 	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
 	yaml_emitter_set_width(&emitter, YAML_G(output_width));
-	yaml_emitter_set_unicode(&emitter, strncasecmp("utf-8", ZSTR_VAL(encoding), ZSTR_LEN(encoding) > sizeof("utf-8") ? sizeof("utf-8") : ZSTR_LEN(encoding)));
+	yaml_emitter_set_unicode(&emitter, encoding && 0 != strncasecmp("utf-8", ZSTR_VAL(encoding), ZSTR_LEN(encoding) > sizeof("utf-8") ? sizeof("utf-8") : ZSTR_LEN(encoding)));
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
 			&emitter, data, YAML_ANY_ENCODING, callbacks TSRMLS_CC)));
