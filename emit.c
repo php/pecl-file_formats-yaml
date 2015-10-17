@@ -176,7 +176,7 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 
 	if (ZEND_HASH_APPLY_PROTECTION(ht) && ht->u.v.nApplyCount > 0) {
 		zval tmp;
-		ZVAL_LONG(&tmp, (unsigned long) ht);
+		ZVAL_LONG(&tmp, (zend_ulong) ht);
 
 		/* we've seen this before, so record address */
 		zend_hash_next_index_insert(state->recursive, &tmp);
