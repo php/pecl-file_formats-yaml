@@ -880,7 +880,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 	default:
 		{
 			php_serialize_data_t var_hash;
-			smart_str buf;
+			smart_str buf = {0};
 
 			PHP_VAR_SERIALIZE_INIT(var_hash);
 			php_var_serialize(&buf, zv, &var_hash TSRMLS_CC);
