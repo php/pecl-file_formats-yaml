@@ -55,16 +55,9 @@
 	memset(&state->event, 0, sizeof(yaml_event_t))
 
 
-#ifdef IS_UNICODE
-#define MAKE_ARRAY(var) \
-	MAKE_STD_ZVAL(var); \
-	array_init(var); \
-	Z_ARRVAL_P(var)->unicode = UG(unicode)
-#else
 #define MAKE_ARRAY(var) \
 	MAKE_STD_ZVAL(var); \
 	array_init(var)
-#endif
 /* }}} */
 
 
@@ -690,11 +683,7 @@ zval *eval_scalar(yaml_event_t event,
 	/* check for non-specific tag (treat as a string) */
 	if (SCALAR_TAG_IS(event, YAML_NONSPECIFIC_TAG) ||
 			event.data.scalar.quoted_implicit) {
-#ifdef IS_UNICODE
-		ZVAL_U_STRINGL(UG(utf8_conv), retval, value, length, ZSTR_DUPLICATE);
-#else
 		ZVAL_STRINGL(retval, value, length, 1);
-#endif
 		return retval;
 	}
 
@@ -805,11 +794,7 @@ zval *eval_scalar(yaml_event_t event,
 	}
 
 	/* others (treat as a string) */
-#ifdef IS_UNICODE
-	ZVAL_U_STRINGL(UG(utf8_conv), retval, value, length, ZSTR_DUPLICATE);
-#else
 	ZVAL_STRINGL(retval, value, length, 1);
-#endif
 
 	return retval;
 }
@@ -922,24 +907,6 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 		str = estrndup(Z_STRVAL_P(zv), Z_STRLEN_P(zv));
 		break;
 
-#ifdef IS_UNICODE
-	case IS_UNICODE:
-		{
-			int len;
-			UErrorCode status = U_ZERO_ERROR;
-
-			zend_unicode_to_string_ex(UG(utf8_conv), &str, &len,
-					Z_USTRVAL_P(zv), Z_USTRLEN_P(zv), &status);
-			if (U_FAILURE(status)) {
-				if (str != NULL) {
-					efree(str);
-					str = NULL;
-				}
-			}
-		}
-		break;
-#endif
-
 #ifdef ZEND_ENGINE_2
 	case IS_OBJECT:
 		{
@@ -976,6 +943,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			} else {
 				str = NULL;
 			}
+			smart_str_free(&buf);
 		}
 		break;
 	}
@@ -1100,11 +1068,7 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 
 	} else {
 		zval_dtor(*zpp);
-#ifdef IS_UNICODE
-		ZVAL_U_STRINGL(UG(utf8_conv), *zpp, ts, ts_len, 1);
-#else
 		ZVAL_STRINGL(*zpp, ts, ts_len, 1);
-#endif
 		return SUCCESS;
 	}
 }
