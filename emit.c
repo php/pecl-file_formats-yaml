@@ -56,8 +56,8 @@ static int y_event_emit(
 static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC);
 static int y_array_is_sequence(HashTable *ht TSRMLS_DC);
 static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC);
-static long y_search_recursive(
-		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC);
+static zend_long y_search_recursive(
+		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC);
 
 static int y_write_zval(
 		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
@@ -137,7 +137,7 @@ static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC)
  */
 static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 {
-	ulong kidx, idx;
+	zend_ulong kidx, idx;
 	zend_string *str_key;
 
 	idx = 0;
@@ -203,12 +203,12 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 /* {{{ y_search_recursive()
  * Search the recursive state hash for an address
  */
-static long y_search_recursive(
-		const y_emit_state_t *state, const unsigned long addr TSRMLS_DC)
+static zend_long y_search_recursive(
+		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC)
 {
  	zval *entry;
-   	ulong num_key;
-	unsigned long found;
+   	zend_ulong num_key;
+	zend_ulong found;
 
 	ZEND_HASH_FOREACH_NUM_KEY_VAL(state->recursive, num_key, entry) {
 		found = Z_LVAL_P(entry);
