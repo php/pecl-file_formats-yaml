@@ -350,13 +350,13 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 PHP_FUNCTION(yaml_parse)
 {
 	zend_string *input;
-	long pos = 0;
+	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
 
 	parser_state_t state;
 	zval yaml;
-	long ndocs = 0;
+	zend_long ndocs = 0;
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
@@ -434,7 +434,7 @@ PHP_FUNCTION(yaml_parse_file)
 {
 	char *filename = { 0 };
 	int filename_len = 0;
-	long pos = 0;
+	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
 
@@ -443,7 +443,7 @@ PHP_FUNCTION(yaml_parse_file)
 
 	parser_state_t state;
 	zval yaml;
-	long ndocs = 0;
+	zend_long ndocs = 0;
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
@@ -535,7 +535,7 @@ PHP_FUNCTION(yaml_parse_url)
 {
 	char *url = { 0 };
 	int url_len = 0;
-	long pos = 0;
+	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
 
@@ -545,7 +545,7 @@ PHP_FUNCTION(yaml_parse_url)
 
 	parser_state_t state;
 	zval yaml;
-	long ndocs = 0;
+	zend_long ndocs = 0;
 
 	memset(&state, 0, sizeof(state));
 	state.have_event = 0;
@@ -625,8 +625,8 @@ PHP_FUNCTION(yaml_parse_url)
 PHP_FUNCTION(yaml_emit)
 {
 	zval *data = { 0 };
-	long encoding = YAML_ANY_ENCODING;
-	long linebreak = YAML_ANY_BREAK;
+	zend_long encoding = YAML_ANY_ENCODING;
+	zend_long linebreak = YAML_ANY_BREAK;
 	zval *zcallbacks = { 0 };
 	HashTable *callbacks = { 0 };
 

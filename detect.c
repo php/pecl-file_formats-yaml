@@ -54,7 +54,7 @@
 
 /* {{{ local prototypes
  */
-static long eval_sexagesimal_l(long lval, const char *sg, const char *eos);
+static zend_long eval_sexagesimal_l(zend_long lval, const char *sg, const char *eos);
 
 static double eval_sexagesimal_d(double dval, const char *sg, const char *eos);
 
@@ -68,7 +68,7 @@ const char *detect_scalar_type(const char *value, size_t length,
 		const yaml_event_t *event)
 {
 	int flags = 0;
-	long lval = 0;
+	zend_long lval = 0;
 	double dval = 0.0;
 
 	/* is value a null? */
@@ -186,7 +186,7 @@ scalar_is_bool(const char *value, size_t length, const yaml_event_t *event)
  * specification is found at http://yaml.org/type/int.html.
  */
 int
-scalar_is_numeric(const char *value, size_t length, long *lval,
+scalar_is_numeric(const char *value, size_t length, zend_long *lval,
 		double *dval, char **str)
 {
 	const char *end = value + length;
@@ -747,7 +747,7 @@ int scalar_is_timestamp(const char *value, size_t length)
 /* {{{ eval_sexagesimal_l()
  * Convert a base 60 number to a long
  */
-static long eval_sexagesimal_l(long lval, const char *sg, const char *eos)
+static zend_long eval_sexagesimal_l(zend_long lval, const char *sg, const char *eos)
 {
 	const char *ep;
 

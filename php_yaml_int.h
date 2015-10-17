@@ -115,10 +115,10 @@ typedef struct y_emit_state_s {
 
 /* {{{ ext/yaml prototypes
 */
-void php_yaml_read_all(parser_state_t *state, long *ndocs, zval *retval TSRMLS_DC);
+void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSRMLS_DC);
 
 void php_yaml_read_partial(
-		parser_state_t *state, long pos, long *ndocs, zval *retval TSRMLS_DC);
+		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval TSRMLS_DC);
 
 void eval_scalar(yaml_event_t event,
 		HashTable * callbacks, zval *retval TSRMLS_DC);
@@ -136,7 +136,7 @@ int scalar_is_bool(
 		const char *value, size_t length, const yaml_event_t *event);
 
 int scalar_is_numeric(
-		const char *value, size_t length, long *lval, double *dval, char **str);
+		const char *value, size_t length, zend_long *lval, double *dval, char **str);
 
 int scalar_is_timestamp(const char *value, size_t length);
 
