@@ -638,7 +638,7 @@ PHP_FUNCTION(yaml_emit)
 /* }}} yaml_emit */
 
 
-/* {{{ proto bool yaml_emit_file(string filename, mixed data[, string encoding[, string linebreak[, array callbacks]]])
+/* {{{ proto bool yaml_emit_file(string filename, mixed data[, int encoding[, int linebreak[, array callbacks]]])
    */
 PHP_FUNCTION(yaml_emit_file)
 {
@@ -647,19 +647,16 @@ PHP_FUNCTION(yaml_emit_file)
 	php_stream *stream = { 0 };
 	FILE *fp = { 0 };
 	zval *data = { 0 };
-	const char *encoding = { 0 };
-	int encoding_len = 0;
-	const char *linebreak = { 0 };
-	int linebreak_len = 0;
+	long encoding = YAML_ANY_ENCODING;
+	long linebreak = YAML_ANY_BREAK;
 	zval *zcallbacks = { 0 };
 	HashTable *callbacks = { 0 };
 
 	yaml_emitter_t emitter = { 0 };
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz/|ssa/",
-			&filename, &filename_len, &data, &encoding,
-			&encoding_len, &linebreak, &zcallbacks,
-			&linebreak_len)) {
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz/|lla/",
+			&filename, &filename_len,
+			&data, &encoding, &linebreak, &zcallbacks)) {
 		return;
 	}
 
