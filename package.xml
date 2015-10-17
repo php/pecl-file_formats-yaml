@@ -20,17 +20,25 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2015-05-18</date>
+ <developer>
+  <name>Sean DuBois</name>
+  <email>sean@siobud.com</email>
+  <active>yes</active>
+ </developer>
+ <date>2015-10-16</date>
  <version>
-  <release>1.2.1a1</release>
-  <api>1.1.0</api>
+  <release>2.0.0RC1</release>
+  <api>2.0.0</api>
  </version>
  <stability>
-  <release>alpha</release>
+  <release>beta</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+  New Features:
+  - PHP7 compatible
+  - 2.x series will no longer support PHP5
  </notes>
  <contents>
   <dir name="/">
@@ -113,7 +121,7 @@
  <dependencies>
   <required>
    <php>
-    <min>5.2.0</min>
+    <min>7.0.0RC5</min>
    </php>
    <pearinstaller>
     <min>1.4.0b1</min>
