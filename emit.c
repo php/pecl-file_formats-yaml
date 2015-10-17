@@ -461,10 +461,10 @@ static int y_write_array(
 	zval *elm;
 	int array_type;
 	zval key_zval;
-	ulong kidx;
+	zend_ulong kidx;
 	zend_string *kstr;
 	HashTable *tmp_ht;
-	long recursive_idx = -1;
+	zend_long recursive_idx = -1;
 	char *anchor = { 0 };
 	size_t anchor_size;
 
@@ -489,7 +489,7 @@ static int y_write_array(
 	 *   if ht->nApplyCount > 0:
 	 *     emit a ref
 	 */
-	recursive_idx = y_search_recursive(state, (unsigned long) ht TSRMLS_CC);
+	recursive_idx = y_search_recursive(state, (zend_ulong) ht TSRMLS_CC);
 	if (-1 != recursive_idx) {
 		/* create anchor to refer to this structure */
 		anchor_size = snprintf(anchor, 0, "refid%ld", recursive_idx + 1);
