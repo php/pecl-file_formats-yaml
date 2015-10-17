@@ -660,6 +660,13 @@ PHP_FUNCTION(yaml_emit_file)
 		return;
 	}
 
+	if (zcallbacks != NULL) {
+		callbacks = Z_ARRVAL_P(zcallbacks);
+		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+			RETURN_FALSE;
+		}
+	}
+
 	if (NULL == (stream = php_stream_open_wrapper(filename, "wb",
 			IGNORE_URL | ENFORCE_SAFE_MODE | REPORT_ERRORS | STREAM_WILL_CAST,
 			NULL))) {
