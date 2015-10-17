@@ -22,7 +22,7 @@
  </lead>
  <date>2015-10-17</date>
  <version>
-  <release>2.0.0RC4</release>
+  <release>2.0.0RC5</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -31,10 +31,12 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+  Breaking changes:
+  - #69617 yaml.decode_php ini setting now defaults to false.
   Bugs Fixed:
-  - Use zend_* datatypes (weltling)
-  - Fix handling of optional encoding argument to yaml_emit_file (weltling)
-  - Removed PHP6 compat IS_UNICODE support (bd808)
+  - Fixed parameter parsing for yaml_emit_file()
+  - Fixed callback usage for yaml_emit_file()
+  - Use smart_str_free() instead of smart_string_free() (remicollet)
  </notes>
  <contents>
   <dir name="/">
@@ -136,6 +138,23 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2015-10-17</date>
+   <version>
+    <release>2.0.0RC4</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    Bugs Fixed:
+    - Use zend_* datatypes (weltling)
+    - Fix handling of optional encoding argument to yaml_emit_file (weltling)
+    - Removed PHP6 compat IS_UNICODE support (bd808)
+   </notes>
+  </release>
   <release>
    <date>2015-10-17</date>
    <version>
