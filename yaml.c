@@ -411,7 +411,7 @@ PHP_FUNCTION(yaml_parse)
 PHP_FUNCTION(yaml_parse_file)
 {
 	char *filename = { 0 };
-	int filename_len = 0;
+	size_t filename_len = 0;
 	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
@@ -492,7 +492,7 @@ PHP_FUNCTION(yaml_parse_file)
 PHP_FUNCTION(yaml_parse_url)
 {
 	char *url = { 0 };
-	int url_len = 0;
+	size_t url_len = 0;
 	zend_long pos = 0;
 	zval *zndocs = { 0 };
 	zval *zcallbacks = { 0 };
