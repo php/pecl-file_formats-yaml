@@ -82,6 +82,9 @@
     <file role="test" name="yaml_parse_006.phpt" />
     <file role="test" name="yaml_parse_007.phpt" />
     <file role="test" name="yaml_parse_008.phpt" />
+    <file role="test" name="yaml_parse_file_001.phpt" />
+    <file role="test" name="yaml_parse_file_001.yaml" />
+    <file role="test" name="yaml_parse_file_002.phpt" />
     <file role="test" name="yaml_parse_spec_binary.phpt" />
     <file role="test" name="yaml_parse_spec_bool.phpt" />
     <file role="test" name="yaml_parse_spec_float.phpt" />
