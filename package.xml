@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2015-10-17</date>
+ <date>2015-12-08</date>
  <version>
-  <release>2.0.0RC5</release>
+  <release>2.0.0RC6</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -31,12 +31,8 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Breaking changes:
-  - #69617 yaml.decode_php ini setting now defaults to false.
   Bugs Fixed:
-  - Fixed parameter parsing for yaml_emit_file()
-  - Fixed callback usage for yaml_emit_file()
-  - Use smart_str_free() instead of smart_string_free() (remicollet)
+  - #71045 zend_mm_alloc_small crashes with zend_string_alloc
  </notes>
  <contents>
   <dir name="/">
@@ -141,6 +137,26 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2015-10-17</date>
+   <version>
+    <release>2.0.0RC5</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>stable</api>
+   </stability>
+   <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
+   <notes>
+    Breaking changes:
+    - #69617 yaml.decode_php ini setting now defaults to false.
+    Bugs Fixed:
+    - Fixed parameter parsing for yaml_emit_file()
+    - Fixed callback usage for yaml_emit_file()
+    - Use smart_str_free() instead of smart_string_free() (remicollet)
+   </notes>
+  </release>
   <release>
    <date>2015-10-17</date>
    <version>
