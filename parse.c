@@ -398,21 +398,21 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 		}
 
 		if (Z_ISREF_P(&value)) {
-			value = *Z_REFVAL_P(&value);
+			ZVAL_COPY_VALUE(&value, Z_REFVAL(value));
 		}
 
 		/* check for '<<' and handle merge */
 		if (key_event.type == YAML_SCALAR_EVENT &&
 				IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
 				STR_EQ("<<", key_str) &&
-				Z_TYPE_P(&value) == IS_ARRAY) {
+				Z_TYPE(value) == IS_ARRAY) {
 			/* zend_hash_merge */
 			/*
 			 * value is either a single ref or a simple array of refs
 			 */
 			if (YAML_ALIAS_EVENT == state->event.type) {
 				/* single ref */
-				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(&value), zval_add_ref, 0);
+				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL(value), zval_add_ref, 0);
 			} else {
 				zval *zvalp;
 				ZEND_HASH_FOREACH_VAL(HASH_OF(&value), zvalp) {
@@ -424,6 +424,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			zval_ptr_dtor(&value);
 		} else {
 			/* add key => value to retval */
+			Z_TRY_ADDREF_P(&value);
 			add_assoc_zval(retval, key_str, &value);
 		}
 		efree(key_str);
