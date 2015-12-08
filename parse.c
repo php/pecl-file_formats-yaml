@@ -401,6 +401,7 @@ static zval *handle_mapping(parser_state_t *state TSRMLS_DC)
 	if (NULL != src_event.data.mapping_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
+		Z_SET_ISREF_P(retval);
 		add_assoc_zval(state->aliases,
 				(char *) src_event.data.mapping_start.anchor,
 				retval);
@@ -500,6 +501,7 @@ static zval *handle_sequence (parser_state_t *state TSRMLS_DC) {
 	if (NULL != src_event.data.sequence_start.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
+		Z_SET_ISREF_P(retval);
 		add_assoc_zval(state->aliases,
 				(char *) src_event.data.sequence_start.anchor,
 				retval);
@@ -540,6 +542,7 @@ static zval *handle_scalar(parser_state_t *state TSRMLS_DC) {
 	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
 		/* record anchors in current alias table */
 		Z_ADDREF_P(retval);
+		Z_SET_ISREF_P(retval);
 		add_assoc_zval(state->aliases,
 				(char *) state->event.data.scalar.anchor, retval);
 	}
@@ -570,7 +573,6 @@ static zval *handle_alias(parser_state_t *state TSRMLS_DC) {
 
 	/* add a reference to retval's internal counter */
 	Z_ADDREF_PP(retval);
-	Z_SET_ISREF_PP(retval);
 
 	return (*retval);
 }
