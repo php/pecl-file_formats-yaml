@@ -15,7 +15,7 @@ array(8) {
   ["date"]=>
   int(980208000)
   ["bill-to"]=>
-  array(3) {
+  &array(3) {
     ["given"]=>
     string(5) "Chris"
     ["family"]=>
@@ -35,7 +35,7 @@ Suite #292
     }
   }
   ["ship-to"]=>
-  array(3) {
+  &array(3) {
     ["given"]=>
     string(5) "Chris"
     ["family"]=>
