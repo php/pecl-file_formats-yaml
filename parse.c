@@ -74,6 +74,8 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC);
 
 void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC);
 
+static zval *record_anchor_make_ref(zval *aliases, const char *anchor, zval *value);
+
 static int apply_filter(
 		zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
 
@@ -371,6 +373,8 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	char *key_str;
 	zval key = {{0} };
 	zval value = {{0} };
+	zval *arrval = retval;
+	zval *valptr;
 
 	/* save copy of mapping start event */
 	COPY_EVENT(src_event, state);
@@ -379,9 +383,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	array_init(retval);
 
 	if (NULL != src_event.data.mapping_start.anchor) {
-		/* record anchors in current alias table */
-		Z_TRY_ADDREF_P(retval);
-		add_assoc_zval(&state->aliases, (char *) src_event.data.mapping_start.anchor, retval);
+		arrval = record_anchor_make_ref(&state->aliases, (char *) src_event.data.mapping_start.anchor, retval);
 	}
 
 	for (get_next_element(state, &key); Z_TYPE_P(&key) != IS_UNDEF; get_next_element(state, &key)) {
@@ -397,25 +399,23 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			return;
 		}
 
-		if (Z_ISREF_P(&value)) {
-			ZVAL_COPY_VALUE(&value, Z_REFVAL(value));
-		}
+		valptr = Z_ISREF(value) ? Z_REFVAL(value) : &value;
 
 		/* check for '<<' and handle merge */
 		if (key_event.type == YAML_SCALAR_EVENT &&
 				IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
 				STR_EQ("<<", key_str) &&
-				Z_TYPE(value) == IS_ARRAY) {
+				Z_TYPE_P(valptr) == IS_ARRAY) {
 			/* zend_hash_merge */
 			/*
 			 * value is either a single ref or a simple array of refs
 			 */
 			if (YAML_ALIAS_EVENT == state->event.type) {
 				/* single ref */
-				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL(value), zval_add_ref, 0);
+				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(valptr), zval_add_ref, 0);
 			} else {
 				zval *zvalp;
-				ZEND_HASH_FOREACH_VAL(HASH_OF(&value), zvalp) {
+				ZEND_HASH_FOREACH_VAL(HASH_OF(valptr), zvalp) {
 					ZVAL_DEREF(zvalp);
 					zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(zvalp), zval_add_ref, 0);
 				} ZEND_HASH_FOREACH_END();
@@ -425,7 +425,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 		} else {
 			/* add key => value to retval */
 			Z_TRY_ADDREF_P(&value);
-			add_assoc_zval(retval, key_str, &value);
+			add_assoc_zval(arrval, key_str, &value);
 		}
 		efree(key_str);
 		yaml_event_delete(&key_event);
@@ -458,6 +458,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	yaml_event_t src_event = { YAML_NO_EVENT };
 	zval value = {{0} };
+	zval *arrval = retval;
 
 	/* save copy of sequence start event */
 	COPY_EVENT(src_event, state);
@@ -466,13 +467,11 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	array_init(retval);
 
 	if (NULL != src_event.data.sequence_start.anchor) {
-		/* record anchors in current alias table */
-		Z_TRY_ADDREF_P(retval);
-		add_assoc_zval(&state->aliases, (char *) src_event.data.sequence_start.anchor, retval);
+		arrval = record_anchor_make_ref(&state->aliases, (char *) src_event.data.sequence_start.anchor, retval);
 	}
 
 	for (get_next_element(state, &value); Z_TYPE_P(&value) != IS_UNDEF; get_next_element(state, &value)) {
-		add_next_index_zval(retval, &value);
+		add_next_index_zval(arrval, &value);
 		ZVAL_UNDEF(&value);
 	}
 
@@ -505,9 +504,7 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 	state->eval_func(state->event, state->callbacks, retval TSRMLS_CC);
 	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
-		/* record anchors in current alias table */
-		Z_TRY_ADDREF_P(retval);
-		add_assoc_zval(&state->aliases, (char *) state->event.data.scalar.anchor, retval);
+		record_anchor_make_ref(&state->aliases, (char *) state->event.data.scalar.anchor, retval);
 	}
 }
 /* }}} */
@@ -519,9 +516,9 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
 	char *anchor = (char *) state->event.data.alias.anchor;
 	zend_string *anchor_zstring = zend_string_init(anchor, strlen(anchor), 0);
-	zval *retval_orig = retval;
+	zval *alias;
 
-	if ((retval = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
+	if ((alias = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
 				"alias %s is not registered "
 				"(line %zd, column %zd)",
@@ -529,19 +526,31 @@ void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
 				state->parser.mark.line + 1,
 				state->parser.mark.column + 1);
 		zend_string_release(anchor_zstring);
-		ZVAL_UNDEF(retval_orig);
+		ZVAL_UNDEF(retval);
 		return;
 	}
 	zend_string_release(anchor_zstring);
 
 	/* add a reference to retval's internal counter */
-	ZVAL_MAKE_REF(retval);
-	Z_TRY_ADDREF_P(retval);
-	ZVAL_COPY_VALUE(retval_orig, retval);
+	Z_TRY_ADDREF_P(alias);
+	ZVAL_COPY_VALUE(retval, alias);
 }
 /* }}} */
 
 
+
+
+/* {{{ record_anchor_make_ref()
+ * Record an anchor in alias table
+ */
+static zval *record_anchor_make_ref(zval *aliases, const char *anchor, zval *value)
+{
+	ZVAL_MAKE_REF(value);
+	Z_TRY_ADDREF_P(value);
+	add_assoc_zval(aliases, anchor, value);
+	return Z_REFVAL_P(value);
+}
+/* }}} */
 
 
 /* {{{ apply_filter()
@@ -611,7 +620,13 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 				zval_ptr_dtor(&retval);
 			} else {
 				/* copy result into our return var */
-				ZVAL_COPY_VALUE(zp, &retval);
+				if (Z_ISREF_P(zp)) {
+					zval *tmp = Z_REFVAL_P(zp);
+					zval_ptr_dtor(tmp);
+					ZVAL_COPY_VALUE(tmp, &retval);
+				} else {
+					ZVAL_COPY_VALUE(zp, &retval);
+				}
 			}
 			return Y_FILTER_SUCCESS;
 		}
@@ -814,6 +829,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 {
 	char *str = { 0 };
 
+	ZVAL_OPT_DEREF(zv);
 	switch (Z_TYPE_P(zv)) {
 	case IS_TRUE:
 			str = estrndup("1", 1);
