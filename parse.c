@@ -412,12 +412,12 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			 */
 			if (YAML_ALIAS_EVENT == state->event.type) {
 				/* single ref */
-				zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(valptr), zval_add_ref, 0);
+				zend_hash_merge(Z_ARRVAL_P(arrval), Z_ARRVAL_P(valptr), zval_add_ref, 0);
 			} else {
 				zval *zvalp;
 				ZEND_HASH_FOREACH_VAL(HASH_OF(valptr), zvalp) {
 					ZVAL_DEREF(zvalp);
-					zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_P(zvalp), zval_add_ref, 0);
+					zend_hash_merge(Z_ARRVAL_P(arrval), Z_ARRVAL_P(zvalp), zval_add_ref, 0);
 				} ZEND_HASH_FOREACH_END();
 			}
 
