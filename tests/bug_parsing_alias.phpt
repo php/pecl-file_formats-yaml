@@ -12,7 +12,7 @@ keylevel0:
   keylevel1: 
     value: 1
   keylevel1.1:
-    keylevel2: #&strange
+    keylevel2: &strange
       value: 2
       <<: *external
 YAML;
