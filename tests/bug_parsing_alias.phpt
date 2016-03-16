@@ -38,7 +38,7 @@ array(2) {
     ["keylevel1.1"]=>
     array(1) {
       ["keylevel2"]=>
-      array(1) {
+      &array(1) {
         ["value"]=>
         int(2)
       }
