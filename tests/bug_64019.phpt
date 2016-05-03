@@ -37,7 +37,7 @@ array(2) {
   ["config"]=>
   array(1) {
     ["<<"]=>
-    &NULL
+    NULL
   }
 }
 array(1) {
