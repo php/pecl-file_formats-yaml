@@ -599,8 +599,7 @@ static int y_write_timestamp(
 	int status;
 	zend_class_entry *clazz = Z_OBJCE_P(data);
 	zval timestamp = {{0} };
-	zval *dtfmt;
-	zend_string *dtfmt_constant;
+	zval dtfmt;
 
 	if (NULL == tag) {
 		tag = (yaml_char_t *) YAML_TIMESTAMP_TAG;
@@ -610,15 +609,13 @@ static int y_write_timestamp(
 	/* get iso-8601 format specifier */
 
 #if ZEND_MODULE_API_NO >= 20071006
-	dtfmt_constant = zend_string_init("DateTime::ISO8601", 17, 0);
-	dtfmt = zend_get_constant_ex(dtfmt_constant, clazz, 0 TSRMLS_CC);
-	zend_string_release(dtfmt_constant);
+	ZVAL_STRING(&dtfmt, "Y-m-d\\TH:i:s.uP");
 #else
 	zend_get_constant_ex("DateTime::ISO8601", 17, &dtfmt, clazz TSRMLS_CC);
 #endif
 
 	/* format date as iso-8601 string */
-	zend_call_method_with_1_params(data, clazz, NULL, "format", &timestamp, dtfmt);
+	zend_call_method_with_1_params(data, clazz, NULL, "format", &timestamp, &dtfmt);
 
 	/* emit formatted date */
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
