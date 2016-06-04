@@ -34,7 +34,6 @@
 
 
 #include "php_yaml.h"
-#include "zval_refcount.h" /* for PHP < 5.3 */
 #include "php_yaml_int.h"
 
 /* {{{ local macros
@@ -606,13 +605,8 @@ static int y_write_timestamp(
 		omit_tag = 1;
 	}
 
-	/* get iso-8601 format specifier */
-
-#if ZEND_MODULE_API_NO >= 20071006
+	/* iso-8601 format specifier including milliseconds */
 	ZVAL_STRING(&dtfmt, "Y-m-d\\TH:i:s.uP");
-#else
-	zend_get_constant_ex("DateTime::ISO8601", 17, &dtfmt, clazz TSRMLS_CC);
-#endif
 
 	/* format date as iso-8601 string */
 	zend_call_method_with_1_params(data, clazz, NULL, "format", &timestamp, &dtfmt);

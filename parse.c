@@ -34,7 +34,6 @@
 
 
 #include "php_yaml.h"
-#include "zval_refcount.h"  /* for PHP < 5.3 */
 #include "php_yaml_int.h"
 
 /* {{{ local macros

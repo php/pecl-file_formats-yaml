@@ -47,7 +47,6 @@
    <file role="src" name="php_yaml.h" />
    <file role="src" name="php_yaml_int.h" />
    <file role="src" name="yaml.c" />
-   <file role="src" name="zval_refcount.h" />
    <dir name="tests">
     <file role="test" name="bug_21995.phpt" />
     <file role="test" name="bug_59860.phpt" />

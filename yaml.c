@@ -33,18 +33,7 @@
  */
 
 #include "php_yaml.h"
-#include "zval_refcount.h"		/* for PHP < 5.3 */
 #include "php_yaml_int.h"
-
-/* {{{ local macros
- */
-#if ZEND_EXTENSION_API_NO < 220060519
-#define PHP_GINIT_FUNCTION(yaml) \
-  void php_yaml_init_globals(zend_yaml_globals *yaml_globals)
-#endif
-
-/* }}} */
-
 
 /* {{{ local prototypes
  */
@@ -150,23 +139,16 @@ static zend_function_entry yaml_functions[] = {
 
 
 /* {{{ cross-extension dependencies */
-
-#if ZEND_EXTENSION_API_NO >= 220050617
 static zend_module_dep yaml_deps[] = {
 	ZEND_MOD_OPTIONAL("date") {NULL, NULL, NULL, 0}
 };
-#endif
 /* }}} */
 
 
 zend_module_entry yaml_module_entry = {	/* {{{ */
-#if ZEND_EXTENSION_API_NO >= 220050617
 	STANDARD_MODULE_HEADER_EX,
 	NULL,
 	yaml_deps,
-#else
-	STANDARD_MODULE_HEADER,
-#endif
 	"yaml",
 	yaml_functions,
 	PHP_MINIT(yaml),
@@ -175,15 +157,11 @@ zend_module_entry yaml_module_entry = {	/* {{{ */
 	NULL, /* RSHUTDOWN */
 	PHP_MINFO(yaml),
 	PHP_YAML_VERSION,
-#if ZEND_EXTENSION_API_NO >= 220060519
 	PHP_MODULE_GLOBALS(yaml),
 	PHP_GINIT(yaml),
 	NULL,
 	NULL,
 	STANDARD_MODULE_PROPERTIES_EX
-#else
-	STANDARD_MODULE_PROPERTIES
-#endif
 };
 /* }}} */
 
@@ -196,9 +174,6 @@ ZEND_GET_MODULE(yaml)
 /* {{{ PHP_MINIT_FUNCTION */
 static PHP_MINIT_FUNCTION(yaml)
 {
-#if ZEND_EXTENSION_API_NO < 220060519
-	ZEND_INIT_MODULE_GLOBALS(yaml, php_yaml_init_globals, NULL)
-#endif
 	REGISTER_INI_ENTRIES();
 
 	/* node style constants */
