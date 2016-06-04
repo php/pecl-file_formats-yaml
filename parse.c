@@ -424,7 +424,6 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 			zval_ptr_dtor(&value);
 		} else {
 			/* add key => value to retval */
-			Z_TRY_ADDREF_P(&value);
 			add_assoc_zval(arrval, key_str, &value);
 		}
 		efree(key_str);
