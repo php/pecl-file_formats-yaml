@@ -34,7 +34,6 @@
 
 
 #include "php_yaml.h"
-#include "zval_refcount.h"  /* for PHP < 5.3 */
 #include "php_yaml_int.h"
 
 /* {{{ local macros
@@ -909,26 +908,18 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 		str = estrndup(Z_STRVAL_P(zv), Z_STRLEN_P(zv));
 		break;
 
-#ifdef ZEND_ENGINE_2
 	case IS_OBJECT:
 		{
 			zval tmp;
 
 			if (SUCCESS == zend_std_cast_object_tostring(
-#if PHP_MAJOR_VERSION >= 6
-					zv, &tmp, IS_STRING, UG(utf8_conv) TSRMLS_CC
-#elif PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION >= 2
 					zv, &tmp, IS_STRING TSRMLS_CC
-#else
-					zv, &tmp, IS_STRING, 0 TSRMLS_CC
-#endif
 					)) {
 				str = estrndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
 				zval_dtor(&tmp);
 				return str;
 			}
 		}
-#endif
 		break;
 
 	default:
@@ -993,65 +984,7 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 		}
 
 		MAKE_STD_ZVAL(arg);
-#ifdef ZEND_ENGINE_2
 		ZVAL_STRINGL(arg, ts, ts_len, 1);
-#else
-		{
-			/* fix timestamp format for PHP4 */
-			char *buf, *dst, *end, *src;
-
-			buf = (char *) emalloc((size_t) ts_len + 1);
-			dst = buf;
-			end = ts + ts_len;
-			src = ts;
-
-			while (src < end && *src != '.') {
-				if (src + 1 < end &&
-						(*(src - 1) >= '0' && *(src - 1) <= '9') &&
-						(*src == 'T' || *src == 't') &&
-						(*(src + 1) >= '0' && *(src + 1) <= '9')) {
-					src++;
-					*dst++ = ' ';
-
-				} else if (*src == ':' && src > ts + 2 && (
-						((*(src - 2) == '+' || *(src - 2) == '-') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
-						((*(src - 3) == '+' || *(src - 3) == '-') &&
-						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '9')))) {
-					src++;
-
-				} else {
-					*dst++ = *src++;
-				}
-			}
-
-			if (src < end && *src == '.') {
-				src++;
-				while (src < end && *src >= '0' && *src <= '9') {
-					src++;
-				}
-			}
-
-			while (src < end) {
-				if (*src == ':' && src > ts + 2 && (
-						((*(src - 2) == '+' || *(src - 2) == '-') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '5')) ||
-						((*(src - 3) == '+' || *(src - 3) == '-') &&
-						 (*(src - 2) >= '0' || *(src - 2) <= '5') &&
-						 (*(src - 1) >= '0' || *(src - 1) <= '9')))) {
-					src++;
-
-				} else {
-					*dst++ = *src++;
-				}
-			}
-
-			*dst = '\0';
-
-			ZVAL_STRINGL(arg, buf, dst - buf, 0);
-		}
-#endif
 
 		argv[0] = &arg;
 

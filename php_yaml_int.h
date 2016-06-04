@@ -84,11 +84,7 @@ typedef struct y_emit_state_s {
 #define Y_SCALAR_FORMAT_MASK    0x0F
 
 
-#if (PHP_MAJOR_VERSION > 5) || ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION >= 3))
-#	define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
-#else
-#	define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
-#endif
+#define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
 
 #define STR_EQ(a, b)\
 	(a != NULL && b != NULL && 0 == strcmp(a, b))
