@@ -40,6 +40,20 @@
 extern "C" {
 #endif
 
+/* {{{ backcompat macros
+*/
+#ifndef ZVAL_OPT_DEREF
+/* Taken from php-src/Zned/zend_types.h @ 95ff285 */
+#define Z_OPT_ISREF(zval) (Z_OPT_TYPE(zval) == IS_REFERENCE)
+#define Z_OPT_ISREF_P(zval_p) Z_OPT_ISREF(*(zval_p))
+#define ZVAL_OPT_DEREF(z) do {           \
+	if (UNEXPECTED(Z_OPT_ISREF_P(z))) {  \
+		(z) = Z_REFVAL_P(z);             \
+	}                                    \
+} while (0)
+#endif
+/* }}} */
+
 /* {{{ ext/yaml types
 */
 typedef void (*eval_scalar_func_t)(yaml_event_t event, HashTable *callbacks, zval *retval TSRMLS_DC);
