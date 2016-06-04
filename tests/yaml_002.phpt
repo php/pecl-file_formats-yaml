@@ -25,13 +25,13 @@ $parsed = yaml_parse($yaml);
 var_dump($parsed == $original);
 ?>
 --EXPECT--
-string(255) "---
-canonical: 2001-12-15T02:59:43+0000
-valid iso8601: 2001-12-14T21:59:43-0500
-alternate iso8601: 2001-12-14T21:59:43-0500
-space separated: 2001-12-14T21:59:43-0500
-no time zone (Z): 2001-12-15T02:59:43+0000
-date (0000:00Z): 2002-12-14T00:00:00+0000
+string(303) "---
+canonical: 2001-12-15T02:59:43.100000+00:00
+valid iso8601: 2001-12-14T21:59:43.100000-05:00
+alternate iso8601: 2001-12-14T21:59:43.100000-05:00
+space separated: 2001-12-14T21:59:43.100000-05:00
+no time zone (Z): 2001-12-15T02:59:43.100000+00:00
+date (0000:00Z): 2002-12-14T00:00:00.000000+00:00
 ...
 "
 bool(true)
