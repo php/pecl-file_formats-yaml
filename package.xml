@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2015-12-30</date>
+ <date>2016-06-04</date>
  <version>
-  <release>2.0.0RC7</release>
+  <release>2.0.0RC8</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -32,7 +32,12 @@
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
   Bugs Fixed:
-  - Fix handling of tag callbacks for aliased values (ranvis)
+  - Quick fix on handle_mapping. arrval should be used instead of retval (jabiinfante)
+  - #71696 Bad datetime management (bocharov)
+  - Fix memory leak in mapping with sequence (bocharov)
+  - Fix anchor in anchor problemo (bocharov)
+  - Fix tests bug_64019.phpt, bug_parsing_alias.phpt (bocharov)
+  - #72204 Crash when try to parse yaml file
  </notes>
  <contents>
   <dir name="/">
@@ -139,6 +144,21 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2015-12-30</date>
+   <version>
+    <release>2.0.0RC7</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    Bugs Fixed:
+    - Fix handling of tag callbacks for aliased values (ranvis)
+   </notes>
+  </release>
   <release>
    <date>2015-12-08</date>
    <version>
