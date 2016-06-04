@@ -58,6 +58,9 @@
     <file role="test" name="bug_64694.phpt" />
     <file role="test" name="bug_69465.phpt" />
     <file role="test" name="bug_69616.phpt" />
+    <file role="test" name="bug_69617.phpt" />
+    <file role="test" name="bug_72204.phpt" />
+    <file role="test" name="bug_parsing_alias.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
     <file role="test" name="yaml_emit_001.phpt" />
