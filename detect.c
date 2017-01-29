@@ -137,7 +137,6 @@ scalar_is_null(const char *value, size_t length, const yaml_event_t *event)
 int
 scalar_is_bool(const char *value, size_t length, const yaml_event_t *event)
 {
-	/* TODO: add ini setting to turn 'y'/'n' checks on/off */
 	if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), YAML_BOOL_TAG)) {
 		if ((length == 1 && (*value == 'Y' || *value == 'y')) ||
 				STR_EQ("YES", value) ||
