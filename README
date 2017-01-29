@@ -72,6 +72,10 @@ ini settings:
   yaml.decode_php=0 for no serialized object parsing
   yaml.decode_php=1 for serialized object parsing
 
+  yaml.decode_bool=0 for no boolean words(on, off, yes, and no) parsing
+  yaml.decode_bool=1 for boolean words(on, off, yes, and no) parsing
+  yaml.decode_bool=2 for no abbreviated boolean words(y/n/Y/N) parsing
+
 /**
  * @param string $input String to parse as YAML document stream
  * @param int $pos Document to extract from stream (-1 for all, 0 for first, ...)

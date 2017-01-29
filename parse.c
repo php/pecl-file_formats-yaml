@@ -85,6 +85,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC);
 
 static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC);
 
+static void eval_bool(zval *zv, int flags, const char *value, size_t length);
 /* }}} */
 
 
@@ -695,7 +696,7 @@ zval *eval_scalar(yaml_event_t event,
 
 	/* check for bool */
 	if (-1 != (flags = scalar_is_bool(value, length, &event))) {
-		ZVAL_BOOL(retval, (zend_bool) flags);
+		eval_bool(retval, flags, value, length);
 		return retval;
 	}
 
@@ -1009,6 +1010,30 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 }
 /* }}} */
 
+/* {{{ eval_bool()
+ * Convert a bool
+ *
+ * This is switched on/off by the `yaml.decode_bool` ini setting.
+ *  - yaml.decode_bool=0 for no boolean words(on, off, yes, and no) parsing
+ *  - yaml.decode_bool=1 for boolean words(on, off, yes, and no) parsing
+ *  - yaml.decode_bool=2 for no abbreviated boolean words(y/n/Y/N) parsing
+ */
+void
+eval_bool(zval *zv, int flags, const char *value, size_t length)
+{
+	if (1L == YAML_G(decode_bool)) {
+		ZVAL_BOOL(zv, (zend_bool) flags);
+	} else if (2L == YAML_G(decode_bool)) {
+		if (length == 1 && (*value == 'Y' || *value == 'y' || *value == 'N' || *value == 'n')) {
+			ZVAL_STRINGL(zv, value, length, 1);
+		} else {
+			ZVAL_BOOL(zv, (zend_bool) flags);
+		}
+	} else {
+		ZVAL_STRINGL(zv, value, length, 1);
+	}
+}
+/* }}} */
 
 /*
  * Local variables:
