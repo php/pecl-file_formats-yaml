@@ -85,7 +85,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC);
 
 static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC);
 
-static void eval_bool(zval *zv, int flags, const char *value, size_t length);
+static void eval_bool(zval *zv, int flags, const char *value, size_t length TSRMLS_DC);
 /* }}} */
 
 
@@ -696,7 +696,7 @@ zval *eval_scalar(yaml_event_t event,
 
 	/* check for bool */
 	if (-1 != (flags = scalar_is_bool(value, length, &event))) {
-		eval_bool(retval, flags, value, length);
+		eval_bool(retval, flags, value, length TSRMLS_CC);
 		return retval;
 	}
 
@@ -1019,7 +1019,7 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
  *  - yaml.decode_bool=2 for no abbreviated boolean words(y/n/Y/N) parsing
  */
 void
-eval_bool(zval *zv, int flags, const char *value, size_t length)
+eval_bool(zval *zv, int flags, const char *value, size_t length TSRMLS_DC)
 {
 	if (1L == YAML_G(decode_bool)) {
 		ZVAL_BOOL(zv, (zend_bool) flags);
