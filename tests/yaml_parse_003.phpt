@@ -12,8 +12,8 @@ grave-accent: `text
 '));
 ?>
 --EXPECTF--
-Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 16), context while scanning for the next token (line 2, column 16) in %syaml_parse_003.php on line 4
+Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 16), context while scanning for the next token (line 2, column 16) in %syaml_parse_003.php on line %d
 bool(false)
 
-Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 15), context while scanning for the next token (line 2, column 15) in %syaml_parse_003.php on line 7
+Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 15), context while scanning for the next token (line 2, column 15) in %syaml_parse_003.php on line %d
 bool(false)

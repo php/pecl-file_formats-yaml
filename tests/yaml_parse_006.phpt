@@ -33,10 +33,10 @@ var_dump(yaml_parse('---
 '));
 ?>
 --EXPECTF--
-Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 1), context while scanning for the next token (line 2, column 1) in %syaml_parse_006.php on line 5
+Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 1), context while scanning for the next token (line 2, column 1) in %syaml_parse_006.php on line %d
 bool(false)
 
-Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 3), context while scanning for the next token (line 2, column 3) in %syaml_parse_006.php on line 9
+Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 3), context while scanning for the next token (line 2, column 3) in %syaml_parse_006.php on line %d
 bool(false)
 array(1) {
   ["key"]=>
@@ -47,8 +47,8 @@ array(1) {
   string(26) "space and tab before value"
 }
 
-Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 2), context while scanning for the next token (line 2, column 2) in %syaml_parse_006.php on line 21
+Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 2), context while scanning for the next token (line 2, column 2) in %syaml_parse_006.php on line %d
 bool(false)
 
-Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 4), context while scanning for the next token (line 2, column 4) in %syaml_parse_006.php on line 25
+Warning: yaml_parse(): scanning error encountered during parsing: found character that cannot start any token (line 2, column 4), context while scanning for the next token (line 2, column 4) in %syaml_parse_006.php on line %d
 bool(false)
