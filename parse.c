@@ -605,6 +605,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		/* cleanup our temp variables */
 		zval_ptr_dtor(&callback_args[1]);
 		zval_ptr_dtor(&callback_args[2]);
+		zend_string_release(tag_zstring);
 
 		if (FAILURE == callback_result || Z_TYPE_P(&retval) == IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
@@ -630,6 +631,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		}
 
 	} else {
+		zend_string_release(tag_zstring);
 		return Y_FILTER_NONE;
 	}
 }
