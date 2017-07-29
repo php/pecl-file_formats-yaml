@@ -22,15 +22,17 @@
  </lead>
  <date>2017-07-29</date>
  <version>
-  <release>2.0.1a1</release>
+  <release>2.0.2</release>
   <api>2.0.0</api>
  </version>
  <stability>
-  <release>alpha</release>
+  <release>stable</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+  Same as 2.0.1, but marked correctly as a stable release
+
   Bugs Fixed:
   - relax tests to pass with 7.1.4RC1 (remicollet)
   - #74799 fix memory leak in apply_filter function (gleb-svitelskiy)
