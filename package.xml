@@ -33,7 +33,8 @@
  <notes>
   Bugs Fixed:
   - relax tests to pass with 7.1.4RC1 (remicollet)
-  - fix memory leak in apply_filter function (gleb-svitelskiy)
+  - #74799 fix memory leak in apply_filter function (gleb-svitelskiy)
+  - #72540 fix crash in yaml_parse_url when stream/file is empty (bd808)
  </notes>
  <contents>
   <dir name="/">
@@ -60,6 +61,9 @@
     <file role="test" name="bug_69616.phpt" />
     <file role="test" name="bug_69617.phpt" />
     <file role="test" name="bug_72204.phpt" />
+    <file role="test" name="bug_72540.phpt" />
+    <file role="test" name="bug_74799.phpt" />
+    <file role="test" name="bug_74799.yaml" />
     <file role="test" name="bug_parsing_alias.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />

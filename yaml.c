@@ -508,6 +508,10 @@ PHP_FUNCTION(yaml_parse_url)
 	}
 
 	input = php_stream_copy_to_mem(stream, PHP_STREAM_COPY_ALL, 0);
+	php_stream_close(stream);
+	if (input == NULL) {
+		RETURN_FALSE;
+	}
 
 	yaml_parser_initialize(&state.parser);
 	yaml_parser_set_input_string(&state.parser, (unsigned char *)input, size);
@@ -519,8 +523,7 @@ PHP_FUNCTION(yaml_parse_url)
 	}
 
 	yaml_parser_delete(&state.parser);
-	php_stream_close(stream);
-	efree(input);
+	zend_string_release(input);
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */

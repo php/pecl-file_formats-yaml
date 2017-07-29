@@ -18,7 +18,7 @@ yaml_parse($yamlString, 0, $ndocs, ['!value' => 'tag_callback']);
 unset($yamlString, $ndocs);
 
 $ndocs = null;
-yaml_parse_file(__DIR__.'/yaml_003.yaml', 0, $ndocs, ['!value' => 'tag_callback']);
+yaml_parse_file(__DIR__.'/bug_74799.yaml', 0, $ndocs, ['!value' => 'tag_callback']);
 unset($ndocs);
 
 $array = ['key' => 'value'];
@@ -26,14 +26,14 @@ yaml_emit($array);
 unset($array);
 
 $array = ['key' => 'value'];
-yaml_emit_file(__DIR__.'/yaml_003.tmp', $array);
+yaml_emit_file(__DIR__.'/bug_74799.tmp', $array);
 unset($array);
 
 var_dump($base_memory == memory_get_usage());
 ?>
 --CLEAN--
 <?php
-unlink(__DIR__.'/yaml_003.tmp');
+unlink(__DIR__.'/bug_74799.tmp');
 ?>
 --EXPECT--
 bool(true)
