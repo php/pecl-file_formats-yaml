@@ -2,7 +2,7 @@
 
 rm .rbenv-version 2>/dev/null
 
-VERSIONS=$(phpenv versions --bare)
+VERSIONS=$(phpenv versions --bare | grep -v ^7)
 SCRIPT_DIR=$(dirname $0)
 
 for v in $VERSIONS system; do
