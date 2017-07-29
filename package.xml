@@ -22,11 +22,11 @@
  </lead>
  <date>2017-07-29</date>
  <version>
-  <release>1.3.1a1</release>
+  <release>1.3.1</release>
   <api>1.1.0</api>
  </version>
  <stability>
-  <release>alpha</release>
+  <release>stable</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
