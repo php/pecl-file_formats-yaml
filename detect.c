@@ -568,7 +568,7 @@ finish:
 			break;
 
 		default:
-			*dval = atof(buf);
+			*dval = zend_strtod(buf, (const char **) NULL);
 			break;
 		}
 	}
