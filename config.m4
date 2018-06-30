@@ -1,7 +1,3 @@
-dnl
-dnl $Id$
-dnl
-
 PHP_ARG_WITH(yaml, [whether to enable LibYAML suppot],
 [  --with-yaml[[=DIR]]       Enable LibYAML support.
                           DIR is the path to LibYAML install prefix])
