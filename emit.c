@@ -173,7 +173,11 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 		return;
 	}
 
+#if PHP_VERSION_ID >= 70300
+	if (!(GC_FLAGS(ht) & GC_IMMUTABLE) && GC_IS_RECURSIVE(ht)) {
+#else
 	if (ZEND_HASH_APPLY_PROTECTION(ht) && ht->u.v.nApplyCount > 0) {
+#endif
 		zval tmp;
 		ZVAL_LONG(&tmp, (zend_ulong) ht);
 
@@ -182,17 +186,29 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 		return;
 	}
 
+#if PHP_VERSION_ID >= 70300
+	if (!(GC_FLAGS(ht) & GC_IMMUTABLE)) {
+		GC_PROTECT_RECURSION(ht);
+	}
+#else
 	if (ZEND_HASH_APPLY_PROTECTION(ht)) {
 		ht->u.v.nApplyCount++;
 	}
+#endif
 
 	ZEND_HASH_FOREACH_VAL(ht, elm) {
 		y_scan_recursion(state, elm TSRMLS_CC);
 	} ZEND_HASH_FOREACH_END();
 
+#if PHP_VERSION_ID >= 70300
+	if (!(GC_FLAGS(ht) & GC_IMMUTABLE)) {
+		GC_UNPROTECT_RECURSION(ht);
+	}
+#else
 	if (ZEND_HASH_APPLY_PROTECTION(ht)) {
 		ht->u.v.nApplyCount--;
 	}
+#endif
 
 	return;
 }
@@ -495,7 +511,11 @@ static int y_write_array(
 		anchor = (char*) emalloc(anchor_size + 1);
 		snprintf(anchor, anchor_size + 1, "refid%ld", recursive_idx + 1);
 
+#if PHP_VERSION_ID >= 70300
+		if (!(GC_FLAGS(ht) & GC_IMMUTABLE) && GC_IS_RECURSIVE(ht)) {
+#else
 		if (ZEND_HASH_APPLY_PROTECTION(ht) && ht->u.v.nApplyCount > 1) {
+#endif
 			/* node has been visited before */
 			status = yaml_alias_event_initialize(
 					&event, (yaml_char_t *) anchor);
@@ -556,16 +576,29 @@ static int y_write_array(
 		}
 
 		tmp_ht = HASH_OF(elm);
+#if PHP_VERSION_ID >= 70300
+		if (tmp_ht && !(GC_FLAGS(tmp_ht) & GC_IMMUTABLE)) {
+			/* increment access count for hash */
+			GC_PROTECT_RECURSION(tmp_ht);
+		}
+#else
 		if (tmp_ht && ZEND_HASH_APPLY_PROTECTION(tmp_ht)) {
 			/* increment access count for hash */
 			tmp_ht->u.v.nApplyCount++;
 		}
+#endif
 
 		status = y_write_zval(state, elm, NULL TSRMLS_CC);
 
+#if PHP_VERSION_ID >= 70300
+		if (tmp_ht && !(GC_FLAGS(tmp_ht) & GC_IMMUTABLE)) {
+			GC_UNPROTECT_RECURSION(tmp_ht);
+		}
+#else
 		if (tmp_ht && ZEND_HASH_APPLY_PROTECTION(tmp_ht)) {
 			tmp_ht->u.v.nApplyCount--;
 		}
+#endif
 
 		if (SUCCESS != status) {
 			return FAILURE;
