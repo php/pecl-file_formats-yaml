@@ -16,11 +16,13 @@ config.status
 config.sub
 configure
 configure.in
+configure.ac
 extras
 include
 install-sh
 libtool
 ltmain.sh
+ltmain.sh.backup
 Makefile
 Makefile.fragments
 Makefile.global
