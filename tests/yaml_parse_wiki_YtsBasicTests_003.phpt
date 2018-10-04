@@ -3,7 +3,6 @@ Yaml YtsBasicTests - Mixed Sequences
 --DESCRIPTION--
 Sequences can contain any YAML data,
 including strings and other sequences.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

@@ -11,4 +11,3 @@ tests for parse callbacks
 
 Add php ini setting to turn y/n boolean treatment on/off.
   see http://www.kuwata-lab.com/materials/php_yaml-0.3.0.patch
-

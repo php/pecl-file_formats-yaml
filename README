@@ -24,7 +24,7 @@ To compile your new extension, you will have to execute the following steps:
 BUILDING ON WINDOWS
 ===================
 
-The extension provides the VisualStudio V6 project file 
+The extension provides the VisualStudio V6 project file
 
   yaml.dsp
 To compile the extension you open this file using VisualStudio,

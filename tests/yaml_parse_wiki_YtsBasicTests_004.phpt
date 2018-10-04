@@ -4,7 +4,6 @@ Yaml YtsBasicTests - Deeply Nested Sequences
 Sequences can be nested even deeper, with each
 level of indentation representing a level of
 depth.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

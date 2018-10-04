@@ -2,7 +2,6 @@
 Yaml YtsStrangeKeys - Quoted line noise key
 --DESCRIPTION--
 Check that quoted line noise parses as key.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

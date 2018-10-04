@@ -4,7 +4,6 @@ Yaml YtsBasicTests - Nested Sequences
 You can include a sequence within another
 sequence by giving the sequence an empty
 dash, followed by an indented list.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

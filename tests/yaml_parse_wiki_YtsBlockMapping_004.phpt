@@ -2,7 +2,6 @@
 Yaml YtsBlockMapping - Colons aligned
 --DESCRIPTION--
 Spaces can come before the ': ' key/value separator.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

@@ -2,7 +2,6 @@
 Yaml YtsMapInSeq - Single key
 --DESCRIPTION--
 Test maps with just one key.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

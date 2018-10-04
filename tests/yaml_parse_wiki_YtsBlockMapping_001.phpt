@@ -2,7 +2,6 @@
 Yaml YtsBlockMapping - One Element Mapping
 --DESCRIPTION--
 A mapping with one key/value pair
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

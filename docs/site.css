@@ -225,7 +225,7 @@ ul.simple li {
 
 /* 3px IE bug hack hidden from IE5-mac \*/
 * html #content { height: 1%; }
-/* End hide from IE5-mac */ 
+/* End hide from IE5-mac */
 
 /* Layout styling and helpers --------------------------------------------- */
 #layout_2, #layout_3 {
@@ -501,7 +501,7 @@ table.mirrors th {
 	color: inherit;
 }
 table.mirrors th.ch {
-	text-align: left; 
+	text-align: left;
 }
 table.mirrors th img {
 	border: 1px solid #000000;
@@ -592,14 +592,14 @@ table#logos td ul {
 }
 
 /* PHP Manual table ------------------------------------------------------- */
-table.doctable, table.informaltable { 
-   border: 0px; 
+table.doctable, table.informaltable {
+   border: 0px;
 }
 table.doctable td, table.doctable th, table.doctable caption,
-table.informaltable td, table.informaltable th, table.informaltable caption { 
+table.informaltable td, table.informaltable th, table.informaltable caption {
    padding: 5px;
 }
-table.doctable thead th, table.informaltable thead th { 
+table.doctable thead th, table.informaltable thead th {
    background-color: #9999CC;
 }
 table.doctable tbody td, table.informaltable tbody td {
@@ -785,7 +785,7 @@ h4.eventmonth {
 	padding: 5px;
 }
 #content.security .record .id,
-#content.security .record .date, 
+#content.security .record .date,
 #content.security .record .range {
 	float: left;
 }
@@ -897,7 +897,7 @@ div.example div.example-contents:after {
 
 div.example-contents br:before {
 	content: counter(phpexample);
-	counter-increment: phpexample; 
+	counter-increment: phpexample;
 }
 */
 
@@ -1017,4 +1017,3 @@ div.reportbug {
 /*
  * vim: noet
  */
-

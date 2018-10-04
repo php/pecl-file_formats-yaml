@@ -4,7 +4,6 @@ Yaml YtsBasicTests - Sequence-Mapping Shortcut
 If you are adding a mapping to a sequence, you
 can place the mapping on the same line as the
 dash as a shortcut.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

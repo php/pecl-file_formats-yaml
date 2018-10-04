@@ -2,7 +2,6 @@
 Yaml YtsBasicTests - Sequence in a Mapping
 --DESCRIPTION--
 A value in a mapping can be a sequence.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

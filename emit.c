@@ -221,8 +221,8 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 static zend_long y_search_recursive(
 		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC)
 {
- 	zval *entry;
-   	zend_ulong num_key;
+	zval *entry;
+	zend_ulong num_key;
 	zend_ulong found;
 
 	ZEND_HASH_FOREACH_NUM_KEY_VAL(state->recursive, num_key, entry) {

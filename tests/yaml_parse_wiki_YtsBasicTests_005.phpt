@@ -6,7 +6,6 @@ hash" to your document by placing each member of the
 list on a new line, with a colon seperating the key
 from its value.  In YAML, this type of list is called
 a mapping.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

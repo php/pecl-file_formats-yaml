@@ -2,7 +2,6 @@
 Yaml YtsBasicTests - Nested Mappings
 --DESCRIPTION--
 A value in a mapping can be another mapping.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

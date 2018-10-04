@@ -2,7 +2,6 @@
 Yaml YtsMapInSeq - Strange keys
 --DESCRIPTION--
 Test a map with "line noise" keys.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion

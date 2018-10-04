@@ -3,7 +3,6 @@ Yaml YtsBasicTests - Mixed Mapping
 --DESCRIPTION--
 A mapping can contain any assortment
 of mappings and sequences as values.
-
 --CREDITS--
 Bryan Davis bd808@bd808.com
 # yaml.kwiki.org import/conversion
