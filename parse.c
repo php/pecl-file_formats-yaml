@@ -111,6 +111,14 @@ void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSR
 				code = Y_PARSER_FAILURE;
 				break;
 			}
+			if (YAML_STREAM_END_EVENT == state->event.type) {
+				/* entire stream consisted of an empty document */
+				code = Y_PARSER_SUCCESS;
+				ZVAL_NULL(&doc);
+				add_next_index_zval(retval, &doc);
+				(*ndocs)++;
+				break;
+			}
 
 		}
 
@@ -165,12 +173,17 @@ void php_yaml_read_partial(
 			code = Y_PARSER_FAILURE;
 
 		} else if (YAML_STREAM_END_EVENT == state->event.type) {
-			/* reached end of stream without finding what we wanted */
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
-					"end of stream reached without finding document %ld",
-					pos);
-			code = Y_PARSER_FAILURE;
-
+			if (pos != 0) {
+				/* reached end of stream without finding what we wanted */
+				php_error_docref(NULL TSRMLS_CC, E_WARNING,
+						"end of stream reached without finding document %ld",
+						pos);
+				code = Y_PARSER_FAILURE;
+			} else {
+				/* an empty document is valid YAML */
+				code = Y_PARSER_SUCCESS;
+				ZVAL_NULL(retval);
+			}
 		} else if (YAML_DOCUMENT_START_EVENT == state->event.type) {
 			if (*ndocs == pos) {
 				handle_document(state, retval TSRMLS_CC);
