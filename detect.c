@@ -219,6 +219,11 @@ scalar_is_numeric(const char *value, size_t length, zend_long *lval,
 		goto finish;
 	}
 
+	/* catch the degenerate case of `.` as input */
+	if (STR_EQ(".", value)) {
+		goto not_numeric;
+	}
+
 	/* sign */
 	if (*value == '+') {
 		value++;
@@ -421,11 +426,6 @@ check_sexa:
 
 check_float:
 		*ptr++ = *value++;
-		if (value == end) {
-			/* don't treat strings ending with a period as numbers */
-			/* mostly here to catch the degenerate case of `.` as input */
-			goto not_numeric;
-		}
 
 		if (type == (Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_SEXAGECIMAL)) {
 			/* sexagecimal float */
