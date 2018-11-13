@@ -11,7 +11,7 @@ set -u
 
 REQ=${1:?PULL-REQUEST-ID required}
 GITHUB_REPO="php/pecl-file_formats-yaml"
-BRANCH=${2:-master}
+BRANCH=${2:-php7}
 
 # switch to main branch
 git checkout ${BRANCH}
