@@ -395,6 +395,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	array_init(retval);
 
 	if (NULL != src_event.data.mapping_start.anchor) {
+		/* record anchors in current alias table */
 		arrval = record_anchor_make_ref(&state->aliases, (char *) src_event.data.mapping_start.anchor, retval);
 	}
 
@@ -426,10 +427,21 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 				/* single ref */
 				zend_hash_merge(Z_ARRVAL_P(arrval), Z_ARRVAL_P(valptr), zval_add_ref, 0);
 			} else {
+				/* array of refs */
 				zval *zvalp;
 				ZEND_HASH_FOREACH_VAL(HASH_OF(valptr), zvalp) {
-					ZVAL_DEREF(zvalp);
-					zend_hash_merge(Z_ARRVAL_P(arrval), Z_ARRVAL_P(zvalp), zval_add_ref, 0);
+					if (Z_ISREF_P(zvalp)) {
+						ZVAL_DEREF(zvalp);
+						zend_hash_merge(
+								Z_ARRVAL_P(arrval), Z_ARRVAL_P(zvalp),
+								zval_add_ref, 0);
+					} else {
+						php_error_docref(NULL TSRMLS_CC, E_WARNING,
+								"expected a mapping for merging, but found scalar "
+								"(line %zd, column %zd)",
+								state->parser.mark.line + 1,
+								state->parser.mark.column + 1);
+					}
 				} ZEND_HASH_FOREACH_END();
 			}
 
