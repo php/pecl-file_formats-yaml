@@ -444,9 +444,17 @@ static zval *handle_mapping(parser_state_t *state TSRMLS_DC)
 				zend_hash_internal_pointer_reset(ht);
 				while (SUCCESS == zend_hash_has_more_elements(ht)) {
 					zend_hash_get_current_data(ht, (void**)&zvalpp);
-					zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_PP(zvalpp),
-							(void (*)(void *pData)) zval_add_ref,
-						NULL, sizeof(zval*), 0);
+					if (Z_ISREF_P(*zvalpp)) {
+						zend_hash_merge(Z_ARRVAL_P(retval), Z_ARRVAL_PP(zvalpp),
+								(void (*)(void *pData)) zval_add_ref,
+							NULL, sizeof(zval*), 0);
+					} else {
+							php_error_docref(NULL TSRMLS_CC, E_WARNING,
+									"expected a mapping for merging, but found scalar "
+									"(line %zd, column %zd)",
+									state->parser.mark.line + 1,
+									state->parser.mark.column + 1);
+					}
 					zend_hash_move_forward(ht);
 				};
 			}
