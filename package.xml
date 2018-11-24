@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2017-07-29</date>
+ <date>2018-11-24</date>
  <version>
-  <release>1.3.1</release>
+  <release>1.3.2</release>
   <api>1.1.0</api>
  </version>
  <stability>
@@ -32,7 +32,7 @@
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
   Bugs Fixed:
-  - #72540 yaml_parse_url: check php_stream_copy_to_mem return value
+  - #74886 Type confusion when processing yaml array merges
  </notes>
  <contents>
   <dir name="/">
@@ -135,6 +135,21 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2017-07-29</date>
+   <version>
+    <release>1.3.1</release>
+    <api>1.1.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    Bugs Fixed:
+    - #72540 yaml_parse_url: check php_stream_copy_to_mem return value
+   </notes>
+  </release>
   <release>
    <date>2016-09-24</date>
    <version>
