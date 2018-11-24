@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2018-11-13</date>
+ <date>2018-11-24</date>
  <version>
-  <release>2.0.3</release>
+  <release>2.0.4</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -31,12 +31,8 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Bugs Fixed:
-  - #75029 Empty documents are valid (bd808)
-  - #75213 Fix float parsing on Alpine (neclimdul)
-  - #76309 Quote strings like "0." when emitting (bd808)
-  - #76522 PHP 7.3 compilation fixes (dktapps, remicollet)
-  - CRLF and whitespace fixes (petk)
+ Bugs Fixed:
+ - #72540 yaml_parse_url: check php_stream_copy_to_mem return value
  </notes>
  <contents>
   <dir name="/">
@@ -148,6 +144,25 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2018-11-13</date>
+   <version>
+    <release>2.0.3</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+    Bugs Fixed:
+    - #75029 Empty documents are valid (bd808)
+    - #75213 Fix float parsing on Alpine (neclimdul)
+    - #76309 Quote strings like "0." when emitting (bd808)
+    - #76522 PHP 7.3 compilation fixes (dktapps, remicollet)
+    - CRLF and whitespace fixes (petk)
+   </notes>
+  </release>
   <release>
    <date>2017-07-29</date>
    <version>
