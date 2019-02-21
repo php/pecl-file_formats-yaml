@@ -640,7 +640,11 @@ static int y_write_timestamp(
 	ZVAL_STRING(&dtfmt, "Y-m-d\\TH:i:s.uP");
 
 	/* format date as iso-8601 string */
+#if PHP_VERSION_ID >= 80000
+	zend_call_method_with_1_params(Z_OBJ_P(data), clazz, NULL, "format", &timestamp, &dtfmt);
+#else
 	zend_call_method_with_1_params(data, clazz, NULL, "format", &timestamp, &dtfmt);
+#endif
 
 	/* emit formatted date */
 	status = yaml_scalar_event_initialize(&event, NULL, tag,

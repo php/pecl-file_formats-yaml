@@ -892,7 +892,11 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 		{
 			zval tmp;
 
+#if PHP_VERSION_ID >= 80000
+			if (SUCCESS == zend_std_cast_object_tostring(Z_OBJ_P(zv), &tmp, IS_STRING TSRMLS_CC)) {
+#else
 			if (SUCCESS == zend_std_cast_object_tostring(zv, &tmp, IS_STRING TSRMLS_CC)) {
+#endif
 				str = estrndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
 				zval_dtor(&tmp);
 				return str;
