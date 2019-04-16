@@ -8,6 +8,10 @@ php:
   - 7.4snapshot
   - nightly
 sudo: false
+addons:
+  apt:
+    packages:
+      - libonig-dev
 matrix:
   fast_finish: true
 env:
