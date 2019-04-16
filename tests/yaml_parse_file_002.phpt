@@ -10,7 +10,13 @@ date.timezone=GMT
 yaml_parse_file(NULL);
 yaml_parse_file('');
 yaml_parse_file('invalid');
-yaml_parse_file();
+try {
+  // PHP7 emits a Warning here
+  yaml_parse_file();
+} catch (ArgumentCountError $e) {
+  // PHP8 raises this exception
+  echo "\nWarning: {$e->getMessage()} in " . __FILE__ . " on line 7\n";
+}
 --EXPECTF--
 Warning: yaml_parse_file(): Filename cannot be empty in %s on line %d
 
