@@ -52,6 +52,13 @@ extern "C" {
 	}                                    \
 } while (0)
 #endif
+
+#ifndef TSRMLS_DC
+#define TSRMLS_DC
+#endif
+#ifndef TSRMLS_CC
+#define TSRMLS_CC
+#endif
 /* }}} */
 
 /* {{{ ext/yaml types
