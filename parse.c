@@ -46,7 +46,7 @@
 #define Y_FILTER_SUCCESS  1
 #define Y_FILTER_FAILURE -1
 
-#define NEXT_EVENT() yaml_next_event(state TSRMLS_CC)
+#define NEXT_EVENT() yaml_next_event(state)
 
 #define COPY_EVENT(dest, state) \
 	memcpy(&dest, &state->event, sizeof(yaml_event_t)); \
@@ -57,30 +57,30 @@
 
 /* {{{ local prototypes
  */
-static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC);
+static void handle_parser_error(const yaml_parser_t *parser);
 
-static inline int yaml_next_event(parser_state_t *state TSRMLS_DC);
+static inline int yaml_next_event(parser_state_t *state);
 
-void get_next_element( parser_state_t *state, zval *retval TSRMLS_DC);
+void get_next_element( parser_state_t *state, zval *retval);
 
-void handle_document(parser_state_t *state, zval *retval TSRMLS_DC);
+void handle_document(parser_state_t *state, zval *retval);
 
-void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC);
+void handle_mapping(parser_state_t *state, zval *retval);
 
-void handle_sequence(parser_state_t *state, zval *retval TSRMLS_DC);
+void handle_sequence(parser_state_t *state, zval *retval);
 
-void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC);
+void handle_scalar(parser_state_t *state, zval *retval);
 
-void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC);
+void handle_alias(parser_state_t *state, zval *retval);
 
 static zval *record_anchor_make_ref(zval *aliases, const char *anchor, zval *value);
 
 static int apply_filter(
-		zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC);
+		zval *zp, yaml_event_t event, HashTable *callbacks);
 
-static char *convert_to_char(zval *zv TSRMLS_DC);
+static char *convert_to_char(zval *zv);
 
-static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC);
+static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len);
 
 /* }}} */
 
@@ -88,7 +88,7 @@ static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC);
 /* {{{ php_yaml_read_all()
  * Process events from yaml parser
  */
-void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSRMLS_DC)
+void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval)
 {
 	zval doc;
 	int code = Y_PARSER_CONTINUE;
@@ -125,7 +125,7 @@ void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSR
 		if (YAML_DOCUMENT_START_EVENT != state->event.type) {
 			code = Y_PARSER_FAILURE;
 
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			php_error_docref(NULL, E_WARNING,
 					"expected DOCUMENT_START event, got %d "
 					"(line %zd, column %zd)",
 					state->event.type,
@@ -134,7 +134,7 @@ void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSR
 			break;
 		}
 
-		handle_document(state, &doc TSRMLS_CC);
+		handle_document(state, &doc);
 
 		if (Z_TYPE_P(&doc) == IS_UNDEF) {
 			code = Y_PARSER_FAILURE;
@@ -163,7 +163,7 @@ void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSR
  * Read a particular document from the parser's document stream.
  */
 void php_yaml_read_partial(
-		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval TSRMLS_DC)
+		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval)
 {
 	int code = Y_PARSER_CONTINUE;
 
@@ -175,7 +175,7 @@ void php_yaml_read_partial(
 		} else if (YAML_STREAM_END_EVENT == state->event.type) {
 			if (pos != 0) {
 				/* reached end of stream without finding what we wanted */
-				php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				php_error_docref(NULL, E_WARNING,
 						"end of stream reached without finding document " ZEND_LONG_FMT,
 						pos);
 				code = Y_PARSER_FAILURE;
@@ -186,7 +186,7 @@ void php_yaml_read_partial(
 			}
 		} else if (YAML_DOCUMENT_START_EVENT == state->event.type) {
 			if (*ndocs == pos) {
-				handle_document(state, retval TSRMLS_CC);
+				handle_document(state, retval);
 				if (Z_TYPE_P(retval) == IS_UNDEF) {
 					code = Y_PARSER_FAILURE;
 					break;
@@ -215,7 +215,7 @@ void php_yaml_read_partial(
 /* {{{ handle_parser_error()
  * Emit a warning about a parser error
  */
-static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
+static void handle_parser_error(const yaml_parser_t *parser)
 {
 	const char *error_type;
 
@@ -244,7 +244,7 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 
 	if (NULL != parser->problem) {
 		if (parser->context) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			php_error_docref(NULL, E_WARNING,
 					"%s error encountered during parsing: %s "
 					"(line %zd, column %zd), "
 					"context %s (line %zd, column %zd)",
@@ -255,7 +255,7 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 					parser->context_mark.line + 1,
 					parser->context_mark.column + 1);
 		} else {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			php_error_docref(NULL, E_WARNING,
 					"%s error encountered during parsing: %s "
 					"(line %zd, column %zd)",
 					error_type,
@@ -264,7 +264,7 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 					parser->problem_mark.column + 1);
 		}
 	} else {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"%s error encountred during parsing", error_type);
 	}
 }
@@ -274,7 +274,7 @@ static void handle_parser_error(const yaml_parser_t *parser TSRMLS_DC)
 /* {{{ yaml_next_event()
  * Load the next parser event
  */
-static inline int yaml_next_event(parser_state_t *state TSRMLS_DC)
+static inline int yaml_next_event(parser_state_t *state)
 {
 	if (state->have_event) {
 		/* free prior event */
@@ -285,7 +285,7 @@ static inline int yaml_next_event(parser_state_t *state TSRMLS_DC)
 	if (!yaml_parser_parse(&state->parser, &state->event)) {
 		/* error encountered parsing input */
 		state->have_event = 0;
-		handle_parser_error(&state->parser TSRMLS_CC);
+		handle_parser_error(&state->parser);
 
 	} else {
 		state->have_event = 1;
@@ -299,7 +299,7 @@ static inline int yaml_next_event(parser_state_t *state TSRMLS_DC)
 /* {{{ get_next_element()
  * Extract the next whole element from the parse stream
  */
-void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
+void get_next_element(parser_state_t *state, zval *retval)
 {
 	if (!NEXT_EVENT()) {
 		/* check state->event if you need to know the difference between
@@ -318,28 +318,28 @@ void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
 		break;
 
 	case YAML_DOCUMENT_START_EVENT:
-		handle_document(state, retval TSRMLS_CC);
+		handle_document(state, retval);
 		break;
 
 	case YAML_MAPPING_START_EVENT:
-		handle_mapping(state, retval TSRMLS_CC);
+		handle_mapping(state, retval);
 		break;
 
 	case YAML_SEQUENCE_START_EVENT:
-		handle_sequence(state, retval TSRMLS_CC);
+		handle_sequence(state, retval);
 		break;
 
 	case YAML_SCALAR_EVENT:
-		handle_scalar(state, retval TSRMLS_CC);
+		handle_scalar(state, retval);
 		break;
 
 	case YAML_ALIAS_EVENT:
-		handle_alias(state, retval TSRMLS_CC);
+		handle_alias(state, retval);
 		break;
 
 	default:
 		/* any other event is an error */
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Unexpected event type %d "
 				"(line %zd, column %zd)",
 				state->event.type,
@@ -354,13 +354,13 @@ void get_next_element(parser_state_t *state, zval *retval TSRMLS_DC)
 /* {{{ handle_document()
  * Handle a document event
  */
-void handle_document(parser_state_t *state, zval *retval TSRMLS_DC)
+void handle_document(parser_state_t *state, zval *retval)
 {
 	/* make a new array to hold aliases */
 	array_init(&state->aliases);
 
 	/* document consists of next element */
-	get_next_element(state, retval TSRMLS_CC);
+	get_next_element(state, retval);
 
 	/* clean up aliases */
 	zval_ptr_dtor(&state->aliases);
@@ -379,7 +379,7 @@ void handle_document(parser_state_t *state, zval *retval TSRMLS_DC)
 /* {{{ handle_mapping()
  * Handle a mapping event
  */
-void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
+void handle_mapping(parser_state_t *state, zval *retval)
 {
 	yaml_event_t src_event = { YAML_NO_EVENT }, key_event = { YAML_NO_EVENT };
 	char *key_str;
@@ -401,8 +401,8 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 
 	for (get_next_element(state, &key); Z_TYPE_P(&key) != IS_UNDEF; get_next_element(state, &key)) {
 		COPY_EVENT(key_event, state);
-		key_str = convert_to_char(&key TSRMLS_CC);
-		get_next_element(state, &value TSRMLS_CC);
+		key_str = convert_to_char(&key);
+		get_next_element(state, &value);
 
 		if (Z_TYPE_P(&value) == IS_UNDEF) {
 			//TODO Sean-Der
@@ -436,7 +436,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 								Z_ARRVAL_P(arrval), Z_ARRVAL_P(zvalp),
 								zval_add_ref, 0);
 					} else {
-						php_error_docref(NULL TSRMLS_CC, E_WARNING,
+						php_error_docref(NULL, E_WARNING,
 								"expected a mapping for merging, but found scalar "
 								"(line %zd, column %zd)",
 								state->parser.mark.line + 1,
@@ -464,7 +464,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 	if (NULL != retval && NULL != state->callbacks) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
-				retval, src_event, state->callbacks TSRMLS_CC)) {
+				retval, src_event, state->callbacks)) {
 			//TODO Sean-Der
 			ZVAL_UNDEF(retval);
 		}
@@ -478,7 +478,7 @@ void handle_mapping(parser_state_t *state, zval *retval TSRMLS_DC)
 /* {{{ handle_sequence
  * Handle a sequence event
  */
-void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
+void handle_sequence (parser_state_t *state, zval *retval) {
 	yaml_event_t src_event = { YAML_NO_EVENT };
 	zval value = {{0} };
 	zval *arrval = retval;
@@ -508,7 +508,7 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 	if (NULL != retval && NULL != state->callbacks) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
-				retval, src_event, state->callbacks TSRMLS_CC)) {
+				retval, src_event, state->callbacks)) {
 			//TODO Sean-Der
 			ZVAL_UNDEF(retval);
 			//zval_ptr_dtor(&retval);
@@ -524,8 +524,8 @@ void handle_sequence (parser_state_t *state, zval *retval TSRMLS_DC) {
 /* {{{ handle_scalar()
  * Handle a scalar event
  */
-void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
-	state->eval_func(state->event, state->callbacks, retval TSRMLS_CC);
+void handle_scalar(parser_state_t *state, zval *retval) {
+	state->eval_func(state->event, state->callbacks, retval);
 	if (NULL != retval && NULL != state->event.data.scalar.anchor) {
 		record_anchor_make_ref(&state->aliases, (char *) state->event.data.scalar.anchor, retval);
 	}
@@ -536,13 +536,13 @@ void handle_scalar(parser_state_t *state, zval *retval TSRMLS_DC) {
 /* {{{ handle_alias()
  * Handle an alias event
  */
-void handle_alias(parser_state_t *state, zval *retval TSRMLS_DC) {
+void handle_alias(parser_state_t *state, zval *retval) {
 	char *anchor = (char *) state->event.data.alias.anchor;
 	zend_string *anchor_zstring = zend_string_init(anchor, strlen(anchor), 0);
 	zval *alias;
 
 	if ((alias = zend_hash_find(Z_ARRVAL_P(&state->aliases), anchor_zstring)) == NULL) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"alias %s is not registered "
 				"(line %zd, column %zd)",
 				anchor,
@@ -580,7 +580,7 @@ static zval *record_anchor_make_ref(zval *aliases, const char *anchor, zval *val
  * Apply user supplied hander to node
  */
 static int
-apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
+apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks)
 {
 	char *tag = { 0 };
 	zend_string *tag_zstring;
@@ -625,7 +625,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		ZVAL_LONG(&callback_args[2], 0);
 
 		/* call the user function */
-		callback_result = call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, callback_args, 0, NULL TSRMLS_CC);
+		callback_result = call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, callback_args, 0, NULL);
 
 		/* cleanup our temp variables */
 		zval_ptr_dtor(&callback_args[1]);
@@ -633,7 +633,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
 		zend_string_release(tag_zstring);
 
 		if (FAILURE == callback_result || Z_TYPE_P(&retval) == IS_UNDEF) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			php_error_docref(NULL, E_WARNING,
 					"Failed to apply filter for tag '%s'"
 					" with user defined function", tag);
 			return Y_FILTER_FAILURE;
@@ -669,7 +669,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks TSRMLS_DC)
  * All YAML scalar types found at http://yaml.org/type/index.html.
  */
 void eval_scalar(yaml_event_t event,
-		HashTable * callbacks, zval *retval TSRMLS_DC)
+		HashTable * callbacks, zval *retval)
 {
 	char *value = (char *) event.data.scalar.value;
 	size_t length = event.data.scalar.length;
@@ -743,7 +743,7 @@ void eval_scalar(yaml_event_t event,
 	if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_TIMESTAMP_TAG) ||
 			 scalar_is_timestamp(value, length)) {
 		if (FAILURE == eval_timestamp(
-				&retval, value, (int) length TSRMLS_CC)) {
+				&retval, value, (int) length)) {
 			ZVAL_NULL(retval);
 		}
 		return;
@@ -756,7 +756,7 @@ void eval_scalar(yaml_event_t event,
 
 		data = php_base64_decode((const unsigned char *) value, (int) length);
 		if (NULL == data) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+			php_error_docref(NULL, E_WARNING,
 					"Failed to decode binary");
 			ZVAL_NULL(retval);
 
@@ -777,8 +777,8 @@ void eval_scalar(yaml_event_t event,
 		PHP_VAR_UNSERIALIZE_INIT(var_hash);
 
 		if (!php_var_unserialize(
-				retval, &p, p + (int) length, &var_hash TSRMLS_CC)) {
-			php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+				retval, &p, p + (int) length, &var_hash)) {
+			php_error_docref(NULL, E_NOTICE,
 					"Failed to unserialize class");
 			/* return the serialized string directly */
 			ZVAL_STRINGL(retval, value, length);
@@ -801,7 +801,7 @@ void eval_scalar(yaml_event_t event,
  * filters if available.
  */
 void eval_scalar_with_callbacks(yaml_event_t event,
-		HashTable *callbacks, zval *retval TSRMLS_DC)
+		HashTable *callbacks, zval *retval)
 {
 	const char *tag = (char *) event.data.scalar.tag;
 	zend_string *tag_zstring;
@@ -827,8 +827,8 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 		ZVAL_STRINGL(&argv[1], tag, strlen(tag));
 		ZVAL_LONG(&argv[2], event.data.scalar.style);
 
-		if (FAILURE == call_user_function_ex(EG(function_table), NULL, callback, retval, 3, argv, 0, NULL TSRMLS_CC) || Z_TYPE_P(retval) == IS_UNDEF) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		if (FAILURE == call_user_function_ex(EG(function_table), NULL, callback, retval, 3, argv, 0, NULL) || Z_TYPE_P(retval) == IS_UNDEF) {
+			php_error_docref(NULL, E_WARNING,
 					"Failed to evaluate value for tag '%s'"
 					" with user defined function", tag);
 		}
@@ -842,7 +842,7 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 
 	/* no mapping, so handle raw */
 	zend_string_release(tag_zstring);
-	return eval_scalar(event, NULL, retval TSRMLS_CC);
+	return eval_scalar(event, NULL, retval);
 }
 /* }}} */
 
@@ -850,7 +850,7 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 /* {{{ convert_to_char()
  * Convert a zval to a character array.
  */
-static char *convert_to_char(zval *zv TSRMLS_DC)
+static char *convert_to_char(zval *zv)
 {
 	char *str = { 0 };
 
@@ -893,9 +893,9 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			zval tmp;
 
 #if PHP_VERSION_ID >= 80000
-			if (SUCCESS == zend_std_cast_object_tostring(Z_OBJ_P(zv), &tmp, IS_STRING TSRMLS_CC)) {
+			if (SUCCESS == zend_std_cast_object_tostring(Z_OBJ_P(zv), &tmp, IS_STRING)) {
 #else
-			if (SUCCESS == zend_std_cast_object_tostring(zv, &tmp, IS_STRING TSRMLS_CC)) {
+			if (SUCCESS == zend_std_cast_object_tostring(zv, &tmp, IS_STRING)) {
 #endif
 				str = estrndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
 				zval_dtor(&tmp);
@@ -910,7 +910,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 			smart_str buf = {0};
 
 			PHP_VAR_SERIALIZE_INIT(var_hash);
-			php_var_serialize(&buf, zv, &var_hash TSRMLS_CC);
+			php_var_serialize(&buf, zv, &var_hash);
 			PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 			if (buf.s) {
@@ -924,7 +924,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 	}
 
 	if (NULL == str) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Failed to convert %s to string", zend_zval_type_name(zv));
 	}
 
@@ -942,7 +942,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
  *  - yaml.decode_timestamp=2 for date_create parsing
  */
 static int
-eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
+eval_timestamp(zval **zpp, const char *ts, size_t ts_len)
 {
 	if (NULL != YAML_G(timestamp_decoder) ||
 			1L == YAML_G(decode_timestamp) ||
@@ -968,8 +968,8 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 		argv[0] = arg;
 
 		if (FAILURE == call_user_function_ex(EG(function_table), NULL, func,
-				&retval, 1, argv, 0, NULL TSRMLS_CC) || Z_TYPE_P(&retval) == IS_UNDEF) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				&retval, 1, argv, 0, NULL) || Z_TYPE_P(&retval) == IS_UNDEF) {
+			php_error_docref(NULL, E_WARNING,
 					"Failed to evaluate string '%s' as timestamp", ts);
 			if (func != NULL) {
 				zval_ptr_dtor(func);

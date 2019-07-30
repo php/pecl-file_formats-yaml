@@ -43,7 +43,7 @@ extern "C" {
 /* {{{ backcompat macros
 */
 #ifndef ZVAL_OPT_DEREF
-/* Taken from php-src/Zned/zend_types.h @ 95ff285 */
+/* Taken from php-src/Zend/zend_types.h @ 95ff285 */
 #define Z_OPT_ISREF(zval) (Z_OPT_TYPE(zval) == IS_REFERENCE)
 #define Z_OPT_ISREF_P(zval_p) Z_OPT_ISREF(*(zval_p))
 #define ZVAL_OPT_DEREF(z) do {           \
@@ -52,18 +52,11 @@ extern "C" {
 	}                                    \
 } while (0)
 #endif
-
-#ifndef TSRMLS_DC
-#define TSRMLS_DC
-#endif
-#ifndef TSRMLS_CC
-#define TSRMLS_CC
-#endif
 /* }}} */
 
 /* {{{ ext/yaml types
 */
-typedef void (*eval_scalar_func_t)(yaml_event_t event, HashTable *callbacks, zval *retval TSRMLS_DC);
+typedef void (*eval_scalar_func_t)(yaml_event_t event, HashTable *callbacks, zval *retval);
 
 typedef struct parser_state_s {
 	yaml_parser_t parser;
@@ -104,13 +97,6 @@ typedef struct y_emit_state_s {
 #define Y_SCALAR_IS_NAN         0x08
 #define Y_SCALAR_FORMAT_MASK    0x0F
 
-
-#if (PHP_MAJOR_VERSION > 5) || ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION >= 3))
-#	define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c) TSRMLS_CC)
-#else
-#	define ZEND_IS_CALLABLE(a,b,c) zend_is_callable((a), (b), (c))
-#endif
-
 #define STR_EQ(a, b)\
 	(a != NULL && b != NULL && 0 == strcmp(a, b))
 
@@ -136,16 +122,16 @@ typedef struct y_emit_state_s {
 
 /* {{{ ext/yaml prototypes
 */
-void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval TSRMLS_DC);
+void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval);
 
 void php_yaml_read_partial(
-		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval TSRMLS_DC);
+		parser_state_t *state, zend_long pos, zend_long *ndocs, zval *retval);
 
 void eval_scalar(yaml_event_t event,
-		HashTable * callbacks, zval *retval TSRMLS_DC);
+		HashTable * callbacks, zval *retval);
 
 void eval_scalar_with_callbacks(
-		yaml_event_t event, HashTable *callbacks, zval *retval TSRMLS_DC);
+		yaml_event_t event, HashTable *callbacks, zval *retval);
 
 const char *detect_scalar_type(
 		const char *value, size_t length, const yaml_event_t *event);
@@ -162,7 +148,7 @@ int scalar_is_numeric(
 int scalar_is_timestamp(const char *value, size_t length);
 
 int php_yaml_write_impl(yaml_emitter_t *emitter, zval *data,
-		yaml_encoding_t encoding, HashTable *callbacks TSRMLS_DC);
+		yaml_encoding_t encoding, HashTable *callbacks);
 
 int php_yaml_write_to_buffer(
 		void *data, unsigned char *buffer, size_t size);

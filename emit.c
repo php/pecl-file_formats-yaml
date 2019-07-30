@@ -40,7 +40,7 @@
  */
 #define y_event_init_failed(e) \
   yaml_event_delete(e); \
-  php_error_docref(NULL TSRMLS_CC, E_WARNING,\
+  php_error_docref(NULL, E_WARNING,\
 	  "Memory error: Not enough memory for creating an event (libyaml)")
 
 #define Y_ARRAY_SEQUENCE 1
@@ -51,34 +51,34 @@
 /* {{{ local prototypes
  */
 static int y_event_emit(
-		const y_emit_state_t *state, yaml_event_t *event TSRMLS_DC);
-static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC);
-static int y_array_is_sequence(HashTable *ht TSRMLS_DC);
-static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC);
+		const y_emit_state_t *state, yaml_event_t *event);
+static void y_handle_emitter_error(const y_emit_state_t *state);
+static int y_array_is_sequence(HashTable *ht);
+static void y_scan_recursion(const y_emit_state_t *state, zval *data);
 static zend_long y_search_recursive(
-		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC);
+		const y_emit_state_t *state, const zend_ulong addr);
 
 static int y_write_zval(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_null(
-		const y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, yaml_char_t *tag);
 static int y_write_bool(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_long(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_double(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_string(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_array(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_timestamp(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_object(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC);
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag);
 static int y_write_object_callback (
 		const y_emit_state_t *state, zval *callback, zval *data,
-		const char *clazz_name TSRMLS_DC);
+		const char *clazz_name);
 static inline unsigned int get_next_char(
 		const unsigned char *str, size_t str_len, size_t *cursor, int *status);
 /* }}} */
@@ -88,11 +88,11 @@ static inline unsigned int get_next_char(
  * send an event to the emitter
  */
 static int
-y_event_emit(const y_emit_state_t *state, yaml_event_t *event TSRMLS_DC)
+y_event_emit(const y_emit_state_t *state, yaml_event_t *event)
 {
 	if (!yaml_emitter_emit(state->emitter, event)) {
 		yaml_event_delete(event);
-		y_handle_emitter_error(state TSRMLS_CC);
+		y_handle_emitter_error(state);
 		return FAILURE;
 
 	} else {
@@ -105,26 +105,26 @@ y_event_emit(const y_emit_state_t *state, yaml_event_t *event TSRMLS_DC)
 /* {{{ y_handle_emitter_error()
  * Emit a warning about an emitter error
  */
-static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC)
+static void y_handle_emitter_error(const y_emit_state_t *state)
 {
 	switch (state->emitter->error) {
 	case YAML_MEMORY_ERROR:
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Memory error: Not enough memory for emitting");
 		break;
 
 	case YAML_WRITER_ERROR:
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Writer error: %s", state->emitter->problem);
 		break;
 
 	case YAML_EMITTER_ERROR:
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Emitter error: %s", state->emitter->problem);
 		break;
 
 	default:
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Internal error");
+		php_error_docref(NULL, E_WARNING, "Internal error");
 		break;
 	}
 }
@@ -134,7 +134,7 @@ static void y_handle_emitter_error(const y_emit_state_t *state TSRMLS_DC)
 /* {{{ y_array_is_sequence()
  * Does the array encode a sequence?
  */
-static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
+static int y_array_is_sequence(HashTable *ht)
 {
 	zend_ulong kidx, idx;
 	zend_string *str_key;
@@ -159,7 +159,7 @@ static int y_array_is_sequence(HashTable *ht TSRMLS_DC)
 /* {{{ y_scan_recursion()
  * walk an object graph looking for recursive references
  */
-static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
+static void y_scan_recursion(const y_emit_state_t *state, zval *data)
 {
 	HashTable *ht;
 	zval *elm;
@@ -197,7 +197,7 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
 #endif
 
 	ZEND_HASH_FOREACH_VAL(ht, elm) {
-		y_scan_recursion(state, elm TSRMLS_CC);
+		y_scan_recursion(state, elm);
 	} ZEND_HASH_FOREACH_END();
 
 #if PHP_VERSION_ID >= 70300
@@ -219,7 +219,7 @@ static void y_scan_recursion(const y_emit_state_t *state, zval *data TSRMLS_DC)
  * Search the recursive state hash for an address
  */
 static zend_long y_search_recursive(
-		const y_emit_state_t *state, const zend_ulong addr TSRMLS_DC)
+		const y_emit_state_t *state, const zend_ulong addr)
 {
 	zval *entry;
 	zend_ulong num_key;
@@ -240,7 +240,7 @@ static zend_long y_search_recursive(
  * Write a php zval to the emitter
  */
 static int y_write_zval(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	int status = FAILURE;
 
@@ -250,41 +250,41 @@ static int y_write_zval(
 		break;
 
 	case IS_NULL:
-		status = y_write_null(state, tag TSRMLS_CC);
+		status = y_write_null(state, tag);
 		break;
 
 	case IS_TRUE:
 	case IS_FALSE:
-		status = y_write_bool(state, data, tag TSRMLS_CC);
+		status = y_write_bool(state, data, tag);
 		break;
 
 	case IS_LONG:
-		status = y_write_long(state, data, tag TSRMLS_CC);
+		status = y_write_long(state, data, tag);
 		break;
 
 	case IS_DOUBLE:
-		status = y_write_double(state, data, tag TSRMLS_CC);
+		status = y_write_double(state, data, tag);
 		break;
 
 	case IS_STRING:
-		status = y_write_string(state, data, tag TSRMLS_CC);
+		status = y_write_string(state, data, tag);
 		break;
 
 	case IS_ARRAY:
-		status = y_write_array(state, data, tag TSRMLS_CC);
+		status = y_write_array(state, data, tag);
 		break;
 
 	case IS_OBJECT:
-		status = y_write_object(state, data, tag TSRMLS_CC);
+		status = y_write_object(state, data, tag);
 		break;
 
 	case IS_RESOURCE:		/* unsupported object */
-		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+		php_error_docref(NULL, E_NOTICE,
 				"Unable to emit PHP resources.");
 		break;
 
 	default:				/* something we didn't think of */
-		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+		php_error_docref(NULL, E_NOTICE,
 				"Unsupported php zval type %d.", Z_TYPE_P(data));
 		break;
 	}
@@ -296,7 +296,7 @@ static int y_write_zval(
 
 /* {{{ y_write_null()
  */
-static int y_write_null(const y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
+static int y_write_null(const y_emit_state_t *state, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -314,7 +314,7 @@ static int y_write_null(const y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -322,7 +322,7 @@ static int y_write_null(const y_emit_state_t *state, yaml_char_t *tag TSRMLS_DC)
 /* {{{ y_write_bool()
  */
 static int y_write_bool(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -341,7 +341,7 @@ static int y_write_bool(
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -349,7 +349,7 @@ static int y_write_bool(
 /* {{{ y_write_long()
  */
 static int y_write_long(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -374,7 +374,7 @@ static int y_write_long(
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -382,7 +382,7 @@ static int y_write_long(
 /* {{{ y_write_double()
  */
 static int y_write_double(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -407,7 +407,7 @@ static int y_write_double(
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -415,7 +415,7 @@ static int y_write_double(
 /* {{{ y_write_string()
  */
 static int y_write_string(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -441,7 +441,7 @@ static int y_write_string(
 			us = get_next_char(s, len, &pos, &status);
 			if (status != SUCCESS) {
 				/* invalid UTF-8 character found */
-				php_error_docref(NULL TSRMLS_CC, E_WARNING,
+				php_error_docref(NULL, E_WARNING,
 						"Invalid UTF-8 sequence in argument");
 				return FAILURE;
 
@@ -459,7 +459,7 @@ static int y_write_string(
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -467,7 +467,7 @@ static int y_write_string(
 /* {{{ y_write_array()
  */
 static int y_write_array(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -482,7 +482,7 @@ static int y_write_array(
 	char *anchor = { 0 };
 	size_t anchor_size;
 
-	array_type = y_array_is_sequence(ht TSRMLS_CC);
+	array_type = y_array_is_sequence(ht);
 
 	if (NULL == tag) {
 		if (Y_ARRAY_SEQUENCE == array_type) {
@@ -503,7 +503,7 @@ static int y_write_array(
 	 *   if ht->nApplyCount > 0:
 	 *     emit a ref
 	 */
-	recursive_idx = y_search_recursive(state, (zend_ulong) ht TSRMLS_CC);
+	recursive_idx = y_search_recursive(state, (zend_ulong) ht);
 	if (-1 != recursive_idx) {
 		/* create anchor to refer to this structure */
 		anchor_size = snprintf(anchor, 0, "refid%ld", recursive_idx + 1);
@@ -524,7 +524,7 @@ static int y_write_array(
 				return FAILURE;
 			}
 
-			status = y_event_emit(state, &event TSRMLS_CC);
+			status = y_event_emit(state, &event);
 			efree(anchor);
 			return status;
 		}
@@ -547,7 +547,7 @@ static int y_write_array(
 		}
 		return FAILURE;
 	}
-	status = y_event_emit(state, &event TSRMLS_CC);
+	status = y_event_emit(state, &event);
 	if (anchor) {
 		efree(anchor);
 	}
@@ -580,13 +580,13 @@ static int y_write_array(
 			}
 
 			/* emit key */
-			status = y_write_zval(state, &key_zval, NULL TSRMLS_CC);
+			status = y_write_zval(state, &key_zval, NULL);
 			if (SUCCESS != status) {
 				return FAILURE;
 			}
 		}
 
-		status = y_write_zval(state, elm, NULL TSRMLS_CC);
+		status = y_write_zval(state, elm, NULL);
 
 
 		if (SUCCESS != status) {
@@ -614,7 +614,7 @@ static int y_write_array(
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -622,7 +622,7 @@ static int y_write_array(
 /* y_write_timestamp()
  */
 static int y_write_timestamp(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int omit_tag = 0;
@@ -656,7 +656,7 @@ static int y_write_timestamp(
 		y_event_init_failed(&event);
 		return FAILURE;
 	}
-	return y_event_emit(state, &event TSRMLS_CC);
+	return y_event_emit(state, &event);
 }
 /* }}} */
 
@@ -664,7 +664,7 @@ static int y_write_timestamp(
 /* {{{ y_write_object()
  */
 static int y_write_object(
-		const y_emit_state_t *state, zval *data, yaml_char_t *tag TSRMLS_DC)
+		const y_emit_state_t *state, zval *data, yaml_char_t *tag)
 {
 	yaml_event_t event;
 	int status;
@@ -678,17 +678,17 @@ static int y_write_object(
 			state->callbacks, clazz_name)) != NULL) {
 		/* found a registered callback for this class */
 		status = y_write_object_callback(
-				state, callback, data, clazz_name->val TSRMLS_CC);
+				state, callback, data, clazz_name->val);
 
 	} else if (0 == strncmp(clazz_name->val, "DateTime", clazz_name->len)) {
-		status = y_write_timestamp(state, data, tag TSRMLS_CC);
+		status = y_write_timestamp(state, data, tag);
 	} else {
 		/* tag and emit serialized version of object */
 		php_serialize_data_t var_hash;
 		smart_str buf = { 0 };
 
 		PHP_VAR_SERIALIZE_INIT(var_hash);
-		php_var_serialize(&buf, data, &var_hash TSRMLS_CC);
+		php_var_serialize(&buf, data, &var_hash);
 		PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 		status = yaml_scalar_event_initialize(&event,
@@ -699,7 +699,7 @@ static int y_write_object(
 			y_event_init_failed(&event);
 			status = FAILURE;
 		} else {
-			status = y_event_emit(state, &event TSRMLS_CC);
+			status = y_event_emit(state, &event);
 		}
 		smart_str_free(&buf);
 	}
@@ -713,7 +713,7 @@ static int y_write_object(
 static int
 y_write_object_callback (
 		const y_emit_state_t *state, zval *callback, zval *data,
-		const char *clazz_name TSRMLS_DC) {
+		const char *clazz_name) {
 	zval argv[1];
 	argv[0] = *data;
 	zval zret;
@@ -723,9 +723,9 @@ y_write_object_callback (
 
 	/* call the user function */
 	if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-			callback, &zret, 1, argv, 0, NULL TSRMLS_CC) ||
+			callback, &zret, 1, argv, 0, NULL) ||
 			Z_TYPE_P(&zret) == IS_UNDEF) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Failed to apply callback for class '%s'"
 				" with user defined function", clazz_name);
 		return FAILURE;
@@ -733,7 +733,7 @@ y_write_object_callback (
 
 	/* return val should be array */
 	if (IS_ARRAY != Z_TYPE_P(&zret)) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Expected callback for class '%s'"
 				" to return an array", clazz_name);
 		return FAILURE;
@@ -742,7 +742,7 @@ y_write_object_callback (
 	/* pull out the tag and surrogate object */
 	str_key = zend_string_init("tag", sizeof("tag") - 1, 0);
 	if ((ztag = zend_hash_find(Z_ARRVAL_P(&zret), str_key)) == NULL ||  Z_TYPE_P(ztag) != IS_STRING) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'tag' with a string value",
 				clazz_name);
@@ -753,7 +753,7 @@ y_write_object_callback (
 
 	str_key = zend_string_init("data", sizeof("data") - 1, 0);
 	if ((zdata = zend_hash_find(Z_ARRVAL_P(&zret), str_key)) == NULL) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+		php_error_docref(NULL, E_WARNING,
 				"Expected callback result for class '%s'"
 				" to contain a key named 'data'",
 				clazz_name);
@@ -765,7 +765,7 @@ y_write_object_callback (
 
 	/* emit surrogate object and tag */
 	return y_write_zval(
-			state, zdata, (yaml_char_t *) Z_STRVAL_P(ztag) TSRMLS_CC);
+			state, zdata, (yaml_char_t *) Z_STRVAL_P(ztag));
 }
 /* }}} */
 
@@ -775,7 +775,7 @@ y_write_object_callback (
 int
 php_yaml_write_impl(
 		yaml_emitter_t *emitter, zval *data,
-		yaml_encoding_t encoding, HashTable *callbacks TSRMLS_DC)
+		yaml_encoding_t encoding, HashTable *callbacks)
 {
 	y_emit_state_t state;
 	yaml_event_t event;
@@ -785,7 +785,7 @@ php_yaml_write_impl(
 	/* scan for recursive objects */
 	ALLOC_HASHTABLE(state.recursive);
 	zend_hash_init(state.recursive, 8, NULL, NULL, 0);
-	y_scan_recursion(&state, data TSRMLS_CC);
+	y_scan_recursion(&state, data);
 	state.callbacks = callbacks;
 
 
@@ -796,7 +796,7 @@ php_yaml_write_impl(
 		status = FAILURE;
 		goto cleanup;
 	}
-	if (FAILURE == y_event_emit(&state, &event TSRMLS_CC)) {
+	if (FAILURE == y_event_emit(&state, &event)) {
 		status = FAILURE;
 		goto cleanup;
 	}
@@ -808,13 +808,13 @@ php_yaml_write_impl(
 		status = FAILURE;
 		goto cleanup;
 	}
-	if (FAILURE == y_event_emit(&state, &event TSRMLS_CC)) {
+	if (FAILURE == y_event_emit(&state, &event)) {
 		status = FAILURE;
 		goto cleanup;
 	}
 
 	/* output data */
-	if (FAILURE == y_write_zval(&state, data, NULL TSRMLS_CC)) {
+	if (FAILURE == y_write_zval(&state, data, NULL)) {
 		status = FAILURE;
 		goto cleanup;
 	}
@@ -826,7 +826,7 @@ php_yaml_write_impl(
 		status = FAILURE;
 		goto cleanup;
 	}
-	if (FAILURE == y_event_emit(&state, &event TSRMLS_CC)) {
+	if (FAILURE == y_event_emit(&state, &event)) {
 		status = FAILURE;
 		goto cleanup;
 	}
@@ -838,7 +838,7 @@ php_yaml_write_impl(
 		status = FAILURE;
 		goto cleanup;
 	}
-	if (FAILURE == y_event_emit(&state, &event TSRMLS_CC)) {
+	if (FAILURE == y_event_emit(&state, &event)) {
 		status = FAILURE;
 		goto cleanup;
 	}
