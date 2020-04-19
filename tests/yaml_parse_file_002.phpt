@@ -15,7 +15,7 @@ try {
   yaml_parse_file();
 } catch (ArgumentCountError $e) {
   // PHP8 raises this exception
-  echo "\nWarning: {$e->getMessage()} in " . __FILE__ . " on line 7\n";
+  echo "\nWarning: {$e->getMessage()} in " . __FILE__ . " on line " . __LINE__ . "\n";
 }
 --EXPECTF--
 Warning: yaml_parse_file(): Filename cannot be empty in %s on line %d
