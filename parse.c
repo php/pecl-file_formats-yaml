@@ -176,7 +176,7 @@ void php_yaml_read_partial(
 			if (pos != 0) {
 				/* reached end of stream without finding what we wanted */
 				php_error_docref(NULL TSRMLS_CC, E_WARNING,
-						"end of stream reached without finding document %ld",
+						"end of stream reached without finding document " ZEND_LONG_FMT,
 						pos);
 				code = Y_PARSER_FAILURE;
 			} else {
@@ -875,7 +875,7 @@ static char *convert_to_char(zval *zv TSRMLS_DC)
 		{
 			char buf[32] = { '\0' };
 
-			(void) snprintf(buf, 32, "%ld", Z_LVAL_P(zv));
+			(void) snprintf(buf, 32, ZEND_LONG_FMT, Z_LVAL_P(zv));
 			str = estrdup(buf);
 		}
 		break;
