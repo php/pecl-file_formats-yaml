@@ -645,6 +645,7 @@ static int y_write_timestamp(
 #else
 	zend_call_method_with_1_params(data, clazz, NULL, "format", &timestamp, &dtfmt);
 #endif
+	zval_ptr_dtor(&dtfmt);
 
 	/* emit formatted date */
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
