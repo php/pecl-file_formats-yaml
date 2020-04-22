@@ -37,7 +37,7 @@
 
 /* {{{ local prototypes
  */
-static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC);
+static int php_yaml_check_callbacks(HashTable *callbacks);
 
 static PHP_MINIT_FUNCTION(yaml);
 static PHP_MSHUTDOWN_FUNCTION(yaml);
@@ -279,7 +279,7 @@ static PHP_GINIT_FUNCTION(yaml)
 /* {{{ php_yaml_check_callbacks()
  * Validate user supplied callback array contents
  */
-static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
+static int php_yaml_check_callbacks(HashTable *callbacks)
 {
 	zval *entry;
 	zend_string *key;
@@ -288,15 +288,15 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 		if (key) {
 			zend_string *name;
 
-			if (!ZEND_IS_CALLABLE(entry, 0, &name)) {
+			if (!zend_is_callable(entry, 0, &name)) {
 				if (name != NULL) {
-					php_error_docref(NULL TSRMLS_CC, E_WARNING,
+					php_error_docref(NULL, E_WARNING,
 							"Callback for tag '%s', '%s' is not valid",
 							key->val, name->val);
 					efree(name);
 
 				} else {
-					php_error_docref(NULL TSRMLS_CC, E_WARNING,
+					php_error_docref(NULL, E_WARNING,
 							"Callback for tag '%s' is not valid", key->val);
 				}
 				return FAILURE;
@@ -307,7 +307,7 @@ static int php_yaml_check_callbacks(HashTable *callbacks TSRMLS_DC)
 			}
 
 		} else {
-			php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+			php_error_docref(NULL, E_NOTICE,
 					"Callback key should be a string");
 		}
 	} ZEND_HASH_FOREACH_END();
@@ -336,7 +336,7 @@ PHP_FUNCTION(yaml_parse)
 
 	YAML_G(timestamp_decoder) = NULL;
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 					"S|lz/a/", &input, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
@@ -344,7 +344,7 @@ PHP_FUNCTION(yaml_parse)
 
 	if (zcallbacks != NULL) {
 		state.callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(state.callbacks TSRMLS_CC)) {
+		if (FAILURE == php_yaml_check_callbacks(state.callbacks)) {
 			RETURN_FALSE;
 		}
 
@@ -359,9 +359,9 @@ PHP_FUNCTION(yaml_parse)
 
 
 	if (pos < 0) {
-		php_yaml_read_all(&state, &ndocs, &yaml TSRMLS_CC);
+		php_yaml_read_all(&state, &ndocs, &yaml);
 	} else {
-		php_yaml_read_partial(&state, pos, &ndocs, &yaml TSRMLS_CC);
+		php_yaml_read_partial(&state, pos, &ndocs, &yaml);
 	}
 
 	yaml_parser_delete(&state.parser);
@@ -404,7 +404,7 @@ PHP_FUNCTION(yaml_parse_file)
 
 	YAML_G(timestamp_decoder) = NULL;
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 					"s|lza/", &filename, &filename_len, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
@@ -412,7 +412,7 @@ PHP_FUNCTION(yaml_parse_file)
 
 	if (zcallbacks != NULL) {
 		state.callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(state.callbacks TSRMLS_CC)) {
+		if (FAILURE == php_yaml_check_callbacks(state.callbacks)) {
 			RETURN_FALSE;
 		}
 
@@ -438,10 +438,10 @@ PHP_FUNCTION(yaml_parse_file)
 	yaml_parser_set_input_file(&state.parser, fp);
 
 	if (pos < 0) {
-		php_yaml_read_all(&state, &ndocs, &yaml TSRMLS_CC);
+		php_yaml_read_all(&state, &ndocs, &yaml);
 
 	} else {
-		php_yaml_read_partial(&state, pos, &ndocs, &yaml TSRMLS_CC);
+		php_yaml_read_partial(&state, pos, &ndocs, &yaml);
 	}
 
 	yaml_parser_delete(&state.parser);
@@ -486,14 +486,14 @@ PHP_FUNCTION(yaml_parse_url)
 
 	YAML_G(timestamp_decoder) = NULL;
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
 				"s|lza/", &url, &url_len, &pos, &zndocs, &zcallbacks)) {
 		return;
 	}
 
 	if (zcallbacks != NULL) {
 		state.callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(state.callbacks TSRMLS_CC)) {
+		if (FAILURE == php_yaml_check_callbacks(state.callbacks)) {
 			RETURN_FALSE;
 		}
 
@@ -517,9 +517,9 @@ PHP_FUNCTION(yaml_parse_url)
 	yaml_parser_set_input_string(&state.parser, (unsigned char *)input, size);
 
 	if (pos < 0) {
-		php_yaml_read_all(&state, &ndocs, &yaml TSRMLS_CC);
+		php_yaml_read_all(&state, &ndocs, &yaml);
 	} else {
-		php_yaml_read_partial(&state, pos, &ndocs, &yaml TSRMLS_CC);
+		php_yaml_read_partial(&state, pos, &ndocs, &yaml);
 	}
 
 	yaml_parser_delete(&state.parser);
@@ -553,14 +553,14 @@ PHP_FUNCTION(yaml_emit)
 	yaml_emitter_t emitter = { 0 };
 	smart_string str = { 0 };
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS()TSRMLS_CC, "z/|lla/",
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "z/|lla/",
 				&data, &encoding, &linebreak, &zcallbacks)) {
 		return;
 	}
 
 	if (zcallbacks != NULL) {
 		callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+		if (FAILURE == php_yaml_check_callbacks(callbacks)) {
 			RETURN_FALSE;
 		}
 	}
@@ -577,7 +577,7 @@ PHP_FUNCTION(yaml_emit)
 
 	if (SUCCESS == php_yaml_write_impl(
 				&emitter, data, (yaml_encoding_t) encoding,
-				callbacks TSRMLS_CC)) {
+				callbacks)) {
 		RETVAL_STRINGL(str.c, str.len);
 
 	} else {
@@ -605,14 +605,14 @@ PHP_FUNCTION(yaml_emit_file)
 
 	yaml_emitter_t emitter = { 0 };
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Sz/|lla/",
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "Sz/|lla/",
 			&filename, &data, &encoding, &linebreak, &zcallbacks)) {
 		return;
 	}
 
 	if (zcallbacks != NULL) {
 		callbacks = Z_ARRVAL_P(zcallbacks);
-		if (FAILURE == php_yaml_check_callbacks(callbacks TSRMLS_CC)) {
+		if (FAILURE == php_yaml_check_callbacks(callbacks)) {
 			RETURN_FALSE;
 		}
 	}
@@ -639,7 +639,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
-			&emitter, data, YAML_ANY_ENCODING, callbacks TSRMLS_CC)));
+			&emitter, data, YAML_ANY_ENCODING, callbacks)));
 
 	yaml_emitter_delete(&emitter);
 	php_stream_close(stream);
