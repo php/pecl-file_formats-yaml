@@ -971,10 +971,16 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len TSRMLS_DC)
 				&retval, 1, argv, 0, NULL TSRMLS_CC) || Z_TYPE_P(&retval) == IS_UNDEF) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING,
 					"Failed to evaluate string '%s' as timestamp", ts);
+			if (func != NULL) {
+				zval_ptr_dtor(func);
+			}
 			zval_ptr_dtor(&arg);
 			return FAILURE;
 
 		} else {
+			if (func != NULL) {
+				zval_ptr_dtor(func);
+			}
 			zval_ptr_dtor(&arg);
 			ZVAL_COPY_VALUE(*zpp, &retval);
 			return SUCCESS;
