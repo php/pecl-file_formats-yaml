@@ -7,7 +7,7 @@ set -u
 
 UPSTREAM_URL="https://github.com/php/pecl-file_formats-yaml.git"
 UPSTREAM=upstream
-MASTER=master
+MASTER=php7
 
 MY_UPSTREAM=$(git remote show ${UPSTREAM} 2>/dev/null |
     grep "Fetch URL"|awk '{print $3}')
@@ -28,4 +28,4 @@ set -x
 
 git fetch ${UPSTREAM} -pv
 git checkout ${MASTER}
-git merge --ff-only ${UPSTREAM}/master
+git merge --ff-only ${UPSTREAM}/${MASTER}
