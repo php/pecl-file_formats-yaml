@@ -362,9 +362,9 @@ static int y_write_long(
 		omit_tag = 1;
 	}
 
-	res_size = snprintf(res, 0, "%ld", Z_LVAL_P(data));
+	res_size = snprintf(res, 0, ZEND_LONG_FMT, Z_LVAL_P(data));
 	res = (char*) emalloc(res_size + 1);
-	snprintf(res, res_size + 1, "%ld", Z_LVAL_P(data));
+	snprintf(res, res_size + 1, ZEND_LONG_FMT, Z_LVAL_P(data));
 
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) res, strlen(res),
