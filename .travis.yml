@@ -1,17 +1,12 @@
 language: php
-dist: xenial
+dist: bionic
 php:
-  - 7.0
   - 7.1
   - 7.2
   - 7.3
-  - 7.4snapshot
+  - 7.4
   - nightly
 sudo: false
-addons:
-  apt:
-    packages:
-      - libonig-dev
 matrix:
   fast_finish: true
 env:
