@@ -22,13 +22,13 @@ $data = array (
 
 print yaml_emit($data);
 ?>
---EXPECT--
+--EXPECTF--
 ---
 audio:
   audioEnabled:
-  - 132317787432502136
+  - 13231778%s
   - 0
   eveampGain:
-  - 132316833510704299
+  - 13231683%s
   - 0.250000
 ...
