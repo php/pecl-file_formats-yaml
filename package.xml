@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2018-11-24</date>
+ <date>2020-04-22</date>
  <version>
-  <release>2.0.4</release>
+  <release>2.1.0</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -31,8 +31,14 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
- Bugs Fixed:
- - #72540 yaml_parse_url: check php_stream_copy_to_mem return value
+  New Features:
+  - Basic PHP8 (master branch) compatiblity
+  Bugs Fixed:
+  - #79494: The 64-bit YAML ext uses 32-bit signed integer arithmetics (cmb69)
+  - Use ZEND_LONG_FMT to fix -Wformat warnings (carusogabriel)
+  - Fix memory leaks when writing timestamps (cmb69)
+  - Update tests/yaml_parse_file_002.phpt for PHP8 (carusogabriel)
+  - #78353: Remove deprecated TSRM macros (a.dankovtsev)
  </notes>
  <contents>
   <dir name="/">
@@ -64,6 +70,7 @@
     <file role="test" name="bug_74799.yaml" />
     <file role="test" name="bug_75029.phpt" />
     <file role="test" name="bug_76309.phpt" />
+    <file role="test" name="bug_79494.phpt" />
     <file role="test" name="bug_parsing_alias.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
@@ -125,7 +132,7 @@
  <dependencies>
   <required>
    <php>
-    <min>7.0.0-dev</min>
+    <min>7.1.0</min>
    </php>
    <pearinstaller>
     <min>1.4.0b1</min>
@@ -144,6 +151,21 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2018-11-24</date>
+   <version>
+    <release>2.0.4</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+   Bugs Fixed:
+   - #72540 yaml_parse_url: check php_stream_copy_to_mem return value
+   </notes>
+  </release>
   <release>
    <date>2018-11-13</date>
    <version>
