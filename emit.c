@@ -506,9 +506,9 @@ static int y_write_array(
 	recursive_idx = y_search_recursive(state, (zend_ulong) ht);
 	if (-1 != recursive_idx) {
 		/* create anchor to refer to this structure */
-		anchor_size = snprintf(anchor, 0, "refid%ld", recursive_idx + 1);
+		anchor_size = snprintf(anchor, 0, "refid" ZEND_LONG_FMT, recursive_idx + 1);
 		anchor = (char*) emalloc(anchor_size + 1);
-		snprintf(anchor, anchor_size + 1, "refid%ld", recursive_idx + 1);
+		snprintf(anchor, anchor_size + 1, "refid" ZEND_LONG_FMT, recursive_idx + 1);
 
 #if PHP_VERSION_ID >= 70300
 		if (!(GC_FLAGS(ht) & GC_IMMUTABLE) && GC_IS_RECURSIVE(ht)) {
