@@ -1,7 +1,7 @@
 --TEST--
 Test PECL bug #74949
 --SKIPIF--
-<?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+<?php if(!extension_loaded('yaml') || PHP_INT_SIZE==4) die('skip yaml n/a'); ?>
 --FILE--
 <?php
 $data = array (
