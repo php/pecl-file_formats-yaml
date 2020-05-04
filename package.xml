@@ -22,23 +22,19 @@
  </lead>
  <date>2020-04-22</date>
  <version>
-  <release>2.1.0</release>
+  <release>2.2.0a1</release>
   <api>2.0.0</api>
  </version>
  <stability>
-  <release>stable</release>
+  <release>alpha</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  New Features:
-  - Basic PHP8 (master branch) compatiblity
   Bugs Fixed:
-  - #79494: The 64-bit YAML ext uses 32-bit signed integer arithmetics (cmb69)
-  - Use ZEND_LONG_FMT to fix -Wformat warnings (carusogabriel)
-  - Fix memory leaks when writing timestamps (cmb69)
-  - Update tests/yaml_parse_file_002.phpt for PHP8 (carusogabriel)
-  - #78353: Remove deprecated TSRM macros (a.dankovtsev)
+  - #77720 Out of memory error when parsing yaml file (bd808)
+  - [-Wformat=] issue on 32-bit (remicollet)
+  - relax test on 32-bit (overflow to float) (remicollet)
  </notes>
  <contents>
   <dir name="/">
@@ -152,6 +148,27 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2020-04-22</date>
+   <version>
+    <release>2.1.0</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+     New Features:
+     - Basic PHP8 (master branch) compatiblity
+     Bugs Fixed:
+     - #79494: The 64-bit YAML ext uses 32-bit signed integer arithmetics (cmb69)
+     - Use ZEND_LONG_FMT to fix -Wformat warnings (carusogabriel)
+     - Fix memory leaks when writing timestamps (cmb69)
+     - Update tests/yaml_parse_file_002.phpt for PHP8 (carusogabriel)
+     - #78353: Remove deprecated TSRM macros (a.dankovtsev)
+   </notes>
+  </release>
   <release>
    <date>2018-11-24</date>
    <version>
