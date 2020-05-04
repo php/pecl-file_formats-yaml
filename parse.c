@@ -78,8 +78,6 @@ static zval *record_anchor_make_ref(zval *aliases, const char *anchor, zval *val
 static int apply_filter(
 		zval *zp, yaml_event_t event, HashTable *callbacks);
 
-static char *convert_to_char(zval *zv);
-
 static int eval_timestamp(zval **zpp, const char *ts, size_t ts_len);
 
 /* }}} */
@@ -382,7 +380,6 @@ void handle_document(parser_state_t *state, zval *retval)
 void handle_mapping(parser_state_t *state, zval *retval)
 {
 	yaml_event_t src_event = { YAML_NO_EVENT }, key_event = { YAML_NO_EVENT };
-	char *key_str;
 	zval key = {{0} };
 	zval value = {{0} };
 	zval *arrval = retval;
@@ -399,14 +396,11 @@ void handle_mapping(parser_state_t *state, zval *retval)
 		arrval = record_anchor_make_ref(&state->aliases, (char *) src_event.data.mapping_start.anchor, retval);
 	}
 
-	for (get_next_element(state, &key); Z_TYPE_P(&key) != IS_UNDEF; get_next_element(state, &key)) {
+	for (get_next_element(state, &key); Z_TYPE(key) != IS_UNDEF; get_next_element(state, &key)) {
 		COPY_EVENT(key_event, state);
-		key_str = convert_to_char(&key);
 		get_next_element(state, &value);
 
-		if (Z_TYPE_P(&value) == IS_UNDEF) {
-			//TODO Sean-Der
-			//zval_ptr_dtor(retval);
+		if (Z_TYPE(value) == IS_UNDEF) {
 			yaml_event_delete(&src_event);
 			yaml_event_delete(&key_event);
 			return;
@@ -417,8 +411,9 @@ void handle_mapping(parser_state_t *state, zval *retval)
 		/* check for '<<' and handle merge */
 		if (key_event.type == YAML_SCALAR_EVENT &&
 				IS_NOT_QUOTED_OR_TAG_IS(key_event, YAML_MERGE_TAG) &&
-				STR_EQ("<<", key_str) &&
-				Z_TYPE_P(valptr) == IS_ARRAY) {
+				Z_TYPE(key) == IS_STRING &&
+				Z_TYPE_P(valptr) == IS_ARRAY &&
+				STR_EQ("<<", Z_STRVAL(key))) {
 			/* zend_hash_merge */
 			/*
 			 * value is either a single ref or a simple array of refs
@@ -444,13 +439,36 @@ void handle_mapping(parser_state_t *state, zval *retval)
 					}
 				} ZEND_HASH_FOREACH_END();
 			}
-
 			zval_ptr_dtor(&value);
 		} else {
-			/* add key => value to retval */
-			add_assoc_zval(arrval, key_str, &value);
+			/* add key => value to arrval */
+			zval *offset = &key;
+			ZVAL_DEREF(offset);
+			switch(Z_TYPE_P(offset)) {
+			case IS_DOUBLE:
+			case IS_FALSE:
+			case IS_LONG:
+			case IS_NULL:
+			case IS_RESOURCE:
+			case IS_STRING:
+			case IS_TRUE:
+				array_set_zval_key(Z_ARRVAL_P(arrval), offset, &value);
+				Z_TRY_DELREF(value);
+				break;
+			case IS_UNDEF:
+				zend_hash_update(Z_ARRVAL_P(arrval), ZSTR_EMPTY_ALLOC(), &value);
+				break;
+			default:
+				php_error_docref(
+					NULL, E_WARNING,
+					"Illegal offset type %s (line %zd, column %zd)",
+					zend_zval_type_name(offset),
+					state->parser.mark.line + 1,
+					state->parser.mark.column + 1
+				);
+				break;
+			}
 		}
-		efree(key_str);
 		yaml_event_delete(&key_event);
 		zval_ptr_dtor(&key);
 		ZVAL_UNDEF(&key);
@@ -843,92 +861,6 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 	/* no mapping, so handle raw */
 	zend_string_release(tag_zstring);
 	return eval_scalar(event, NULL, retval);
-}
-/* }}} */
-
-
-/* {{{ convert_to_char()
- * Convert a zval to a character array.
- */
-static char *convert_to_char(zval *zv)
-{
-	char *str = { 0 };
-
-	ZVAL_OPT_DEREF(zv);
-	switch (Z_TYPE_P(zv)) {
-	case IS_TRUE:
-			str = estrndup("1", 1);
-			break;
-	case IS_FALSE:
-			str = estrndup("", 0);
-			break;
-	case IS_DOUBLE:
-		{
-			char buf[64] = { '\0' };
-
-			(void) snprintf(buf, 64, "%G", Z_DVAL_P(zv));
-			str = estrdup(buf);
-		}
-		break;
-
-	case IS_LONG:
-		{
-			char buf[32] = { '\0' };
-
-			(void) snprintf(buf, 32, ZEND_LONG_FMT, Z_LVAL_P(zv));
-			str = estrdup(buf);
-		}
-		break;
-
-	case IS_NULL:
-		str = estrndup("", 0);
-		break;
-
-	case IS_STRING:
-		str = estrndup(Z_STRVAL_P(zv), Z_STRLEN_P(zv));
-		break;
-
-	case IS_OBJECT:
-		{
-			zval tmp;
-
-#if PHP_VERSION_ID >= 80000
-			if (SUCCESS == zend_std_cast_object_tostring(Z_OBJ_P(zv), &tmp, IS_STRING)) {
-#else
-			if (SUCCESS == zend_std_cast_object_tostring(zv, &tmp, IS_STRING)) {
-#endif
-				str = estrndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
-				zval_dtor(&tmp);
-				return str;
-			}
-		}
-		break;
-
-	default:
-		{
-			php_serialize_data_t var_hash;
-			smart_str buf = {0};
-
-			PHP_VAR_SERIALIZE_INIT(var_hash);
-			php_var_serialize(&buf, zv, &var_hash);
-			PHP_VAR_SERIALIZE_DESTROY(var_hash);
-
-			if (buf.s) {
-				str = estrndup(buf.s->val, buf.s->len);
-			} else {
-				str = NULL;
-			}
-			smart_str_free(&buf);
-		}
-		break;
-	}
-
-	if (NULL == str) {
-		php_error_docref(NULL, E_WARNING,
-				"Failed to convert %s to string", zend_zval_type_name(zv));
-	}
-
-	return str;
 }
 /* }}} */
 

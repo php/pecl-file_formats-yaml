@@ -16,12 +16,12 @@ YAML;
 
 var_dump(yaml_parse($yaml_code));
 ?>
---EXPECT--
+--EXPECTF--
 array(1) {
   ["[a]"]=>
   int(1)
 }
-array(1) {
-  ["a:1:{i:0;s:1:"a";}"]=>
-  int(1)
+
+Warning: yaml_parse(): Illegal offset type array (line 1, column 7) in %s/bug_64694.php on line 12
+array(0) {
 }
