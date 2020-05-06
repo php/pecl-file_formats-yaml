@@ -32,6 +32,7 @@
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
   Bugs Fixed:
+  - #79567 Parsing long long values leads to truncation on LLP64 platforms (bd808)
   - #77720 Out of memory error when parsing yaml file (bd808)
   - [-Wformat=] issue on 32-bit (remicollet)
   - relax test on 32-bit (overflow to float) (remicollet)
@@ -68,6 +69,7 @@
     <file role="test" name="bug_76309.phpt" />
     <file role="test" name="bug_77720.phpt" />
     <file role="test" name="bug_79494.phpt" />
+    <file role="test" name="bug_79567.phpt" />
     <file role="test" name="bug_parsing_alias.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
