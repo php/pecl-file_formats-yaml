@@ -1,0 +1,50 @@
+image: Visual Studio 2017
+version: '{branch}.{build}'
+
+clone_folder: c:\projects\yaml
+
+install:
+  - ps: appveyor\install.ps1
+
+cache:
+  - c:\build-cache -> .appveyor.yml, appveyor\install.ps1
+
+environment:
+  BIN_SDK_VER: 2.2.0
+  matrix:
+    - PHP_VER: 7.2.30
+      ARCH: x64
+      TS: 1
+      VC: vc15
+      DEP: libyaml-0.1.7
+    - PHP_VER: 7.2.30
+      ARCH: x86
+      TS: 0
+      VC: vc15
+      DEP: libyaml-0.1.7
+    - PHP_VER: 7.3.17
+      ARCH: x64
+      TS: 1
+      VC: vc15
+      DEP: libyaml-0.1.7
+    - PHP_VER: 7.3.17
+      ARCH: x86
+      TS: 0
+      VC: vc15
+      DEP: libyaml-0.1.7
+    - PHP_VER: 7.4.5
+      ARCH: x64
+      TS: 1
+      VC: vc15
+      DEP: libyaml-0.1.7
+    - PHP_VER: 7.4.5
+      ARCH: x86
+      TS: 0
+      VC: vc15
+      DEP: libyaml-0.1.7
+
+build_script:
+  - ps: appveyor\build.ps1
+
+test_script:
+  - ps: appveyor\test.ps1
