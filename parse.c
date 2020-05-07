@@ -854,13 +854,11 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 		zval_ptr_dtor(&argv[0]);
 		zval_ptr_dtor(&argv[1]);
 		zval_ptr_dtor(&argv[2]);
-		zend_string_release(tag_zstring);
-		return;
+	} else {
+		/* no mapping, so handle raw */
+		eval_scalar(event, NULL, retval);
 	}
-
-	/* no mapping, so handle raw */
 	zend_string_release(tag_zstring);
-	return eval_scalar(event, NULL, retval);
 }
 /* }}} */
 
