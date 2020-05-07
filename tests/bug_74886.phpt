@@ -7,11 +7,11 @@ Test PECL bug #74886
 var_dump(yaml_parse('
 - &REF { "x": 1 }
 - # scalar
-  << : 0xDEADBEEF
+  << : 0x7FFFFFFF
 - # scalar in sequence len 1
-  << : [ 0xDEADBEEF ]
+  << : [ 0x7FFFFFFF ]
 - # scalar in sequence len 2
-  << : [ *REF, 0xDEADBEEF ]
+  << : [ *REF, 0x7FFFFFFF ]
 '));
 ?>
 --EXPECTF--
@@ -27,7 +27,7 @@ array(4) {
   [1]=>
   array(1) {
     ["<<"]=>
-    int(3735928559)
+    int(2147483647)
   }
   [2]=>
   array(0) {
