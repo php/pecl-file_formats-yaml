@@ -520,18 +520,18 @@ finish:
 				ptr++;
 			}
 
-			*lval = strtol(ptr, (char **) NULL, 2);
+			*lval = ZEND_STRTOL(ptr, (char **) NULL, 2);
 			if (*buf == '-') {
 				*lval *= -1L;
 			}
 			break;
 
 		case Y_SCALAR_IS_OCTAL:
-			*lval = strtol(buf, (char **) NULL, 8);
+			*lval = ZEND_STRTOL(buf, (char **) NULL, 8);
 			break;
 
 		case Y_SCALAR_IS_HEXADECIMAL:
-			*lval = strtol(buf, (char **) NULL, 16);
+			*lval = ZEND_STRTOL(buf, (char **) NULL, 16);
 			break;
 
 		case Y_SCALAR_IS_SEXAGECIMAL:
@@ -542,7 +542,7 @@ finish:
 			break;
 
 		default:
-			*lval = atol(buf);
+			ZEND_ATOL(*lval, buf);
 			break;
 		}
 
@@ -765,7 +765,7 @@ static zend_long eval_sexagesimal_l(zend_long lval, const char *sg, const char *
 	}
 
 	return eval_sexagesimal_l(
-			lval * 60 + strtol(sg, (char **) NULL, 10), ep, eos);
+			lval * 60 + ZEND_STRTOL(sg, (char **) NULL, 10), ep, eos);
 }
 /* }}} */
 
@@ -791,7 +791,7 @@ static double eval_sexagesimal_d(double dval, const char *sg, const char *eos)
 	}
 
 	return eval_sexagesimal_d(
-			dval * 60.0 + strtod(sg, (char **) NULL), ep, eos);
+			dval * 60.0 + zend_strtod(sg, (const char **) NULL), ep, eos);
 }
 /* }}} */
 
