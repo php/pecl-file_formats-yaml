@@ -22,6 +22,6 @@ array(1) {
   int(1)
 }
 
-Warning: yaml_parse(): Illegal offset type array (line 1, column 7) in %s/bug_64694.php on line 12
+Warning: yaml_parse(): Illegal offset type array (line 1, column 7) in %sbug_64694.php on line 12
 array(0) {
 }

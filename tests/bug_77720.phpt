@@ -21,225 +21,225 @@ var_dump(yaml_parse($key_laughs));
 ?>
 --EXPECTF--
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 2, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 2, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 3, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 3, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 4, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 4, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 5, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 5, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 6, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 6, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 7, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 7, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 8, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 8, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 9, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 9, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 10, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 10, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 2) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 2) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 73) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 11, column 79) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 11, column 79) in %sbug_77720.php on line 15
 
-Warning: yaml_parse(): Illegal offset type array (line 12, column 1) in %s/bug_77720.php on line 15
+Warning: yaml_parse(): Illegal offset type array (line 12, column 1) in %sbug_77720.php on line 15
 array(11) {
   [0]=>
   array(9) {
