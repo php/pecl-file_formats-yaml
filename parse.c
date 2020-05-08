@@ -366,8 +366,8 @@ void handle_document(parser_state_t *state, zval *retval)
 	/* assert that end event is next in stream */
 	if (NULL != retval && NEXT_EVENT() &&
 			YAML_DOCUMENT_END_EVENT != state->event.type) {
+		zval_ptr_dtor(retval);
 		ZVAL_UNDEF(retval);
-		//zval_ptr_dtor(&retval);
 		//retval = NULL;
 	}
 }
@@ -667,6 +667,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks)
 					zval_ptr_dtor(tmp);
 					ZVAL_COPY_VALUE(tmp, &retval);
 				} else {
+					zval_ptr_dtor(zp);
 					ZVAL_COPY_VALUE(zp, &retval);
 				}
 			}
