@@ -293,13 +293,15 @@ static int php_yaml_check_callbacks(HashTable *callbacks)
 					php_error_docref(NULL, E_WARNING,
 							"Callback for tag '%s', '%s' is not valid",
 							key->val, name->val);
-					efree(name);
+					zend_string_release(name);
 
 				} else {
 					php_error_docref(NULL, E_WARNING,
 							"Callback for tag '%s' is not valid", key->val);
 				}
 				return FAILURE;
+			} else {
+				zend_string_release(name);
 			}
 
 			if (!memcmp(key->val, YAML_TIMESTAMP_TAG, sizeof(YAML_TIMESTAMP_TAG))) {
