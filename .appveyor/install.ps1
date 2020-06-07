@@ -45,19 +45,6 @@ if (-not (Test-Path c:\build-cache\$dname)) {
 $env:PHP_PATH = 'c:\build-cache\' + $dname
 $env:PATH = $env:PHP_PATH + ';' + $env:PATH
 
-$bname = 'php-test-pack-' + $env:PHP_VER + '.zip'
-if (-not (Test-Path c:\build-cache\$bname)) {
-    Invoke-WebRequest "http://windows.php.net/downloads/releases/archives/$bname" -OutFile "c:\build-cache\$bname"
-    if (-not (Test-Path c:\build-cache\$bname)) {
-        Invoke-WebRequest "http://windows.php.net/downloads/releases/$bname" -OutFile "c:\build-cache\$bname"
-    }
-}
-$dname = 'php-test-pack-' + $env:PHP_VER
-if (-not (Test-Path c:\build-cache\$dname)) {
-    7z x c:\build-cache\$bname -oc:\build-cache\$dname
-}
-$env:PHP_TEST_PATH = 'c:\build-cache\' + $dname
-
 $bname = $env:DEP + '-' + $env:VC.toUpper() + '-' + $env:ARCH + '.zip'
 if (-not (Test-Path c:\build-cache\$bname)) {
     Invoke-WebRequest "http://windows.php.net/downloads/pecl/deps/$bname" -OutFile "c:\build-cache\$bname"
