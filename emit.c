@@ -722,8 +722,8 @@ y_write_object_callback (
 	zend_string *str_key;
 
 	/* call the user function */
-	if (FAILURE == call_user_function_ex(EG(function_table), NULL,
-			callback, &zret, 1, argv, 0, NULL) ||
+	if (FAILURE == call_user_function(EG(function_table), NULL,
+			callback, &zret, 1, argv) ||
 			Z_TYPE_P(&zret) == IS_UNDEF) {
 		php_error_docref(NULL, E_WARNING,
 				"Failed to apply callback for class '%s'"

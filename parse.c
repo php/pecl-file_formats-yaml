@@ -643,7 +643,7 @@ apply_filter(zval *zp, yaml_event_t event, HashTable *callbacks)
 		ZVAL_LONG(&callback_args[2], 0);
 
 		/* call the user function */
-		callback_result = call_user_function_ex(EG(function_table), NULL, callback, &retval, 3, callback_args, 0, NULL);
+		callback_result = call_user_function(EG(function_table), NULL, callback, &retval, 3, callback_args);
 
 		/* cleanup our temp variables */
 		zval_ptr_dtor(&callback_args[1]);
@@ -846,7 +846,7 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 		ZVAL_STRINGL(&argv[1], tag, strlen(tag));
 		ZVAL_LONG(&argv[2], event.data.scalar.style);
 
-		if (FAILURE == call_user_function_ex(EG(function_table), NULL, callback, retval, 3, argv, 0, NULL) || Z_TYPE_P(retval) == IS_UNDEF) {
+		if (FAILURE == call_user_function(EG(function_table), NULL, callback, retval, 3, argv) || Z_TYPE_P(retval) == IS_UNDEF) {
 			php_error_docref(NULL, E_WARNING,
 					"Failed to evaluate value for tag '%s'"
 					" with user defined function", tag);
@@ -898,8 +898,8 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len)
 		ZVAL_STRINGL(&arg, ts, ts_len);
 		argv[0] = arg;
 
-		if (FAILURE == call_user_function_ex(EG(function_table), NULL, func,
-				&retval, 1, argv, 0, NULL) || Z_TYPE_P(&retval) == IS_UNDEF) {
+		if (FAILURE == call_user_function(EG(function_table), NULL, func,
+				&retval, 1, argv) || Z_TYPE_P(&retval) == IS_UNDEF) {
 			php_error_docref(NULL, E_WARNING,
 					"Failed to evaluate string '%s' as timestamp", ts);
 			if (func != NULL) {
