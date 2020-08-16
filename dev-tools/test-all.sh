@@ -2,7 +2,7 @@
 
 rm .rbenv-version 2>/dev/null
 
-VERSIONS=$(phpenv versions --bare | grep -E '^(7|8|master)')
+VERSIONS=$(phpenv versions --bare | grep -E '^(7.[^0]|8|master)' | sort -V)
 SCRIPT_DIR=$(dirname $0)
 
 for v in $VERSIONS; do
