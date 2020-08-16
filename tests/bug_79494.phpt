@@ -2,6 +2,8 @@
 Test PECL bug #74949
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+serialize_precision=-1
 --FILE--
 <?php
 $data = array (
@@ -26,9 +28,9 @@ print yaml_emit($data);
 ---
 audio:
   audioEnabled:
-  - 13231778%s
+  - %r(132317787432502136|1\.3231778743250214E\+17)%r
   - 0
   eveampGain:
-  - 13231683%s
-  - 0.250000
+  - %r(132316833510704299|1\.323168335107043E\+17)%r
+  - 0.25
 ...

@@ -387,22 +387,20 @@ static int y_write_double(
 	yaml_event_t event;
 	int omit_tag = 0;
 	int status;
-	char *res = { 0 };
-	size_t res_size;
+	char res[PHP_DOUBLE_MAX_LENGTH];
 
 	if (NULL == tag) {
 		tag = (yaml_char_t *) YAML_FLOAT_TAG;
 		omit_tag = 1;
 	}
 
-	res_size = snprintf(res, 0, "%f", Z_DVAL_P(data));
-	res = (char*) emalloc(res_size + 1);
-	snprintf(res, res_size + 1, "%f", Z_DVAL_P(data));
+	// Bug 79866: let PHP determine output precision
+	php_gcvt(Z_DVAL_P(data), (int)PG(serialize_precision), '.', 'E', res);
 
 	status = yaml_scalar_event_initialize(&event, NULL, tag,
 			(yaml_char_t *) res, strlen(res),
 			omit_tag, omit_tag, YAML_PLAIN_SCALAR_STYLE);
-	efree(res);
+
 	if (!status) {
 		y_event_init_failed(&event);
 		return FAILURE;

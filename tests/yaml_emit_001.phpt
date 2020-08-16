@@ -2,6 +2,8 @@
 yaml_emit - scalars
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+serialize_precision=-1
 --FILE--
 <?php
 var_dump(yaml_emit(null));
@@ -57,10 +59,10 @@ string(11) "--- 10
 string(12) "--- -10
 ...
 "
-string(19) "--- 123.456000
+string(16) "--- 123.456
 ...
 "
-string(20) "--- -123.456000
+string(17) "--- -123.456
 ...
 "
 string(14) "--- "yes"

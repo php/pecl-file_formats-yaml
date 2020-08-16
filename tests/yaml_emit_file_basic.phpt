@@ -2,6 +2,8 @@
 Test Github pull request #1
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+serialize_precision=-1
 --FILE--
 <?php
 $addr = array(
@@ -50,7 +52,7 @@ unlink($temp_filename);
 ?>
 --EXPECT--
 bool(true)
-string(628) "---
+string(620) "---
 invoice: 34843
 date: 980208000
 bill-to:
@@ -82,8 +84,8 @@ product:
   quantity: 1
   description: Super Hoop
   price: 2392
-tax: 251.420000
-total: 4443.520000
+tax: 251.42
+total: 4443.52
 comments: Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.
 ...
 "
