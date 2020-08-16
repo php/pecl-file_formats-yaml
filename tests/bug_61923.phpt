@@ -2,6 +2,8 @@
 Test PECL bug #61923
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+serialize_precision=-1
 --FILE--
 <?php
 $yaml_code = <<<YAML
@@ -71,7 +73,7 @@ array(2) {
     float(67997.00037)
   }
 }
-string(162) "---
+string(161) "---
 strings:
 - "1:0"
 - "0:1"
@@ -89,6 +91,6 @@ numbers:
 - -3600
 - 1
 - 1
-- 67997.000370
+- 67997.00037
 ...
 "

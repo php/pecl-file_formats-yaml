@@ -2,6 +2,8 @@
 yaml_emit - sequences
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+serialize_precision=-1
 --FILE--
 <?php
 $str = <<<EOD
@@ -65,14 +67,14 @@ var_dump(yaml_emit(array()));
 ?>
 --EXPECT--
 === Array of scalars ===
-string(610) "---
+string(604) "---
 - ~
 - true
 - false
 - 10
 - -10
-- 123.456000
-- -123.456000
+- 123.456
+- -123.456
 - "yes"
 - "no"
 - "~"

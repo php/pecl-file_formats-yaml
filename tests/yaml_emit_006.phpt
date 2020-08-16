@@ -8,6 +8,7 @@ if(!extension_loaded('yaml')) die('skip yaml n/a');
 yaml.output_canonical=0
 yaml.output_indent=2
 yaml.output_width=80
+serialize_precision=-1
 --FILE--
 <?php
 $addr = array(
@@ -54,7 +55,7 @@ var_dump(yaml_emit($invoice));
 
 ?>
 --EXPECT--
-string(628) "---
+string(620) "---
 invoice: 34843
 date: 980208000
 bill-to:
@@ -86,13 +87,13 @@ product:
   quantity: 1
   description: Super Hoop
   price: 2392
-tax: 251.420000
-total: 4443.520000
+tax: 251.42
+total: 4443.52
 comments: Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.
 ...
 "
 == CANONICAL ==
-string(1830) "---
+string(1822) "---
 !!map {
     ? !!str "invoice"
     : !!int "34843",
@@ -160,9 +161,9 @@ string(1830) "---
         },
     ],
     ? !!str "tax"
-    : !!float "251.420000",
+    : !!float "251.42",
     ? !!str "total"
-    : !!float "4443.520000",
+    : !!float "4443.52",
     ? !!str "comments"
     : !!str "Late afternoon is best. Backup
         contact is Nancy Billsmer @ 338-4338.",

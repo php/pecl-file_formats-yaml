@@ -32,6 +32,8 @@
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
   Bugs Fixed:
+  - #79866 Use serialize_precision when encoding double values (bd808)
+  - yaml_parse_file_002.phpt: Fix expectations for PHP 8.0.0beta1 (bd808)
   - Remove use of call_user_function_ex() for compat with PHP 8.0.0a2 (andypost)
   - Adjust test values for compat with 32bit platforms (bd808)
   - Fix memory leaks (cmb69)
@@ -73,6 +75,7 @@
     <file role="test" name="bug_77720.phpt" />
     <file role="test" name="bug_79494.phpt" />
     <file role="test" name="bug_79567.phpt" />
+    <file role="test" name="bug_79866.phpt" />
     <file role="test" name="bug_parsing_alias.phpt" />
     <file role="test" name="yaml_001.phpt" />
     <file role="test" name="yaml_002.phpt" />
