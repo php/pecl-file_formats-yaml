@@ -36,4 +36,4 @@ Warning: yaml_parse_file(): %r(Filename|Path)%r cannot be empty in %s on line %d
 
 Warning: yaml_parse_file(invalid): %r[Ff]%railed to open stream: No such file or directory in %s on line %d
 
-Warning: yaml_parse_file() expects at least 1 parameter, 0 given in %s on line %d
+Warning: yaml_parse_file() expects at least 1 %r(argument|parameter)%r, 0 given in %s on line %d
