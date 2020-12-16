@@ -304,7 +304,7 @@ static int php_yaml_check_callbacks(HashTable *callbacks)
 				zend_string_release(name);
 			}
 
-			if (!memcmp(key->val, YAML_TIMESTAMP_TAG, sizeof(YAML_TIMESTAMP_TAG))) {
+			if (zend_string_equals_literal(key, YAML_TIMESTAMP_TAG)) {
 				YAML_G(timestamp_decoder) = entry;
 			}
 
