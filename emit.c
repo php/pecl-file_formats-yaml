@@ -718,6 +718,7 @@ y_write_object_callback (
 	zval *ztag;
 	zval *zdata;
 	zend_string *str_key;
+	int result;
 
 	/* call the user function */
 	if (FAILURE == call_user_function(EG(function_table), NULL,
@@ -734,6 +735,7 @@ y_write_object_callback (
 		php_error_docref(NULL, E_WARNING,
 				"Expected callback for class '%s'"
 				" to return an array", clazz_name);
+		zval_ptr_dtor(&zret);
 		return FAILURE;
 	}
 
@@ -760,10 +762,12 @@ y_write_object_callback (
 	}
 	zend_string_release(str_key);
 
-
 	/* emit surrogate object and tag */
-	return y_write_zval(
+	result = y_write_zval(
 			state, zdata, (yaml_char_t *) Z_STRVAL_P(ztag));
+
+	zval_ptr_dtor(&zret);
+	return result;
 }
 /* }}} */
 
