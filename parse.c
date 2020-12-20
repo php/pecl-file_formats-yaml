@@ -403,6 +403,7 @@ void handle_mapping(parser_state_t *state, zval *retval)
 		if (Z_TYPE(value) == IS_UNDEF) {
 			yaml_event_delete(&src_event);
 			yaml_event_delete(&key_event);
+			zval_ptr_dtor(&key);
 			return;
 		}
 
