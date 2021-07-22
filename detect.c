@@ -542,7 +542,11 @@ finish:
 			break;
 
 		default:
+#if PHP_VERSION_ID >= 80100
+			*lval = ZEND_ATOL(buf);
+#else
 			ZEND_ATOL(*lval, buf);
+#endif
 			break;
 		}
 
