@@ -11,17 +11,13 @@ on:
 
 jobs:
   ubuntu:
-    name: Test on Ubuntu
+    name: Ubuntu
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         php-version:
-          - "7.1"
-          - "7.2"
-          - "7.3"
-          - "7.4"
           - "8.0"
           - "8.1"
           - "8.2"
@@ -60,3 +56,60 @@ jobs:
           -d extension=yaml.so
           --show-diff
           tests
+
+  windows:
+    name: Windows
+    runs-on: windows-2019
+
+    defaults:
+      run:
+        shell: cmd
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "8.0"
+          - "8.1"
+          - "8.2"
+        arch:
+          - "x64"
+        ts:
+          - nts
+          - ts
+        vsversion:
+          - "16.0"
+        libyaml:
+          - libyaml-0.1.7-vs16
+
+    steps:
+      - name: Configure git
+        run: git config --system core.autocrlf false
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        id: setup-php
+        uses: cmb69/setup-php-sdk@v0.7
+        with:
+          version: "${{ matrix.php-version }}"
+          arch: "${{ matrix.arch }}"
+          ts: "${{ matrix.ts }}"
+      - name: Download deps
+        run: |
+          curl -LO https://windows.php.net/downloads/pecl/deps/${{ matrix.libyaml }}-${{ matrix.arch }}.zip
+          7z x ${{ matrix.libyaml }}-${{ matrix.arch }}.zip -o..\deps
+          dir ..\deps
+      - name: Enable developer cli
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: "${{ matrix.arch }}"
+          toolset: "${{ steps.setup-php.outputs.toolset }}"
+          vsversion: "${{ matrix.vsversion }}"
+      - name: Generate build files
+        run: phpize
+      - name: Configure build
+        run: configure --with-yaml --with-php-build=..\deps --with-prefix=${{ steps.setup-php.outputs.prefix }}
+      - name: Build
+        run: nmake /D /P
+      - name: Run tests
+        run: nmake test TESTS="-n --show-diff tests"
