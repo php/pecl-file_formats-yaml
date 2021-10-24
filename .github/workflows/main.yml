@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - php7
+  pull_request:
+    branches:
+      - php7
+  workflow_dispatch:
+
+jobs:
+  ubuntu:
+    name: Test on Ubuntu
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+          - "8.1"
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          coverage: "none"
+          tools: "phpize, php-config"
+      - name: Generate build files
+        run: phpize
+      - name: Configure build
+        run: CFLAGS="-Wall -fno-strict-aliasing" ./configure --with-yaml
+      - name: Build
+        run: make all
+      - name: Run tests
+        run: >-
+          REPORT_EXIT_STATUS=1
+          NO_INTERACTION=1
+          TEST_PHP_EXECUTABLE=$(which php)
+          php -n
+          -d open_basedir=
+          -d output_buffering=0
+          -d memory_limit=-1
+          run-tests.php -n
+          -d extension_dir=modules
+          -d extension=yaml.so
+          --show-diff
+          tests
