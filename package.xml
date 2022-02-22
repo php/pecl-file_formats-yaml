@@ -106,6 +106,7 @@
     <file role="test" name="yaml_parse_spec_set.phpt" />
     <file role="test" name="yaml_parse_spec_str.phpt" />
     <file role="test" name="yaml_parse_spec_timestamp.phpt" />
+    <file role="test" name="yaml_parse_url_001.phpt" />
     <file role="test" name="yaml_parse_wiki_YtsBasicTests_001.phpt" />
     <file role="test" name="yaml_parse_wiki_YtsBasicTests_002.phpt" />
     <file role="test" name="yaml_parse_wiki_YtsBasicTests_003.phpt" />
