@@ -476,7 +476,6 @@ PHP_FUNCTION(yaml_parse_url)
 
 	php_stream *stream = { 0 };
 	zend_string *input;
-	size_t size = 0;
 
 	parser_state_t state;
 	zval yaml;
@@ -516,7 +515,7 @@ PHP_FUNCTION(yaml_parse_url)
 	}
 
 	yaml_parser_initialize(&state.parser);
-	yaml_parser_set_input_string(&state.parser, (unsigned char *)input, size);
+	yaml_parser_set_input_string(&state.parser, (unsigned char *)ZSTR_VAL(input), ZSTR_LEN(input));
 
 	if (pos < 0) {
 		php_yaml_read_all(&state, &ndocs, &yaml);
