@@ -35,7 +35,7 @@ foreach( $floats as $idx => $float ) {
   $expect = "--- {$native}\n...\n";
   $got = yaml_emit($float);
   if ( $got !== $expect ) {
-    echo "== FAIL! ${idx} ==\n";
+    echo "== FAIL! {$idx} ==\n";
     echo "expected:\n{$expect}\n";
     echo "got:{$got}\n";
   }
