@@ -467,6 +467,7 @@ void handle_mapping(parser_state_t *state, zval *retval)
 					state->parser.mark.line + 1,
 					state->parser.mark.column + 1
 				);
+				zval_ptr_dtor(&value);
 				break;
 			}
 		}
@@ -518,8 +519,10 @@ void handle_sequence (parser_state_t *state, zval *retval) {
 	}
 
 	if (YAML_SEQUENCE_END_EVENT != state->event.type) {
-		//TODO Sean-Der
+		zval_ptr_dtor(retval);
 		ZVAL_UNDEF(retval);
+		goto done;
+		//TODO Sean-Der
 		//zval_ptr_dtor(&retval);
 		//retval = NULL;
 	}
@@ -528,13 +531,15 @@ void handle_sequence (parser_state_t *state, zval *retval) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
 				retval, src_event, state->callbacks)) {
-			//TODO Sean-Der
+			zval_ptr_dtor(&retval);
 			ZVAL_UNDEF(retval);
-			//zval_ptr_dtor(&retval);
+			goto done;
+			//TODO Sean-Der
 			//retval = NULL;
 		}
 	}
 
+done:
 	yaml_event_delete(&src_event);
 }
 /* }}} */
