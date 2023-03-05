@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2021-10-24</date>
+ <date>2023-03-05</date>
  <version>
-  <release>2.2.2</release>
+  <release>2.2.3</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -32,7 +32,9 @@
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
   Bugs Fixed:
-  - PHP 8.1 compilation fixes (remicollet)
+  - Fixed memory release on error handling (negram)
+  - Fix test for PHP 8.2 (andypost)
+  - #65: Fix #65 yaml_parse_url method not working (remicollet)
  </notes>
  <contents>
   <dir name="/">
@@ -150,6 +152,21 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2021-10-24</date>
+   <version>
+    <release>2.2.2</release>
+    <api>2.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <notes>
+     Bugs Fixed:
+     - PHP 8.1 compilation fixes (remicollet)
+   </notes>
+  </release>
   <release>
    <date>2020-12-20</date>
    <version>
