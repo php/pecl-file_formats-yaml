@@ -1,4 +1,4 @@
--TEST--
+--TEST--
 yaml_parse_file - ndocs
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
