@@ -407,7 +407,7 @@ PHP_FUNCTION(yaml_parse_file)
 	YAML_G(timestamp_decoder) = NULL;
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(),
-					"s|lza/", &filename, &filename_len, &pos, &zndocs,
+					"s|lz/a/", &filename, &filename_len, &pos, &zndocs,
 					&zcallbacks)) {
 		return;
 	}
@@ -451,7 +451,7 @@ PHP_FUNCTION(yaml_parse_file)
 
 	if (zndocs != NULL) {
 		/* copy document count to var user sent in */
-		zval_dtor(zndocs);
+		zval_ptr_dtor(zndocs);
 		ZVAL_LONG(zndocs, ndocs);
 	}
 
