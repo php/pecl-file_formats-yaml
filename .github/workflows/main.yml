@@ -40,6 +40,8 @@ jobs:
         run: phpize
       - name: Configure build
         run: CFLAGS="-Wall -fno-strict-aliasing" ./configure --with-yaml
+      - name: Report gcc problems
+        uses: ammaraskar/gcc-problem-matcher@master
       - name: Build
         run: make all
       - name: Run tests
@@ -109,8 +111,8 @@ jobs:
         run: phpize
       - name: Configure build
         run: configure --with-yaml --with-php-build=..\deps --with-prefix=${{ steps.setup-php.outputs.prefix }}
-      - name: Report gcc problems
-        uses: ammaraskar/gcc-problem-matcher@master
+      - name: Report msvc problems
+        uses: ammaraskar/msvc-problem-matcher@master
       - name: Build
         run: nmake /D /P
       - name: Run tests
