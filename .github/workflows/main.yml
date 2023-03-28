@@ -39,7 +39,7 @@ jobs:
       - name: Generate build files
         run: phpize
       - name: Configure build
-        run: CFLAGS="-Wall -fno-strict-aliasing" ./configure --with-yaml
+        run: CFLAGS="-Werror -Wall -fno-strict-aliasing" ./configure --with-yaml
       - name: Report gcc problems
         uses: ammaraskar/gcc-problem-matcher@master
       - name: Build
