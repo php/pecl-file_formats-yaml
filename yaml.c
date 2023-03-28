@@ -133,7 +133,7 @@ static zend_function_entry yaml_functions[] = {
 	PHP_FE(yaml_parse_url, arginfo_yaml_parse_url)
 	PHP_FE(yaml_emit, arginfo_yaml_emit)
 	PHP_FE(yaml_emit_file, arginfo_yaml_emit_file)
-	{NULL, NULL, NULL}
+	PHP_FE_END
 };
 /* }}} */
 
