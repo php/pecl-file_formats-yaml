@@ -433,7 +433,7 @@ static int y_write_string(
 		size_t pos = 0, us;
 		int j;
 		const unsigned char *s = (const unsigned char *)Z_STRVAL_P(data);
-		int len = Z_STRLEN_P(data);
+		size_t len = Z_STRLEN_P(data);
 
 		for (j = 0; pos < len; j++) {
 			us = get_next_char(s, len, &pos, &status);
