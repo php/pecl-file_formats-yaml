@@ -531,7 +531,7 @@ void handle_sequence (parser_state_t *state, zval *retval) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
 				retval, src_event, state->callbacks)) {
-			zval_ptr_dtor(retval);
+			zval_ptr_dtor(&retval);
 			ZVAL_UNDEF(retval);
 			goto done;
 			//TODO Sean-Der
