@@ -61,8 +61,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: library-files
-          path: yaml.so
+          name: "yaml_${{ matrix.php-version }}_linux"
+          path: .libs/yaml.so
 
   windows:
     name: Windows
@@ -126,5 +126,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: library-files
+          name: "yaml_${{ matrix.php-version }}_win32_${{ matrix.ts }}_${{ matrix.arch }}"
           path: x64/
