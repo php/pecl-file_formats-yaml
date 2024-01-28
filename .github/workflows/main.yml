@@ -58,6 +58,11 @@ jobs:
           -d extension=yaml.so
           --show-diff
           tests
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-files
+          path: yaml.so
 
   windows:
     name: Windows
@@ -118,3 +123,8 @@ jobs:
         run: nmake /D /P
       - name: Run tests
         run: nmake test TESTS="-n --show-diff tests"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-files
+          path: x64/
