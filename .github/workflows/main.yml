@@ -77,7 +77,6 @@ jobs:
           - "8.3"
         arch:
           - "x64"
-          - "x86"
         ts:
           - nts
           - ts
@@ -93,7 +92,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup PHP
         id: setup-php
-        uses: cmb69/setup-php-sdk@v0.7
+        uses: php/setup-php-sdk@v0.8
         with:
           version: "${{ matrix.php-version }}"
           arch: "${{ matrix.arch }}"
