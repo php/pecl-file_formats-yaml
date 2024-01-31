@@ -58,6 +58,11 @@ jobs:
           -d extension=yaml.so
           --show-diff
           tests
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "yaml_${{ matrix.php-version }}_linux"
+          path: .libs/yaml.so
 
   windows:
     name: Windows
@@ -74,6 +79,7 @@ jobs:
           - "8.0"
           - "8.1"
           - "8.2"
+          - "8.3"
         arch:
           - "x64"
         ts:
@@ -91,7 +97,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup PHP
         id: setup-php
-        uses: cmb69/setup-php-sdk@v0.7
+        uses: php/setup-php-sdk@v0.8
         with:
           version: "${{ matrix.php-version }}"
           arch: "${{ matrix.arch }}"
@@ -117,3 +123,8 @@ jobs:
         run: nmake /D /P
       - name: Run tests
         run: nmake test TESTS="-n --show-diff tests"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "yaml_${{ matrix.php-version }}_win32_${{ matrix.ts }}_${{ matrix.arch }}"
+          path: x64/
