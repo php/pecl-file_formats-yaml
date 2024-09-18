@@ -1,0 +1,19 @@
+{
+    "name": "php/yaml",
+    "type": "php-ext",
+    "license": "MIT",
+    "description": "YAML-1.1 parser and emitter",
+    "require": {
+        "php": ">= 7.1.0"
+    },
+    "php-ext": {
+        "extension-name": "yaml",
+        "configure-options": [
+            {
+                "name": "with-yaml",
+                "description": "Enable LibYAML support. DIR is the path to LibYAML install prefix",
+                "needs-value": true
+            }
+        ]
+    }
+}
