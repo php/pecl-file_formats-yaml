@@ -10,34 +10,34 @@ cache:
   - c:\build-cache -> .appveyor.yml, .appveyor\install.ps1
 
 environment:
-  BIN_SDK_VER: 2.2.0
+  BIN_SDK_VER: 2.3.0
   matrix:
-    - PHP_VER: 7.2.30
+    - PHP_VER: 7.2.34
       ARCH: x64
       TS: 1
       VC: vc15
       DEP: libyaml-0.1.7
-    - PHP_VER: 7.2.30
+    - PHP_VER: 7.2.34
       ARCH: x86
       TS: 0
       VC: vc15
       DEP: libyaml-0.1.7
-    - PHP_VER: 7.3.17
+    - PHP_VER: 7.3.33
       ARCH: x64
       TS: 1
       VC: vc15
       DEP: libyaml-0.1.7
-    - PHP_VER: 7.3.17
+    - PHP_VER: 7.3.33
       ARCH: x86
       TS: 0
       VC: vc15
       DEP: libyaml-0.1.7
-    - PHP_VER: 7.4.5
+    - PHP_VER: 7.4.33
       ARCH: x64
       TS: 1
       VC: vc15
       DEP: libyaml-0.1.7
-    - PHP_VER: 7.4.5
+    - PHP_VER: 7.4.33
       ARCH: x86
       TS: 0
       VC: vc15
