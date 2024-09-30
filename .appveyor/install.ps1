@@ -3,7 +3,7 @@ if (-not (Test-Path c:\build-cache)) {
 }
 $bname = 'php-sdk-' + $env:BIN_SDK_VER + '.zip'
 if (-not (Test-Path c:\build-cache\$bname)) {
-    Invoke-WebRequest "https://github.com/microsoft/php-sdk-binary-tools/archive/$bname" -OutFile "c:\build-cache\$bname"
+    Invoke-WebRequest "https://github.com/php/php-sdk-binary-tools/archive/$bname" -OutFile "c:\build-cache\$bname"
 }
 $dname0 = 'php-sdk-binary-tools-php-sdk-' + $env:BIN_SDK_VER
 $dname1 = 'php-sdk-' + $env:BIN_SDK_VER
@@ -15,9 +15,9 @@ $ts_part = ''
 if ('0' -eq $env:TS) { $ts_part = '-nts' }
 $bname = 'php-devel-pack-' + $env:PHP_VER + $ts_part + '-Win32-' + $env:VC.toUpper() + '-' + $env:ARCH + '.zip'
 if (-not (Test-Path c:\build-cache\$bname)) {
-    Invoke-WebRequest "http://windows.php.net/downloads/releases/archives/$bname" -OutFile "c:\build-cache\$bname"
+    Invoke-WebRequest "https://downloads.php.net/~windows/releases/archives/$bname" -OutFile "c:\build-cache\$bname"
     if (-not (Test-Path c:\build-cache\$bname)) {
-        Invoke-WebRequest "http://windows.php.net/downloads/releases/$bname" -OutFile "c:\build-cache\$bname"
+        Invoke-WebRequest "hhttps://downloads.php.net/~windows/releases/$bname" -OutFile "c:\build-cache\$bname"
     }
 }
 $dname0 = 'php-' + $env:PHP_VER + '-devel-' + $env:VC.toUpper() + '-' + $env:ARCH
@@ -33,9 +33,9 @@ $env:PATH = $env:PHP_DEVEL_PATH + ';' + $env:PATH
 
 $bname = 'php-' + $env:PHP_VER + $ts_part + '-Win32-' + $env:VC.toUpper() + '-' + $env:ARCH + '.zip'
 if (-not (Test-Path c:\build-cache\$bname)) {
-    Invoke-WebRequest "http://windows.php.net/downloads/releases/archives/$bname" -OutFile "c:\build-cache\$bname"
+    Invoke-WebRequest "https://downloads.php.net/~windows/releases/archives/$bname" -OutFile "c:\build-cache\$bname"
     if (-not (Test-Path c:\build-cache\$bname)) {
-        Invoke-WebRequest "http://windows.php.net/downloads/releases/$bname" -OutFile "c:\build-cache\$bname"
+        Invoke-WebRequest "https://downloads.php.net/~windows/releases/$bname" -OutFile "c:\build-cache\$bname"
     }
 }
 $dname = 'php-' + $env:PHP_VER + $ts_part + '-Win32-' + $env:VC.toUpper() + '-' + $env:ARCH
@@ -47,6 +47,6 @@ $env:PATH = $env:PHP_PATH + ';' + $env:PATH
 
 $bname = $env:DEP + '-' + $env:VC.toUpper() + '-' + $env:ARCH + '.zip'
 if (-not (Test-Path c:\build-cache\$bname)) {
-    Invoke-WebRequest "http://windows.php.net/downloads/pecl/deps/$bname" -OutFile "c:\build-cache\$bname"
+    Invoke-WebRequest "http://downloads.php.net/~windows/pecl/deps/$bname" -OutFile "c:\build-cache\$bname"
     7z x c:\build-cache\$bname -oc:\build-cache\deps
 }
