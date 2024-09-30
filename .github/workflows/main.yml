@@ -86,8 +86,6 @@ jobs:
         ts:
           - nts
           - ts
-        vsversion:
-          - "16.0"
         libyaml:
           - libyaml-0.1.7-vs16
 
@@ -114,7 +112,6 @@ jobs:
         with:
           arch: "${{ matrix.arch }}"
           toolset: "${{ steps.setup-php.outputs.toolset }}"
-          vsversion: "${{ matrix.vsversion }}"
       - name: Generate build files
         run: phpize
       - name: Configure build
