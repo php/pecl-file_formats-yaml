@@ -32,9 +32,9 @@ try {
   echo "\nWarning: {$e->getMessage()} in " . __FILE__ . " on line 19\n";
 }
 --EXPECTF--
-Warning: yaml_parse_file(): %r(Filename|Path)%r cannot be empty in %s on line %d
+Warning: yaml_parse_file(): %r(Filename|Path)%r %r(cannot|must not)%r be empty in %s on line %d
 
-Warning: yaml_parse_file(): %r(Filename|Path)%r cannot be empty in %s on line %d
+Warning: yaml_parse_file(): %r(Filename|Path)%r %r(cannot|must not)%r be empty in %s on line %d
 
 Warning: yaml_parse_file(invalid): %r[Ff]%railed to open stream: No such file or directory in %s on line %d
 
