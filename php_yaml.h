@@ -53,7 +53,11 @@ extern "C" {
 #include <ext/standard/base64.h>
 #include <ext/standard/basic_functions.h>
 #include <ext/standard/php_var.h>
+#if PHP_VERSION_ID < 70200
 #include <ext/standard/php_smart_string.h>
+#else
+#include <Zend/zend_smart_string.h>
+#endif
 #include <Zend/zend_extensions.h>
 #include <Zend/zend_hash.h>
 #include <Zend/zend_interfaces.h>
