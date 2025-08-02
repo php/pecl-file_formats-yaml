@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2024-10-07</date>
+ <date>2025-08-02</date>
  <version>
-  <release>2.2.4</release>
+  <release>2.2.5</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -32,10 +32,7 @@
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
    Bugs Fixed:
-   - #85: PHP 8.4.0 beta4 test yaml_parse_file_002.phpt fails (andypost)
-   - emit.c: fix -Wsign-compare (bd808)
-   - #75: yaml_parse_file does not set &amp;$ndoc as expected (tomterl)
-   - Fix [-Wincompatible-pointer-types] warning (remicollet)
+   - use Zend/zend_smart_string.h (remicollet)
  </notes>
  <contents>
   <dir name="/">
@@ -155,6 +152,20 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2024-10-07</date>
+   <version>
+    <release>2.2.4</release>
+    <api>2.0.0</api>
+   </version>
+   <notes>
+     Bugs Fixed:
+     - #85: PHP 8.4.0 beta4 test yaml_parse_file_002.phpt fails (andypost)
+     - emit.c: fix -Wsign-compare (bd808)
+     - #75: yaml_parse_file does not set &amp;$ndoc as expected (tomterl)
+     - Fix [-Wincompatible-pointer-types] warning (remicollet)
+   </notes>
+  </release>
   <release>
    <date>2023-03-05</date>
    <version>
