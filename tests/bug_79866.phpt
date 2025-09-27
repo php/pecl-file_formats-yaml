@@ -29,7 +29,7 @@ $floats = [
 foreach( $floats as $idx => $float ) {
   $float = floatval($float);
   ob_start();
-  echo $float;
+  @print_r($float);
   $native = ob_get_clean();
 
   $expect = "--- {$native}\n...\n";
