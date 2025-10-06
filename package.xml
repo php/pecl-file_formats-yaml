@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2023-03-05</date>
+ <date>2025-08-02</date>
  <version>
-  <release>2.2.3</release>
+  <release>2.2.5</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -31,10 +31,8 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
-  Bugs Fixed:
-  - Fixed memory release on error handling (negram)
-  - Fix test for PHP 8.2 (andypost)
-  - #65: Fix #65 yaml_parse_url method not working (remicollet)
+   Bugs Fixed:
+   - use Zend/zend_smart_string.h (remicollet)
  </notes>
  <contents>
   <dir name="/">
@@ -95,6 +93,8 @@
     <file role="test" name="yaml_parse_file_001.phpt" />
     <file role="test" name="yaml_parse_file_001.yaml" />
     <file role="test" name="yaml_parse_file_002.phpt" />
+    <file role="test" name="yaml_parse_file_003.phpt" />
+    <file role="test" name="yaml_parse_file_003.yaml" />
     <file role="test" name="yaml_parse_spec_binary.phpt" />
     <file role="test" name="yaml_parse_spec_bool.phpt" />
     <file role="test" name="yaml_parse_spec_float.phpt" />
@@ -152,6 +152,33 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2024-10-07</date>
+   <version>
+    <release>2.2.4</release>
+    <api>2.0.0</api>
+   </version>
+   <notes>
+     Bugs Fixed:
+     - #85: PHP 8.4.0 beta4 test yaml_parse_file_002.phpt fails (andypost)
+     - emit.c: fix -Wsign-compare (bd808)
+     - #75: yaml_parse_file does not set &amp;$ndoc as expected (tomterl)
+     - Fix [-Wincompatible-pointer-types] warning (remicollet)
+   </notes>
+  </release>
+  <release>
+   <date>2023-03-05</date>
+   <version>
+    <release>2.2.3</release>
+    <api>2.0.0</api>
+   </version>
+   <notes>
+    Bugs Fixed:
+    - Fixed memory release on error handling (negram)
+    - Fix test for PHP 8.2 (andypost)
+    - #65: Fix #65 yaml_parse_url method not working (remicollet)
+   </notes>
+  </release>
   <release>
    <date>2021-10-24</date>
    <version>
