@@ -2,6 +2,9 @@
 Test PECL bug #64019
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+; Ignore Deprecated: Using null as an array offset is deprecated...
+error_reporting = E_ALL & ~E_DEPRECATED
 --FILE--
 <?php
 $yaml_code = <<<YAML
