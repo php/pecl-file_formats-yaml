@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # build and test against a phpenv managed php version
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR=$(dirname $0)
 
@@ -22,6 +22,6 @@ make distclean &>/dev/null || true
 phpenv local $1 &&
 phpize &&
 CC=colorgcc CFLAGS="-Wall -fno-strict-aliasing -g3" \
-  ./configure --with-yaml --enable-debug &&
+  ./configure --with-yaml=${LIBYAML:=} --enable-debug &&
 make clean all &&
 TEST_PHP_EXECUTABLE=$(command -v php) ${SCRIPT_DIR}/test.sh || exit $?
