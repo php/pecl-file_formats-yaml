@@ -2,6 +2,9 @@
 Yaml 1.1 Spec - null
 --SKIPIF--
 <?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+--INI--
+; Ignore Deprecated: Using null as an array offset is deprecated...
+error_reporting = E_ALL & ~E_DEPRECATED
 --FILE--
 <?php
   var_dump(yaml_parse('
