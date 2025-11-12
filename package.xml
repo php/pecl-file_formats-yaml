@@ -20,9 +20,9 @@
   <email>bd808@bd808.com</email>
   <active>yes</active>
  </lead>
- <date>2025-08-02</date>
+ <date>2025-11-12</date>
  <version>
-  <release>2.2.5</release>
+  <release>2.3.0</release>
   <api>2.0.0</api>
  </version>
  <stability>
@@ -31,8 +31,11 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/mit-license.php">MIT</license>
  <notes>
+   New Features:
+   - Add a composer.json to enable support for PIE (asgrim)
    Bugs Fixed:
-   - use Zend/zend_smart_string.h (remicollet)
+   - #97: Ignore null array offset warnings in explicit null tests (bd808)
+   - avoid unexpected NAN value was coerced to string (remicollet)
  </notes>
  <contents>
   <dir name="/">
@@ -152,6 +155,17 @@
  </extsrcrelease>
 
  <changelog>
+  <release>
+   <date>2025-08-02</date>
+   <version>
+    <release>2.2.5</release>
+    <api>2.0.0</api>
+   </version>
+   <notes>
+     Bugs Fixed:
+     - use Zend/zend_smart_string.h (remicollet)
+   </notes>
+  </release>
   <release>
    <date>2024-10-07</date>
    <version>
