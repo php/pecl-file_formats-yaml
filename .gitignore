@@ -50,6 +50,7 @@ yaml.loT
 *.ncb
 *.opt
 *.plg
+*.dep
 *swp
 *.patch
 *.tgz
