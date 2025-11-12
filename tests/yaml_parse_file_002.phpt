@@ -5,8 +5,8 @@ yaml_parse_file - error cases
 --INI--
 yaml.decode_timestamp=1
 date.timezone=GMT
-; E_ALL - E_DEPRECATED to hide Deprecated: yaml_parse_file(): Passing null to parameter #1...
-error_reporting=24575
+; Ignore Deprecated: yaml_parse_file(): Passing null to parameter #1...
+error_reporting = E_ALL & ~E_DEPRECATED
 --FILE--
 <?php
 try {
