@@ -1,4 +1,4 @@
-PHP_ARG_WITH(yaml, [whether to enable LibYAML suppot],
+PHP_ARG_WITH(yaml, [whether to enable LibYAML support],
 [  --with-yaml[[=DIR]]       Enable LibYAML support.
                           DIR is the path to LibYAML install prefix])
 
