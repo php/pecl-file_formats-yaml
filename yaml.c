@@ -574,7 +574,7 @@ PHP_FUNCTION(yaml_emit)
 	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
 	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
 	yaml_emitter_set_width(&emitter, YAML_G(output_width));
-	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
+	yaml_emitter_set_unicode(&emitter, 1);
 
 	if (SUCCESS == php_yaml_write_impl(
 				&emitter, data, (yaml_encoding_t) encoding,
@@ -637,7 +637,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_canonical(&emitter, YAML_G(output_canonical));
 	yaml_emitter_set_indent(&emitter, YAML_G(output_indent));
 	yaml_emitter_set_width(&emitter, YAML_G(output_width));
-	yaml_emitter_set_unicode(&emitter, YAML_ANY_ENCODING != encoding);
+	yaml_emitter_set_unicode(&emitter, 1);
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
 			&emitter, data, YAML_ANY_ENCODING, callbacks)));

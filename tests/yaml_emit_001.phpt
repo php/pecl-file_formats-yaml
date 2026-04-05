@@ -112,8 +112,8 @@ string(58) "--- |-
   an embedded newline.
 ...
 "
-string(267) "--- "This string was made with a here doc.\n\nIt contains embedded newlines.\n  \t\tIt
+string(253) "--- "This string was made with a here doc.\n\nIt contains embedded newlines.\n  \t\tIt
   also has some embedded tabs.\n\nHere are some symbols:\n`~!@#$%^&*()_-+={}[]|\\:\";'<>,.?/\n\nThese
-  are extended characters: I\xF1t\xEBrn\xE2ti\xF4n\xE0liz\xE6ti\xF8n\n\n"
+  are extended characters: Iñtërnâtiônàlizætiøn\n\n"
 ...
 "

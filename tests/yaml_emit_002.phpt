@@ -67,7 +67,7 @@ var_dump(yaml_emit(array()));
 ?>
 --EXPECT--
 === Array of scalars ===
-string(604) "---
+string(590) "---
 - ~
 - true
 - false
@@ -94,7 +94,7 @@ string(604) "---
   an embedded newline.
 - "This string was made with a here doc.\n\nIt contains embedded newlines.\n  \t\tIt
   also has some embedded tabs.\n\nHere are some symbols:\n`~!@#$%^&*()_-+={}[]|\\:\";'<>,.?/\n\nThese
-  are extended characters: I\xF1t\xEBrn\xE2ti\xF4n\xE0liz\xE6ti\xF8n\n\n"
+  are extended characters: Iñtërnâtiônàlizætiøn\n\n"
 ...
 "
 === Nested ===
