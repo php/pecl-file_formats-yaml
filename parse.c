@@ -149,8 +149,7 @@ void php_yaml_read_all(parser_state_t *state, zend_long *ndocs, zval *retval)
 	}
 
 	if (Y_PARSER_FAILURE == code) {
-		//TODO sdubois
-		//zval_ptr_dtor(&retval);
+		zval_ptr_dtor(retval);
 		ZVAL_UNDEF(retval);
 	}
 }
@@ -201,8 +200,8 @@ void php_yaml_read_partial(
 	}
 
 	if (Y_PARSER_FAILURE == code) {
-		//TODO sdubois
 		if (Z_TYPE_P(retval) != IS_UNDEF) {
+			zval_ptr_dtor(retval);
 			ZVAL_UNDEF(retval);
 		}
 	}
@@ -401,6 +400,8 @@ void handle_mapping(parser_state_t *state, zval *retval)
 		get_next_element(state, &value);
 
 		if (Z_TYPE(value) == IS_UNDEF) {
+			zval_ptr_dtor(retval);
+			ZVAL_UNDEF(retval);
 			yaml_event_delete(&src_event);
 			yaml_event_delete(&key_event);
 			zval_ptr_dtor(&key);
@@ -477,15 +478,15 @@ void handle_mapping(parser_state_t *state, zval *retval)
 	}
 
 	if (YAML_MAPPING_END_EVENT != state->event.type) {
-		//TODO Sean-Der
+		zval_ptr_dtor(retval);
 		ZVAL_UNDEF(retval);
 	}
 
-	if (NULL != retval && NULL != state->callbacks) {
+	if (Z_TYPE_P(retval) != IS_UNDEF && NULL != state->callbacks) {
 		/* apply callbacks to the collected node */
 		if (Y_FILTER_FAILURE == apply_filter(
 				retval, src_event, state->callbacks)) {
-			//TODO Sean-Der
+			zval_ptr_dtor(retval);
 			ZVAL_UNDEF(retval);
 		}
 	}
