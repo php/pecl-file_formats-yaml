@@ -580,18 +580,17 @@ static int y_write_array(
 			/* emit key */
 			status = y_write_zval(state, &key_zval, NULL);
 			if (SUCCESS != status) {
-				goto cleanup_ht;
+				break;
 			}
 		}
 
 		status = y_write_zval(state, elm, NULL);
 
 		if (SUCCESS != status) {
-			goto cleanup_ht;
+			break;
 		}
 	} ZEND_HASH_FOREACH_END();
 
-cleanup_ht:
 #if PHP_VERSION_ID >= 70300
 	if (!(GC_FLAGS(ht) & GC_IMMUTABLE)) {
 		GC_UNPROTECT_RECURSION(ht);
