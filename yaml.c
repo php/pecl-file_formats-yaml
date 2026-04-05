@@ -640,7 +640,7 @@ PHP_FUNCTION(yaml_emit_file)
 	yaml_emitter_set_unicode(&emitter, 1);
 
 	RETVAL_BOOL((SUCCESS == php_yaml_write_impl(
-			&emitter, data, YAML_ANY_ENCODING, callbacks)));
+			&emitter, data, (yaml_encoding_t) encoding, callbacks)));
 
 	yaml_emitter_delete(&emitter);
 	php_stream_close(stream);

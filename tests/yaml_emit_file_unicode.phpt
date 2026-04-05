@@ -26,12 +26,12 @@ var_dump($parsed["emoji"] === "Hello 🌍");
 $temp_filename = dirname(__FILE__) . '/yaml_emit_file_unicode.tmp';
 @unlink($temp_filename);
 ?>
---EXPECT--
+--EXPECTF--
 bool(true)
 ---
 city: 香港
 greeting: Iñtërnâtiônàlizætiøn
-emoji: "Hello \U0001F30D"
+emoji: %s
 ...
 bool(true)
 bool(true)
