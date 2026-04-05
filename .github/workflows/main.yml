@@ -98,7 +98,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup PHP
         id: setup-php
-        uses: php/setup-php-sdk@v0.10
+        uses: php/setup-php-sdk@fix/invoke-webrequest-tls
         with:
           version: "${{ matrix.php-version }}"
           arch: "${{ matrix.arch }}"

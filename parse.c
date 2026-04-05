@@ -164,6 +164,8 @@ void php_yaml_read_partial(
 {
 	int code = Y_PARSER_CONTINUE;
 
+	ZVAL_UNDEF(retval);
+
 	while (Y_PARSER_CONTINUE == code) {
 
 		if (!NEXT_EVENT()) {
