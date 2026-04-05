@@ -580,15 +580,14 @@ static int y_write_array(
 			/* emit key */
 			status = y_write_zval(state, &key_zval, NULL);
 			if (SUCCESS != status) {
-				return FAILURE;
+				break;
 			}
 		}
 
 		status = y_write_zval(state, elm, NULL);
 
-
 		if (SUCCESS != status) {
-			return FAILURE;
+			break;
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -601,6 +600,10 @@ static int y_write_array(
 		ht->u.v.nApplyCount--;
 	}
 #endif
+
+	if (FAILURE == status) {
+		return FAILURE;
+	}
 
 	if (Y_ARRAY_SEQUENCE == array_type) {
 		status = yaml_sequence_end_event_initialize(&event);
@@ -747,6 +750,7 @@ y_write_object_callback (
 				" to contain a key named 'tag' with a string value",
 				clazz_name);
 		zend_string_release(str_key);
+		zval_ptr_dtor(&zret);
 		return FAILURE;
 	}
 	zend_string_release(str_key);
@@ -758,6 +762,7 @@ y_write_object_callback (
 				" to contain a key named 'data'",
 				clazz_name);
 		zend_string_release(str_key);
+		zval_ptr_dtor(&zret);
 		return FAILURE;
 	}
 	zend_string_release(str_key);
