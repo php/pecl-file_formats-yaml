@@ -83,6 +83,10 @@ typedef struct y_emit_state_s {
 #define YAML_PHP_TAG         "!php/object"
 #define YAML_NONSPECIFIC_TAG "!"
 
+#define Y_SCHEMA_DEFAULT   0
+#define Y_SCHEMA_YAML_1_1  1
+#define Y_SCHEMA_CORE_1_2  2
+
 #define Y_SCALAR_IS_NOT_NUMERIC 0x00
 #define Y_SCALAR_IS_INT         0x10
 #define Y_SCALAR_IS_FLOAT       0x20
@@ -136,13 +140,22 @@ void eval_scalar_with_callbacks(
 const char *detect_scalar_type(
 		const char *value, size_t length, const yaml_event_t *event);
 
+const char *detect_scalar_type_12(
+		const char *value, size_t length, const yaml_event_t *event);
+
 int scalar_is_null(
 		const char *value, size_t length, const yaml_event_t *event);
 
 int scalar_is_bool(
 		const char *value, size_t length, const yaml_event_t *event);
 
+int scalar_is_bool_12(
+		const char *value, size_t length, const yaml_event_t *event);
+
 int scalar_is_numeric(
+		const char *value, size_t length, zend_long *lval, double *dval, char **str);
+
+int scalar_is_numeric_12(
 		const char *value, size_t length, zend_long *lval, double *dval, char **str);
 
 int scalar_is_timestamp(const char *value, size_t length);

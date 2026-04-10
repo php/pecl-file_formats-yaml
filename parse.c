@@ -702,6 +702,7 @@ void eval_scalar(yaml_event_t event,
 	char *value = (char *) event.data.scalar.value;
 	size_t length = event.data.scalar.length;
 	int flags = 0;
+	int schema_12 = (YAML_G(decode_schema) == Y_SCHEMA_CORE_1_2);
 
 	ZVAL_NULL(retval);
 
@@ -718,7 +719,12 @@ void eval_scalar(yaml_event_t event,
 	}
 
 	/* check for bool */
-	if (-1 != (flags = scalar_is_bool(value, length, &event))) {
+	if (schema_12) {
+		flags = scalar_is_bool_12(value, length, &event);
+	} else {
+		flags = scalar_is_bool(value, length, &event);
+	}
+	if (-1 != flags) {
 		ZVAL_BOOL(retval, (zend_bool) flags);
 		return;
 	}
@@ -731,8 +737,13 @@ void eval_scalar(yaml_event_t event,
 		zend_long lval = 0;
 		double dval = 0.0;
 
-		flags = scalar_is_numeric(
-				value, length, &lval, &dval, NULL);
+		if (schema_12) {
+			flags = scalar_is_numeric_12(
+					value, length, &lval, &dval, NULL);
+		} else {
+			flags = scalar_is_numeric(
+					value, length, &lval, &dval, NULL);
+		}
 		if (flags != Y_SCALAR_IS_NOT_NUMERIC) {
 			if (flags & Y_SCALAR_IS_FLOAT) {
 				ZVAL_DOUBLE(retval, dval);
@@ -767,9 +778,12 @@ void eval_scalar(yaml_event_t event,
 		}
 	}
 
-	/* check for timestamp */
+	/* check for timestamp
+	 * In YAML 1.2 Core Schema, no implicit timestamp detection;
+	 * explicit !!timestamp tags are still honored.
+	 */
 	if (IS_NOT_IMPLICIT_AND_TAG_IS(event, YAML_TIMESTAMP_TAG) ||
-			 scalar_is_timestamp(value, length)) {
+			(!schema_12 && scalar_is_timestamp(value, length))) {
 		if (FAILURE == eval_timestamp(
 				&retval, value, (int) length)) {
 			ZVAL_NULL(retval);
@@ -837,9 +851,15 @@ void eval_scalar_with_callbacks(yaml_event_t event,
 
 	if (YAML_PLAIN_SCALAR_STYLE == event.data.scalar.style && NULL == tag) {
 		/* plain scalar with no specified type */
-		tag = detect_scalar_type(
-				(char *) event.data.scalar.value, event.data.scalar.length,
-				&event);
+		if (YAML_G(decode_schema) == Y_SCHEMA_CORE_1_2) {
+			tag = detect_scalar_type_12(
+					(char *) event.data.scalar.value, event.data.scalar.length,
+					&event);
+		} else {
+			tag = detect_scalar_type(
+					(char *) event.data.scalar.value, event.data.scalar.length,
+					&event);
+		}
 	}
 	if (NULL == tag) {
 		/* couldn't/wouldn't detect tag type, assume string */

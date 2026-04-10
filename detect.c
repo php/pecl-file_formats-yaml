@@ -616,6 +616,368 @@ not_numeric:
 /* }}} */
 
 
+/* {{{ detect_scalar_type_12(const char *, size_t, yaml_event_t)
+ * Guess what datatype the scalar encodes using YAML 1.2 Core Schema
+ */
+const char *detect_scalar_type_12(const char *value, size_t length,
+		const yaml_event_t *event)
+{
+	int flags = 0;
+	zend_long lval = 0;
+	double dval = 0.0;
+
+	/* is value a null? */
+	if (0 == length || scalar_is_null(value, length, event)) {
+		return YAML_NULL_TAG;
+	}
+
+	/* is value numeric? (1.2 rules) */
+	flags = scalar_is_numeric_12(value, length, &lval, &dval, NULL);
+	if (flags != Y_SCALAR_IS_NOT_NUMERIC) {
+		return (flags & Y_SCALAR_IS_FLOAT) ? YAML_FLOAT_TAG : YAML_INT_TAG;
+	}
+
+	/* is value boolean? (1.2 rules: only true/false) */
+	flags = scalar_is_bool_12(value, length, event);
+	if (-1 != flags) {
+		return YAML_BOOL_TAG;
+	}
+
+	/* no implicit timestamp detection in 1.2 Core Schema */
+
+	/* no guess */
+	return NULL;
+}
+/* }}} */
+
+
+/* {{{ scalar_is_bool_12(const char *,size_t,yaml_event_t)
+ * Does this scalar encode a BOOL value under YAML 1.2 Core Schema?
+ *
+ * Only true/True/TRUE and false/False/FALSE are recognized.
+ */
+int
+scalar_is_bool_12(const char *value, size_t length, const yaml_event_t *event)
+{
+	if (NULL == event || IS_NOT_QUOTED_OR_TAG_IS((*event), YAML_BOOL_TAG)) {
+		if (STR_EQ("TRUE", value) ||
+				STR_EQ("True", value) ||
+				STR_EQ("true", value)) {
+			return 1;
+		}
+
+		if (STR_EQ("FALSE", value) ||
+				STR_EQ("False", value) ||
+				STR_EQ("false", value)) {
+			return 0;
+		}
+
+	} else if (NULL != event &&
+			IS_NOT_IMPLICIT_AND_TAG_IS((*event), YAML_BOOL_TAG)) {
+		if (0 == length || (1 == length && '0' == *value)) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+
+	return -1;
+}
+/* }}} */
+
+
+/* {{{ scalar_is_numeric_12()
+ * Does this scalar encode a NUMERIC value under YAML 1.2 Core Schema?
+ *
+ * YAML 1.2 Core Schema integers:
+ *   0 | -?[1-9][0-9]* | 0x[0-9a-fA-F]+ | 0o[0-7]+
+ * YAML 1.2 Core Schema floats:
+ *   [-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?
+ *   [-+]?(\.inf|\.Inf|\.INF)
+ *   .nan|.NaN|.NAN
+ *
+ * No binary (0b), no sexagesimal, no underscores, no commas.
+ */
+int
+scalar_is_numeric_12(const char *value, size_t length, zend_long *lval,
+		double *dval, char **str)
+{
+	const char *end = value + length;
+	char *buf = { 0 }, *ptr = { 0 };
+	int negative = 0;
+	int type = 0;
+
+	if (0 == length) {
+		goto not_numeric_12;
+	}
+
+	/* trim */
+	while (value < end && (*(end - 1) == ' ' || *(end - 1) == '\t')) {
+		end--;
+	}
+
+	while (value < end && (*value == ' ' || *value == '\t')) {
+		value++;
+	}
+
+	if (value == end) {
+		goto not_numeric_12;
+	}
+
+	/* not a number */
+	if (STR_EQ(".NAN", value) ||
+			STR_EQ(".NaN", value) ||
+			STR_EQ(".nan", value)) {
+		type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_NAN;
+		goto finish_12;
+	}
+
+	/* sign */
+	if (*value == '+') {
+		value++;
+
+	} else if (*value == '-') {
+		negative = 1;
+		value++;
+	}
+
+	if (value == end) {
+		goto not_numeric_12;
+	}
+
+	/* infinity */
+	if (STR_EQ(".INF", value) ||
+			STR_EQ(".Inf", value) ||
+			STR_EQ(".inf", value)) {
+		type = Y_SCALAR_IS_FLOAT;
+		type |= (negative ? Y_SCALAR_IS_INFINITY_N : Y_SCALAR_IS_INFINITY_P);
+		goto finish_12;
+	}
+
+	/* alloc */
+	buf = (char *) emalloc(length + 3);
+	ptr = buf;
+	if (negative) {
+		*ptr++ = '-';
+	}
+
+	/* parse */
+	if (*value == '0') {
+		*ptr++ = *value++;
+		if (value == end) {
+			goto return_zero_12;
+		}
+
+		if (*value == 'x') {
+			/* hexadecimal integer: 0x[0-9a-fA-F]+ */
+			*ptr++ = *value++;
+
+			if (value == end) {
+				goto not_numeric_12;
+			}
+
+			while (value < end) {
+				if ((*value >= '0' && *value <= '9') ||
+						(*value >= 'A' && *value <= 'F') ||
+						(*value >= 'a' && *value <= 'f')) {
+					*ptr++ = *value++;
+
+				} else {
+					goto not_numeric_12;
+				}
+			}
+
+			type = Y_SCALAR_IS_INT | Y_SCALAR_IS_HEXADECIMAL;
+
+		} else if (*value == 'o') {
+			/* octal integer: 0o[0-7]+ */
+			value++;
+
+			if (value == end) {
+				goto not_numeric_12;
+			}
+
+			while (value < end) {
+				if (*value >= '0' && *value <= '7') {
+					*ptr++ = *value++;
+
+				} else {
+					goto not_numeric_12;
+				}
+			}
+
+			type = Y_SCALAR_IS_INT | Y_SCALAR_IS_OCTAL;
+
+		} else if (*value == '.') {
+			goto check_float_12;
+
+		} else {
+			/* bare 0 followed by other digits is not valid in 1.2 */
+			goto not_numeric_12;
+		}
+
+	} else if (*value >= '1' && *value <= '9') {
+		/* decimal integer or float: [1-9][0-9]* */
+		*ptr++ = *value++;
+		while (value < end) {
+			if (*value >= '0' && *value <= '9') {
+				*ptr++ = *value++;
+
+			} else if (*value == '.') {
+				goto check_float_12;
+
+			} else if (*value == 'E' || *value == 'e') {
+				type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_DECIMAL;
+				goto check_exp_12;
+
+			} else {
+				goto not_numeric_12;
+			}
+		}
+
+		type = Y_SCALAR_IS_INT | Y_SCALAR_IS_DECIMAL;
+
+	} else if (*value == '.') {
+		/* float starting with dot: .[0-9]+ */
+		*ptr++ = '0';
+
+check_float_12:
+		*ptr++ = *value++;
+		if (value == end) {
+			/* trailing dot with no digits - not a number */
+			goto not_numeric_12;
+		}
+
+		/* need at least one digit, or could be exponent directly */
+		while (value < end) {
+			if (*value >= '0' && *value <= '9') {
+				*ptr++ = *value++;
+
+			} else if (*value == 'E' || *value == 'e') {
+				goto check_exp_12;
+
+			} else {
+				goto not_numeric_12;
+			}
+		}
+
+		type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_DECIMAL;
+		goto terminate_12;
+
+check_exp_12:
+		*ptr++ = *value++;
+		if (value == end || (*value != '+' && *value != '-' &&
+				(*value < '0' || *value > '9'))) {
+			goto not_numeric_12;
+		}
+
+		if (*value == '+' || *value == '-') {
+			*ptr++ = *value++;
+		}
+
+		if (value == end || *value < '0' || *value > '9') {
+			goto not_numeric_12;
+		}
+
+		while (value < end) {
+			if (*value >= '0' && *value <= '9') {
+				*ptr++ = *value++;
+
+			} else {
+				goto not_numeric_12;
+			}
+		}
+
+		type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_DECIMAL;
+
+	} else {
+		goto not_numeric_12;
+	}
+
+terminate_12:
+	/* terminate */
+	*ptr = '\0';
+
+finish_12:
+	/* convert & assign */
+	if ((type & Y_SCALAR_IS_INT) && lval != NULL) {
+		switch (type & Y_SCALAR_FORMAT_MASK) {
+		case Y_SCALAR_IS_OCTAL:
+			*lval = ZEND_STRTOL(buf, (char **) NULL, 8);
+			break;
+
+		case Y_SCALAR_IS_HEXADECIMAL:
+			*lval = ZEND_STRTOL(buf, (char **) NULL, 16);
+			break;
+
+		default:
+#if PHP_VERSION_ID < 80100
+			ZEND_ATOL(*lval, buf);
+#else
+			*lval = ZEND_ATOL(buf);
+#endif
+			break;
+		}
+
+	} else if ((type & Y_SCALAR_IS_FLOAT) && dval != NULL) {
+		switch (type & Y_SCALAR_FORMAT_MASK) {
+		case Y_SCALAR_IS_INFINITY_P:
+			*dval = php_get_inf();
+			break;
+
+		case Y_SCALAR_IS_INFINITY_N:
+			*dval = -php_get_inf();
+			break;
+
+		case Y_SCALAR_IS_NAN:
+			*dval = php_get_nan();
+			break;
+
+		default:
+			*dval = zend_strtod(buf, (const char **) NULL);
+			break;
+		}
+	}
+
+	if (buf != NULL) {
+		if (str != NULL) {
+			*str = buf;
+
+		} else {
+			efree(buf);
+		}
+	}
+
+	/* return */
+	return type;
+
+
+return_zero_12:
+	if (lval != NULL) {
+		*lval = 0;
+	}
+
+	if (dval != NULL) {
+		*dval = 0.0;
+	}
+
+	if (buf != NULL) {
+		efree(buf);
+	}
+
+	return (Y_SCALAR_IS_INT | Y_SCALAR_IS_ZERO);
+
+
+not_numeric_12:
+	if (buf != NULL) {
+		efree(buf);
+	}
+
+	return Y_SCALAR_IS_NOT_NUMERIC;
+}
+/* }}} */
+
+
 /* {{{ scalar_is_timestamp(const char *,size_t)
  * Does this scalar encode a TIMESTAMP value?
  *

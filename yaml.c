@@ -68,6 +68,8 @@ PHP_INI_BEGIN()
 			decode_timestamp, zend_yaml_globals, yaml_globals)
 	STD_PHP_INI_ENTRY("yaml.decode_php", "0", PHP_INI_ALL, OnUpdateBool,
 			decode_php, zend_yaml_globals, yaml_globals)
+	STD_PHP_INI_ENTRY("yaml.decode_schema", "0", PHP_INI_ALL, OnUpdateLong,
+			decode_schema, zend_yaml_globals, yaml_globals)
 	STD_PHP_INI_ENTRY("yaml.output_canonical", "0", PHP_INI_ALL, OnUpdateBool,
 			output_canonical, zend_yaml_globals, yaml_globals)
 	STD_PHP_INI_ENTRY("yaml.output_indent", "2", PHP_INI_ALL, OnUpdateLong,
@@ -234,6 +236,14 @@ static PHP_MINIT_FUNCTION(yaml)
 	REGISTER_LONG_CONSTANT("YAML_CRLN_BREAK", YAML_CRLN_BREAK,
 			CONST_PERSISTENT | CONST_CS);
 
+	/* schema constants */
+	REGISTER_LONG_CONSTANT("YAML_SCHEMA_DEFAULT", Y_SCHEMA_DEFAULT,
+			CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("YAML_SCHEMA_YAML_1_1", Y_SCHEMA_YAML_1_1,
+			CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("YAML_SCHEMA_CORE_1_2", Y_SCHEMA_CORE_1_2,
+			CONST_PERSISTENT | CONST_CS);
+
 	return SUCCESS;
 }
 /* }}} */
@@ -268,6 +278,7 @@ static PHP_GINIT_FUNCTION(yaml)
 	yaml_globals->decode_binary = 0;
 	yaml_globals->decode_timestamp = 0;
 	yaml_globals->decode_php = 0;
+	yaml_globals->decode_schema = Y_SCHEMA_DEFAULT;
 	yaml_globals->timestamp_decoder = NULL;
 	yaml_globals->output_canonical = 0;
 	yaml_globals->output_indent = 2;
