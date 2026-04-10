@@ -674,11 +674,19 @@ scalar_is_bool_12(const char *value, size_t length, const yaml_event_t *event)
 
 	} else if (NULL != event &&
 			IS_NOT_IMPLICIT_AND_TAG_IS((*event), YAML_BOOL_TAG)) {
-		if (0 == length || (1 == length && '0' == *value)) {
-			return 0;
-		} else {
+		/* explicit !!bool tag: parse true/false values */
+		if (STR_EQ("true", value) || STR_EQ("True", value) ||
+				STR_EQ("TRUE", value) ||
+				(1 == length && '1' == *value)) {
 			return 1;
 		}
+		if (STR_EQ("false", value) || STR_EQ("False", value) ||
+				STR_EQ("FALSE", value) ||
+				0 == length || (1 == length && '0' == *value)) {
+			return 0;
+		}
+		/* unknown value with explicit bool tag, treat as true for compat */
+		return 1;
 	}
 
 	return -1;
@@ -811,6 +819,10 @@ scalar_is_numeric_12(const char *value, size_t length, zend_long *lval,
 		} else if (*value == '.') {
 			goto check_float_12;
 
+		} else if (*value == 'E' || *value == 'e') {
+			type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_DECIMAL;
+			goto check_exp_12;
+
 		} else {
 			/* bare 0 followed by other digits is not valid in 1.2 */
 			goto not_numeric_12;
@@ -838,17 +850,22 @@ scalar_is_numeric_12(const char *value, size_t length, zend_long *lval,
 		type = Y_SCALAR_IS_INT | Y_SCALAR_IS_DECIMAL;
 
 	} else if (*value == '.') {
-		/* float starting with dot: .[0-9]+ */
+		/* float starting with dot: .[0-9]+ requires digit after dot */
+		if (value + 1 >= end || *(value + 1) < '0' || *(value + 1) > '9') {
+			goto not_numeric_12;
+		}
 		*ptr++ = '0';
 
 check_float_12:
 		*ptr++ = *value++;
 		if (value == end) {
-			/* trailing dot with no digits - not a number */
-			goto not_numeric_12;
+			/* trailing dot (e.g., 1.) — accept as float */
+			*ptr++ = '0';
+			type = Y_SCALAR_IS_FLOAT | Y_SCALAR_IS_DECIMAL;
+			goto terminate_12;
 		}
 
-		/* need at least one digit, or could be exponent directly */
+		/* parse fractional digits and optional exponent */
 		while (value < end) {
 			if (*value >= '0' && *value <= '9') {
 				*ptr++ = *value++;
