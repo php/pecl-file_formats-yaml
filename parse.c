@@ -431,6 +431,8 @@ void handle_mapping(parser_state_t *state, zval *retval)
 				ZEND_HASH_FOREACH_VAL(HASH_OF(valptr), zvalp) {
 					if (Z_ISREF_P(zvalp)) {
 						ZVAL_DEREF(zvalp);
+					}
+					if (Z_TYPE_P(zvalp) == IS_ARRAY) {
 						zend_hash_merge(
 								Z_ARRVAL_P(arrval), Z_ARRVAL_P(zvalp),
 								zval_add_ref, 0);
