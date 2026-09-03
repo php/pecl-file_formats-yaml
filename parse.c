@@ -929,7 +929,7 @@ eval_timestamp(zval **zpp, const char *ts, size_t ts_len)
 		}
 
 	} else {
-		zval_dtor(*zpp);
+		zval_ptr_dtor_nogc(*zpp);
 		ZVAL_STRINGL(*zpp, ts, ts_len);
 		return SUCCESS;
 	}
