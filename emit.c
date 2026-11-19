@@ -692,6 +692,11 @@ static int y_write_object(
 		php_var_serialize(&buf, data, &var_hash);
 		PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
+		if (EG(exception) || buf.s == NULL) {
+			smart_str_free(&buf);
+			return FAILURE;
+		}
+
 		status = yaml_scalar_event_initialize(&event,
 				NULL, (yaml_char_t *) YAML_PHP_TAG, (yaml_char_t *) buf.s->val, buf.s->len,
 				0, 0, YAML_DOUBLE_QUOTED_SCALAR_STYLE);
