@@ -1,7 +1,10 @@
 --TEST--
 yaml_emit - object that cannot be serialized
 --SKIPIF--
-<?php if(!extension_loaded('yaml')) die('skip yaml n/a'); ?>
+<?php
+if (!extension_loaded('yaml')) die('skip yaml n/a');
+if (PHP_VERSION_ID < 70400) die('skip requires PHP 7.4+');
+?>
 --FILE--
 <?php
 class NotSerializable {
